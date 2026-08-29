@@ -60,7 +60,7 @@ def append_table_row(text, section, row):
         out.append(row)
     text = "\n".join(out)
     # drop the template's empty placeholder row if a real row now exists
-    return re.sub(r"^\|( +\|)+\n", "", text, flags=re.MULTILINE)
+    return re.sub(r"^\|( +\|)+\n", "", text, count=1, flags=re.MULTILINE)
 
 
 def set_frontmatter(text, key, value):
@@ -99,19 +99,29 @@ def main():
 
     for m in meals:
         day = local_day(m["logged_at"]); note = ensure_note(day)
-        row = (f"| {m['food_name']} | {m['grams']} | {m['calories']} | "
+        food_name = m['food_name'].replace("|", "/")
+        row = (f"| {food_name} | {m['grams']} | {m['calories']} | "
                f"{m['protein_g']} | {m['carbs_g']} | {m['fat_g']} |")
         note.write_text(append_table_row(note.read_text(), "Meals", row))
         touched.add(day)
-        rest("PATCH", f"meals?id=eq.{m['id']}", {"synced_to_vault": True})
+        try:
+            rest("PATCH", f"meals?id=eq.{m['id']}", {"synced_to_vault": True})
+        except Exception as e:
+            print(f"ERROR: PATCH failed for meal id {m['id']}: {e}")
+            raise SystemExit(1)
 
     for l in lifts:
         day = local_day(l["logged_at"]); note = ensure_note(day)
+        exercise = l['exercise'].replace("|", "/")
         notes_cell = (l.get("notes") or "").replace("|", "/")
-        row = f"| {l['exercise']} | {l['sets']}x{l['reps']} | {l['weight']} lbs | {notes_cell} |"
+        row = f"| {exercise} | {l['sets']}x{l['reps']} | {l['weight']} lbs | {notes_cell} |"
         note.write_text(append_table_row(note.read_text(), "Lifts", row))
         touched.add(day)
-        rest("PATCH", f"lifts?id=eq.{l['id']}", {"synced_to_vault": True})
+        try:
+            rest("PATCH", f"lifts?id=eq.{l['id']}", {"synced_to_vault": True})
+        except Exception as e:
+            print(f"ERROR: PATCH failed for lift id {l['id']}: {e}")
+            raise SystemExit(1)
 
     for day in touched:
         p = DAILY / f"{day}.md"
