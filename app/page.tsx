@@ -23,17 +23,29 @@ export default function Dashboard() {
     const [m, l, w] = await Promise.all([
       supabase.from("meals").select("*").gte("logged_at", start.toISOString()).order("logged_at"),
       supabase.from("lifts").select("*").gte("logged_at", start.toISOString()).order("logged_at"),
-      supabase.from("meals").select("logged_at,calories").gte("logged_at", weekStart.toISOString()),
+      supabase.from("meals").select("logged_at,calories").gte("logged_at", weekStart.toISOString()).order("logged_at"),
     ]);
     setMeals((m.data as Meal[]) ?? []);
     setLifts((l.data as Lift[]) ?? []);
     const byDay = new Map<string, number>();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(weekStart); d.setDate(d.getDate() + i); d.setHours(0, 0, 0, 0);
+      const isoKey = d.toISOString().split('T')[0];
+      byDay.set(isoKey, 0);
+    }
     for (const row of (w.data ?? []) as { logged_at: string; calories: number }[]) {
       const d = new Date(row.logged_at); d.setHours(0, 0, 0, 0);
-      const key = d.toLocaleDateString("en-US", { weekday: "short" });
-      byDay.set(key, (byDay.get(key) ?? 0) + Number(row.calories));
+      const isoKey = d.toISOString().split('T')[0];
+      byDay.set(isoKey, (byDay.get(isoKey) ?? 0) + Number(row.calories));
     }
-    setWeek([...byDay].map(([day, kcal]) => ({ day, kcal: Math.round(kcal) })));
+    const weekArray: { day: string; kcal: number }[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(weekStart); d.setDate(d.getDate() + i); d.setHours(0, 0, 0, 0);
+      const isoKey = d.toISOString().split('T')[0];
+      const day = d.toLocaleDateString("en-US", { weekday: "short" });
+      weekArray.push({ day, kcal: Math.round(byDay.get(isoKey) ?? 0) });
+    }
+    setWeek(weekArray);
   }, []);
 
   useEffect(() => {
