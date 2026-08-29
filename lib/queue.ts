@@ -22,9 +22,13 @@ export async function enqueueOrSend(kind: "meal" | "lift",
   entry: Record<string, unknown>): Promise<"sent" | "queued"> {
   const item: Queued = { id: crypto.randomUUID(), kind, entry, queued_at: new Date().toISOString() };
   try {
-    await insert(item);
+    const result = await insert(item);
+    if (result === "permanent") {
+      throw new Error("gainz queue: server rejected item permanently");
+    }
     return "sent";
   } catch (e) {
+    if (e instanceof Error && e.message.startsWith("gainz queue: server rejected")) throw e; // do NOT queue permanents
     console.warn("gainz queue: offline, queueing item", item.id, e);
     await update<Queued[]>(KEY, (q) => [...(q ?? []), item]);
     return "queued";
