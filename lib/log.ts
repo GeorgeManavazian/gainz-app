@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { enqueueOrSend } from "@/lib/queue";
 
 export type MealEntry = { food_name: string; grams: number; calories: number;
   protein_g: number; carbs_g: number; fat_g: number; fdc_id?: string };
@@ -6,11 +6,9 @@ export type LiftEntry = { exercise: string; sets: number; reps: number;
   weight: number; notes?: string };
 
 export async function logMeal(entry: MealEntry): Promise<void> {
-  const { error } = await supabase.from("meals").insert(entry);
-  if (error) throw error;
+  await enqueueOrSend("meal", entry as unknown as Record<string, unknown>);
 }
 
 export async function logLift(entry: LiftEntry): Promise<void> {
-  const { error } = await supabase.from("lifts").insert(entry);
-  if (error) throw error;
+  await enqueueOrSend("lift", entry as unknown as Record<string, unknown>);
 }
