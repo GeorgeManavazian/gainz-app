@@ -3,19 +3,29 @@ import { supabase } from "@/lib/supabase";
 
 type Queued = { id: string; kind: "meal" | "lift"; entry: Record<string, unknown>; queued_at: string };
 const KEY = "gainz-offline-queue";
+const DEAD_KEY = "gainz-offline-deadletter";
 
 // insert is idempotent: the queued item's UUID becomes the row's primary key,
 // so a retried insert of an already-landed item fails with 23505 and is treated as done.
+//
+// supabase-js postgrest calls do NOT throw on network failure — they resolve with
+// { error: { code: "", message: "TypeError: fetch failed" }, status: 0 }. So "no error"
+// and "genuine server rejection" are the only two non-throwing outcomes; everything else
+// (status 0, empty/absent code, 5xx) is transient and must throw so callers queue/retry it.
 async function insert(item: Queued): Promise<"ok" | "duplicate" | "permanent"> {
   const table = item.kind === "meal" ? "meals" : "lifts";
-  const { error } = await supabase.from(table)
+  const { error, status } = await supabase.from(table)
     .insert({ ...item.entry, id: item.id, logged_at: item.queued_at });
   if (!error) return "ok";
   if (error.code === "23505") return "duplicate";
-  // Server answered with a structured rejection (RLS, constraint, bad column):
-  // retrying will never succeed. Network failures throw instead of returning error.
-  console.error("gainz queue: permanent insert failure, dropping item", item, error);
-  return "permanent";
+  if (status >= 400 && status <= 499 && !!error.code) {
+    // Server answered with a structured rejection (RLS, constraint, bad column):
+    // retrying will never succeed.
+    console.error("gainz queue: permanent insert failure, dropping item", item, error);
+    return "permanent";
+  }
+  // Transient (network failure, status 0, 5xx, etc.) — throw so callers queue/retry it.
+  throw new Error(`gainz queue: transient insert failure: ${error.message}`);
 }
 
 export async function enqueueOrSend(kind: "meal" | "lift",
@@ -38,6 +48,8 @@ export async function enqueueOrSend(kind: "meal" | "lift",
 let isFlushing = false;
 
 export async function flushQueue(): Promise<number> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return 0;
   if (isFlushing) return 0;
   isFlushing = true;
   try {
@@ -47,7 +59,12 @@ export async function flushQueue(): Promise<number> {
     const done = new Set<string>();
     for (const item of q) {
       try {
-        await insert(item); // "ok" | "duplicate" | "permanent" all mean: stop retrying
+        const result = await insert(item); // "ok" | "duplicate" | "permanent" all mean: stop retrying
+        if (result === "permanent") {
+          // Genuine server rejection: don't silently drop it, dead-letter it for inspection.
+          console.error("gainz queue: dead-lettering permanently rejected item", item.id);
+          await update<Queued[]>(DEAD_KEY, (dq) => [...(dq ?? []), item]);
+        }
         done.add(item.id);
         flushed++;
       } catch (e) {

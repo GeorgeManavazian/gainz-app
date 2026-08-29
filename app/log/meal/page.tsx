@@ -12,6 +12,7 @@ export default function LogMeal() {
   const [picked, setPicked] = useState<Food | null>(null);
   const [grams, setGrams] = useState("");
   const [saved, setSaved] = useState(false);
+  const [err, setErr] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
@@ -30,14 +31,19 @@ export default function LogMeal() {
 
   async function save() {
     if (!picked || g <= 0) return;
-    await logMeal({
-      food_name: picked.description, grams: g,
-      calories: scale(picked.per100g.kcal), protein_g: scale(picked.per100g.protein),
-      carbs_g: scale(picked.per100g.carbs), fat_g: scale(picked.per100g.fat),
-      fdc_id: String(picked.fdcId),
-    });
-    setPicked(null); setQ(""); setGrams(""); setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await logMeal({
+        food_name: picked.description, grams: g,
+        calories: scale(picked.per100g.kcal), protein_g: scale(picked.per100g.protein),
+        carbs_g: scale(picked.per100g.carbs), fat_g: scale(picked.per100g.fat),
+        fdc_id: String(picked.fdcId),
+      });
+      setErr("");
+      setPicked(null); setQ(""); setGrams(""); setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setErr("Couldn't save. Please try again.");
+    }
   }
 
   return (
@@ -81,6 +87,7 @@ export default function LogMeal() {
               <span className="flex-1"><span className="block font-bold tabular-nums text-foreground">{scale(picked.per100g.carbs)}</span><span className="text-muted">C</span></span>
               <span className="flex-1"><span className="block font-bold tabular-nums text-foreground">{scale(picked.per100g.fat)}</span><span className="text-muted">F</span></span>
             </div>
+            {err && <p className="text-sm text-danger">{err}</p>}
             <div className="flex gap-3">
               <button
                 className="flex-1 rounded-xl bg-accent px-4 py-3.5 text-base font-semibold text-accent-foreground disabled:opacity-40"

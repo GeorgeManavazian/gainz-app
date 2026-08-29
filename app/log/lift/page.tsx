@@ -12,6 +12,7 @@ export default function LogLift() {
   const [notes, setNotes] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [saved, setSaved] = useState(false);
+  const [err, setErr] = useState("");
 
   useEffect(() => {
     supabase.from("lifts").select("exercise").order("logged_at", { ascending: false })
@@ -27,9 +28,14 @@ export default function LogLift() {
   async function save() {
     const s = parseInt(sets), r = parseInt(reps), w = parseFloat(weight);
     if (!exercise || !(s > 0) || !(r > 0) || isNaN(w)) return;
-    await logLift({ exercise, sets: s, reps: r, weight: w, notes: notes || undefined });
-    setSets(""); setReps(""); setWeight(""); setNotes(""); setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await logLift({ exercise, sets: s, reps: r, weight: w, notes: notes || undefined });
+      setErr("");
+      setSets(""); setReps(""); setWeight(""); setNotes(""); setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setErr("Couldn't save. Please try again.");
+    }
   }
 
   return (
@@ -75,6 +81,7 @@ export default function LogLift() {
             className="rounded-xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
             placeholder="Notes (optional)"
             value={notes} onChange={(e) => setNotes(e.target.value)} />
+          {err && <p className="text-sm text-danger">{err}</p>}
           <button
             className="rounded-xl bg-accent px-4 py-3.5 text-base font-semibold text-accent-foreground active:opacity-80"
             onClick={save}>Save</button>
