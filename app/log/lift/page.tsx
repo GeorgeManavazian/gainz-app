@@ -34,33 +34,50 @@ export default function LogLift() {
 
   return (
     <AuthGuard>
-      <main className="mx-auto max-w-md p-4">
-        <h1 className="mb-3 text-xl font-bold">Log lift</h1>
-        {saved && <p className="mb-2 text-green-600">Logged ✓</p>}
-        <div className="flex flex-col gap-3">
-          <input className="rounded border p-3" placeholder="Exercise"
+      <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-10 pt-6 text-foreground">
+        <h1 className="text-xl font-bold tracking-tight">Log lift</h1>
+        {saved && (
+          <p className="rounded-xl border border-success/30 bg-success/10 px-4 py-2.5 text-sm font-medium text-success">
+            Logged ✓
+          </p>
+        )}
+        <div className="flex flex-col gap-4">
+          <input
+            className="rounded-xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+            placeholder="Exercise"
             value={exercise} onChange={(e) => setExercise(e.target.value)} />
           {suggestions.length > 0 && (
             <ul className="flex flex-wrap gap-2">
               {suggestions.slice(0, 5).map((s) => (
                 <li key={s}>
-                  <button className="rounded-full border px-3 py-1 text-sm"
+                  <button
+                    className="rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground active:bg-surface-2"
                     onClick={() => setExercise(s)}>{s}</button>
                 </li>
               ))}
             </ul>
           )}
-          <div className="flex gap-2">
-            <input className="w-1/3 rounded border p-3" inputMode="numeric" placeholder="sets"
+          <div className="flex gap-3">
+            <input
+              className="w-1/3 rounded-xl border border-border bg-surface px-3 py-3.5 text-center text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+              inputMode="numeric" placeholder="Sets"
               value={sets} onChange={(e) => setSets(e.target.value)} />
-            <input className="w-1/3 rounded border p-3" inputMode="numeric" placeholder="reps"
+            <input
+              className="w-1/3 rounded-xl border border-border bg-surface px-3 py-3.5 text-center text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+              inputMode="numeric" placeholder="Reps"
               value={reps} onChange={(e) => setReps(e.target.value)} />
-            <input className="w-1/3 rounded border p-3" inputMode="decimal" placeholder="lbs"
+            <input
+              className="w-1/3 rounded-xl border border-border bg-surface px-3 py-3.5 text-center text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+              inputMode="decimal" placeholder="Lbs"
               value={weight} onChange={(e) => setWeight(e.target.value)} />
           </div>
-          <input className="rounded border p-3" placeholder="notes (optional)"
+          <input
+            className="rounded-xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+            placeholder="Notes (optional)"
             value={notes} onChange={(e) => setNotes(e.target.value)} />
-          <button className="rounded bg-black p-3 text-white" onClick={save}>Save</button>
+          <button
+            className="rounded-xl bg-accent px-4 py-3.5 text-base font-semibold text-accent-foreground active:opacity-80"
+            onClick={save}>Save</button>
         </div>
       </main>
     </AuthGuard>

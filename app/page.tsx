@@ -60,55 +60,76 @@ export default function Dashboard() {
 
   return (
     <AuthGuard>
-      <main className="mx-auto max-w-md p-4">
-        <h1 className="mb-3 text-2xl font-bold">Gainz</h1>
-        <section className="mb-4 grid grid-cols-4 gap-2 text-center">
+      <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-6 bg-background px-4 pb-10 pt-6 text-foreground">
+        <h1 className="text-2xl font-bold tracking-tight">Gainz</h1>
+
+        <section className="grid grid-cols-4 gap-2">
           {([["kcal", sum("calories"), TARGETS.kcal],
              ["P", sum("protein_g"), TARGETS.protein],
              ["C", sum("carbs_g"), TARGETS.carbs],
              ["F", sum("fat_g"), TARGETS.fat]] as const).map(([label, v, t]) => (
-            <div key={label} className="rounded border p-2">
-              <p className="text-lg font-bold">{v}</p>
-              <p className="text-xs text-gray-500">/{t} {label}</p>
+            <div key={label} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-3 text-center">
+              <p className="text-xl font-bold tabular-nums leading-none">{v}</p>
+              <p className="text-[11px] leading-none text-muted">/{t} {label}</p>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
+                <div
+                  className="h-full rounded-full bg-accent"
+                  style={{ width: `${Math.min(100, Math.round((v / t) * 100))}%` }}
+                />
+              </div>
             </div>
           ))}
         </section>
-        <div className="mb-4 flex gap-2">
-          <Link className="flex-1 rounded bg-black p-3 text-center text-white" href="/log/meal">+ Meal</Link>
-          <Link className="flex-1 rounded bg-black p-3 text-center text-white" href="/log/lift">+ Lift</Link>
+
+        <div className="flex gap-3">
+          <Link
+            className="flex-1 rounded-xl bg-accent px-4 py-4 text-center text-base font-semibold text-accent-foreground active:opacity-80"
+            href="/log/meal"
+          >
+            + Meal
+          </Link>
+          <Link
+            className="flex-1 rounded-xl border border-border bg-surface px-4 py-4 text-center text-base font-semibold text-foreground active:bg-surface-2"
+            href="/log/lift"
+          >
+            + Lift
+          </Link>
         </div>
-        <section className="mb-4">
-          <h2 className="mb-1 font-semibold">Today's meals</h2>
-          <ul className="divide-y text-sm">
+
+        <section className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold text-muted">Today&apos;s meals</h2>
+          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface text-sm">
             {meals.map((m) => (
-              <li key={m.id} className="flex justify-between py-2">
-                <span>{m.food_name} · {m.grams}g</span>
-                <span className="text-gray-500">{Math.round(m.calories)} kcal</span>
+              <li key={m.id} className="flex justify-between px-4 py-3">
+                <span className="text-foreground">{m.food_name} · {m.grams}g</span>
+                <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
               </li>
             ))}
-            {meals.length === 0 && <li className="py-2 text-gray-400">Nothing yet</li>}
+            {meals.length === 0 && <li className="px-4 py-3 text-muted">Nothing yet</li>}
           </ul>
         </section>
-        <section className="mb-4">
-          <h2 className="mb-1 font-semibold">Last 7 days</h2>
+
+        <section className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold text-muted">Last 7 days</h2>
           <ul className="flex gap-2 text-center text-xs">
             {week.map((d) => (
-              <li key={d.day} className="flex-1 rounded border p-1">
-                <p className="font-bold">{d.kcal}</p>
-                <p className="text-gray-500">{d.day}</p>
+              <li key={d.day} className="flex-1 rounded-xl border border-border bg-surface p-2">
+                <p className="font-bold tabular-nums">{d.kcal}</p>
+                <p className="text-muted">{d.day}</p>
               </li>
             ))}
           </ul>
         </section>
-        <section>
-          <h2 className="mb-1 font-semibold">Today's lifts</h2>
-          <ul className="divide-y text-sm">
+
+        <section className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold text-muted">Today&apos;s lifts</h2>
+          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface text-sm">
             {lifts.map((l) => (
-              <li key={l.id} className="py-2">
+              <li key={l.id} className="px-4 py-3 text-foreground">
                 {l.exercise} — {l.sets}x{l.reps} @ {l.weight}lbs
               </li>
             ))}
-            {lifts.length === 0 && <li className="py-2 text-gray-400">Rest day so far</li>}
+            {lifts.length === 0 && <li className="px-4 py-3 text-muted">Rest day so far</li>}
           </ul>
         </section>
       </main>

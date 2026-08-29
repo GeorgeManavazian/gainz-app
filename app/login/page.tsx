@@ -17,14 +17,29 @@ export default function Login() {
   }
 
   return (
-    <form onSubmit={signIn} className="mx-auto mt-24 flex max-w-xs flex-col gap-3 p-4">
-      <h1 className="text-2xl font-bold">Gainz</h1>
-      <input className="rounded border p-2" type="email" placeholder="email"
-        value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input className="rounded border p-2" type="password" placeholder="password"
-        value={password} onChange={(e) => setPassword(e.target.value)} />
-      <button className="rounded bg-black p-2 text-white" type="submit">Sign in</button>
-      {err && <p className="text-sm text-red-600">{err}</p>}
-    </form>
+    <main className="flex min-h-dvh flex-col items-center justify-center bg-background px-6">
+      <div className="w-full max-w-xs">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Gainz</h1>
+          <p className="mt-1 text-sm text-muted">Track your lifts. Track your macros.</p>
+        </div>
+        <form onSubmit={signIn} className="flex flex-col gap-3">
+          <input
+            className="rounded-xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+            type="email" placeholder="Email"
+            value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            className="rounded-xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+            type="password" placeholder="Password"
+            value={password} onChange={(e) => setPassword(e.target.value)} />
+          <button
+            className="mt-2 rounded-xl bg-accent px-4 py-3.5 text-center text-base font-semibold text-accent-foreground active:opacity-80"
+            type="submit">
+            Sign in
+          </button>
+          {err && <p className="text-sm text-danger">{err}</p>}
+        </form>
+      </div>
+    </main>
   );
 }

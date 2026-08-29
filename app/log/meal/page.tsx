@@ -42,19 +42,25 @@ export default function LogMeal() {
 
   return (
     <AuthGuard>
-      <main className="mx-auto max-w-md p-4">
-        <h1 className="mb-3 text-xl font-bold">Log meal</h1>
-        {saved && <p className="mb-2 text-green-600">Logged ✓</p>}
+      <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-10 pt-6 text-foreground">
+        <h1 className="text-xl font-bold tracking-tight">Log meal</h1>
+        {saved && (
+          <p className="rounded-xl border border-success/30 bg-success/10 px-4 py-2.5 text-sm font-medium text-success">
+            Logged ✓
+          </p>
+        )}
         {!picked ? (
           <>
-            <input className="w-full rounded border p-3" placeholder="Search food…"
+            <input
+              className="w-full rounded-xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+              placeholder="Search food…"
               value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
-            <ul className="mt-2 divide-y">
+            <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
               {results.map((f) => (
                 <li key={f.fdcId}>
-                  <button className="w-full p-3 text-left" onClick={() => setPicked(f)}>
-                    {f.description}
-                    <span className="block text-sm text-gray-500">
+                  <button className="w-full px-4 py-3.5 text-left active:bg-surface-2" onClick={() => setPicked(f)}>
+                    <span className="text-foreground">{f.description}</span>
+                    <span className="mt-0.5 block text-sm text-muted">
                       {Math.round(f.per100g.kcal)} kcal / 100g
                     </span>
                   </button>
@@ -63,18 +69,25 @@ export default function LogMeal() {
             </ul>
           </>
         ) : (
-          <div className="flex flex-col gap-3">
-            <p className="font-medium">{picked.description}</p>
-            <input className="rounded border p-3" inputMode="decimal" placeholder="grams"
+          <div className="flex flex-col gap-4">
+            <p className="text-lg font-semibold text-foreground">{picked.description}</p>
+            <input
+              className="rounded-xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+              inputMode="decimal" placeholder="Grams"
               value={grams} onChange={(e) => setGrams(e.target.value)} autoFocus />
-            <p className="text-sm text-gray-600">
-              {scale(picked.per100g.kcal)} kcal · {scale(picked.per100g.protein)}P ·{" "}
-              {scale(picked.per100g.carbs)}C · {scale(picked.per100g.fat)}F
-            </p>
-            <div className="flex gap-2">
-              <button className="flex-1 rounded bg-black p-3 text-white"
+            <div className="flex justify-between rounded-2xl border border-border bg-surface px-4 py-3.5 text-center text-sm">
+              <span className="flex-1"><span className="block font-bold tabular-nums text-foreground">{scale(picked.per100g.kcal)}</span><span className="text-muted">kcal</span></span>
+              <span className="flex-1"><span className="block font-bold tabular-nums text-foreground">{scale(picked.per100g.protein)}</span><span className="text-muted">P</span></span>
+              <span className="flex-1"><span className="block font-bold tabular-nums text-foreground">{scale(picked.per100g.carbs)}</span><span className="text-muted">C</span></span>
+              <span className="flex-1"><span className="block font-bold tabular-nums text-foreground">{scale(picked.per100g.fat)}</span><span className="text-muted">F</span></span>
+            </div>
+            <div className="flex gap-3">
+              <button
+                className="flex-1 rounded-xl bg-accent px-4 py-3.5 text-base font-semibold text-accent-foreground disabled:opacity-40"
                 onClick={save} disabled={g <= 0}>Save</button>
-              <button className="rounded border p-3" onClick={() => setPicked(null)}>Back</button>
+              <button
+                className="rounded-xl border border-border bg-surface px-4 py-3.5 text-base font-semibold text-foreground active:bg-surface-2"
+                onClick={() => setPicked(null)}>Back</button>
             </div>
           </div>
         )}
