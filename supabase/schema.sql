@@ -57,3 +57,19 @@ alter table profiles enable row level security;
 
 create policy "own profile" on profiles for all
   using (id = auth.uid()) with check (id = auth.uid());
+
+create table if not exists weigh_ins (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) default auth.uid(),
+  date date not null,
+  weight_lb numeric not null check (weight_lb > 0),
+  created_at timestamptz not null default now(),
+  unique (user_id, date)
+);
+
+alter table weigh_ins enable row level security;
+
+create policy "own weigh_ins" on weigh_ins for all
+  using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+alter table profiles add column if not exists last_adjusted_at timestamptz;

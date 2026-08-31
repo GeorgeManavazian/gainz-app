@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/targets";
 
-export type ProfileRow = Profile & { id: string; updated_at: string };
+export type ProfileRow = Profile & { id: string; updated_at: string; last_adjusted_at: string | null };
 
 export async function getProfile(): Promise<ProfileRow | null> {
   const { data, error } = await supabase.from("profiles").select("*").maybeSingle();
@@ -23,5 +23,15 @@ export async function upsertProfile(p: Profile): Promise<void> {
   const { error } = await supabase
     .from("profiles")
     .upsert({ id: user.id, ...p, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
+
+/** Record a stall adjustment: new TDEE override + cooldown timestamp. Other fields untouched. */
+export async function applyAdjustment(p: ProfileRow, newTdeeOverride: number): Promise<void> {
+  const { error } = await supabase
+    .from("profiles")
+    .update({ tdee_override: newTdeeOverride, last_adjusted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString() })
+    .eq("id", p.id);
   if (error) throw error;
 }
