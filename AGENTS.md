@@ -22,9 +22,10 @@ v1 shipped 2026-08-30 and works end-to-end, but George considers it unfinished a
 - `app/api/food-search/route.ts`: server-side USDA proxy — `USDA_API_KEY` must never get a `NEXT_PUBLIC_` prefix.
 - `scripts/vault_sync.py`: mirror of `~/.config/gainz/vault_sync.py` (launchd `com.gainz.vaultsync`, 20 min) — keep both copies identical when editing.
 - Secrets: `.env.local` (URL, anon key, USDA key — mirrored in Vercel env). Service-role key ONLY in `~/.config/gainz/supabase_sync.json`, never in repo/Vercel.
+- `lib/targets.ts`: pure macro-target math (Mifflin-St Jeor TDEE, fat 0.33 g/lb, phase-default protein, carbs fill). Unit-tested in `lib/targets.test.ts` (`npm test`, vitest). `lib/profile.ts` wraps the `profiles` row (one per user, RLS). `/profile` edits it; dashboard calls `computeTargets` — no hardcoded targets anywhere.
 
 ## Docs
-Spec: `docs/superpowers/specs/2026-08-29-gainz-app-design.md`. Build plan: `docs/superpowers/plans/2026-08-29-gainz-app.md`.
+Spec: `docs/superpowers/specs/2026-08-29-gainz-app-design.md`. Build plan: `docs/superpowers/plans/2026-08-29-gainz-app.md`. Macro targets spec: docs/superpowers/specs/2026-08-30-macro-targets-design.md. Plan: docs/superpowers/plans/2026-08-30-macro-targets.md.
 
 ## Known deferred items (from final review)
 - food-search route is unauthenticated on the public URL (USDA quota exposure only)

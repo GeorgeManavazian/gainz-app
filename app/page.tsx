@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
 import { supabase } from "@/lib/supabase";
-
-const TARGETS = { kcal: 2350, protein: 225, carbs: 212, fat: 67 };
+import { getProfile } from "@/lib/profile";
+import { computeTargets, type Targets } from "@/lib/targets";
 
 type Meal = { id: string; food_name: string; grams: number; calories: number;
   protein_g: number; carbs_g: number; fat_g: number; logged_at: string };
@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [lifts, setLifts] = useState<Lift[]>([]);
 
   const [week, setWeek] = useState<{ day: string; kcal: number }[]>([]);
+  const [targets, setTargets] = useState<Targets | null | undefined>(undefined); // undefined = loading, null = no profile
 
   const load = useCallback(async () => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
@@ -55,31 +56,52 @@ export default function Dashboard() {
     return () => { supabase.removeChannel(ch); };
   }, [load]);
 
+  useEffect(() => {
+    getProfile()
+      .then((p) => setTargets(p ? computeTargets(p) : null))
+      .catch(() => setTargets(null));
+  }, []);
+
   const sum = (k: keyof Pick<Meal, "calories" | "protein_g" | "carbs_g" | "fat_g">) =>
     Math.round(meals.reduce((a, m) => a + Number(m[k]), 0));
 
   return (
     <AuthGuard>
       <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-6 bg-background px-4 pb-10 pt-6 text-foreground">
-        <h1 className="text-2xl font-bold tracking-tight">Gainz</h1>
+        <div className="flex items-baseline justify-between">
+          <h1 className="text-2xl font-bold tracking-tight">Gainz</h1>
+          <Link href="/profile" className="text-sm font-medium text-muted active:text-foreground">Profile</Link>
+        </div>
 
-        <section className="grid grid-cols-4 gap-2">
-          {([["kcal", sum("calories"), TARGETS.kcal],
-             ["P", sum("protein_g"), TARGETS.protein],
-             ["C", sum("carbs_g"), TARGETS.carbs],
-             ["F", sum("fat_g"), TARGETS.fat]] as const).map(([label, v, t]) => (
-            <div key={label} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-3 text-center">
-              <p className="text-xl font-bold tabular-nums leading-none">{v}</p>
-              <p className="text-[11px] leading-none text-muted">/{t} {label}</p>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
-                <div
-                  className="h-full rounded-full bg-accent"
-                  style={{ width: `${Math.min(100, Math.round((v / t) * 100))}%` }}
-                />
+        {targets === undefined ? (
+          <section className="grid grid-cols-4 gap-2">
+            {["kcal", "P", "C", "F"].map((label) => (
+              <div key={label} className="h-[74px] rounded-2xl border border-border bg-surface" />
+            ))}
+          </section>
+        ) : targets === null ? (
+          <Link href="/profile"
+            className="rounded-2xl border border-accent/40 bg-surface p-4 text-sm active:bg-surface-2">
+            <p className="font-semibold text-foreground">Set up your targets</p>
+            <p className="mt-1 text-muted">Add height, weight, and goal to get daily kcal and macros.</p>
+          </Link>
+        ) : (
+          <section className="grid grid-cols-4 gap-2">
+            {([["kcal", sum("calories"), targets.kcal],
+               ["P", sum("protein_g"), targets.protein_g],
+               ["C", sum("carbs_g"), targets.carbs_g],
+               ["F", sum("fat_g"), targets.fat_g]] as const).map(([label, v, t]) => (
+              <div key={label} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-3 text-center">
+                <p className="text-xl font-bold tabular-nums leading-none">{v}</p>
+                <p className="text-[11px] leading-none text-muted">/{t} {label}</p>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
+                  <div className="h-full rounded-full bg-accent"
+                    style={{ width: `${t > 0 ? Math.min(100, Math.round((v / t) * 100)) : 0}%` }} />
+                </div>
               </div>
-            </div>
-          ))}
-        </section>
+            ))}
+          </section>
+        )}
 
         <div className="flex gap-3">
           <Link
