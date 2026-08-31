@@ -34,3 +34,22 @@ create policy "own lifts" on lifts for all
 
 alter publication supabase_realtime add table meals;
 alter publication supabase_realtime add table lifts;
+
+create table if not exists profiles (
+  id uuid primary key references auth.users(id) default auth.uid(),
+  sex text not null check (sex in ('male','female')),
+  birth_date date not null,
+  height_in numeric not null check (height_in > 0),
+  weight_lb numeric not null check (weight_lb > 0),
+  activity text not null check (activity in ('sedentary','light','moderate','active','very')),
+  phase text not null check (phase in ('cut','maintain','bulk')),
+  rate_lb_per_wk numeric not null default 0 check (rate_lb_per_wk >= 0),
+  protein_g_per_lb numeric check (protein_g_per_lb between 0.8 and 1.5),
+  tdee_override integer check (tdee_override > 0),
+  updated_at timestamptz not null default now()
+);
+
+alter table profiles enable row level security;
+
+create policy "own profile" on profiles for all
+  using (id = auth.uid()) with check (id = auth.uid());
