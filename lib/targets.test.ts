@@ -84,6 +84,7 @@ describe("computeTargets", () => {
   });
 
   it("defaults today to now (smoke)", () => {
+    // override makes kcal age-independent, so this stays stable against the real clock
     expect(computeTargets(george).kcal).toBe(2350);
   });
 });

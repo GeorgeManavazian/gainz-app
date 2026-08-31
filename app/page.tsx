@@ -81,7 +81,7 @@ export default function Dashboard() {
         {targets === undefined ? (
           <section className="grid grid-cols-4 gap-2">
             {["kcal", "P", "C", "F"].map((label) => (
-              <div key={label} className="h-[74px] rounded-2xl border border-border bg-surface" />
+              <div key={label} className="h-[79px] rounded-2xl border border-border bg-surface" />
             ))}
           </section>
         ) : targets === "error" ? (
@@ -97,21 +97,24 @@ export default function Dashboard() {
             <p className="mt-1 text-muted">Add height, weight, and goal to get daily kcal and macros.</p>
           </Link>
         ) : (
-          <section className="grid grid-cols-4 gap-2">
-            {([["kcal", sum("calories"), targets.kcal],
-               ["P", sum("protein_g"), targets.protein_g],
-               ["C", sum("carbs_g"), targets.carbs_g],
-               ["F", sum("fat_g"), targets.fat_g]] as const).map(([label, v, t]) => (
-              <div key={label} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-3 text-center">
-                <p className="text-xl font-bold tabular-nums leading-none">{v}</p>
-                <p className="text-[11px] leading-none text-muted">/{t} {label}</p>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
-                  <div className="h-full rounded-full bg-accent"
-                    style={{ width: `${t > 0 ? Math.min(100, Math.round((v / t) * 100)) : 0}%` }} />
+          <div className="flex flex-col gap-2">
+            <section className="grid grid-cols-4 gap-2">
+              {([["kcal", sum("calories"), targets.kcal],
+                 ["P", sum("protein_g"), targets.protein_g],
+                 ["C", sum("carbs_g"), targets.carbs_g],
+                 ["F", sum("fat_g"), targets.fat_g]] as const).map(([label, v, t]) => (
+                <div key={label} className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-3 text-center">
+                  <p className="text-xl font-bold tabular-nums leading-none">{v}</p>
+                  <p className="text-[11px] leading-none text-muted">/{t} {label}</p>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
+                    <div className="h-full rounded-full bg-accent"
+                      style={{ width: `${t > 0 ? Math.min(100, Math.round((v / t) * 100)) : 0}%` }} />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </section>
+              ))}
+            </section>
+            {targets.warning && <p className="text-sm text-danger">{targets.warning}</p>}
+          </div>
         )}
 
         <div className="flex gap-3">

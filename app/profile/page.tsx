@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
 import { getProfile, upsertProfile } from "@/lib/profile";
 import {
@@ -55,6 +56,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
+  const [touched, setTouched] = useState<{ rate: boolean; protein: boolean }>({ rate: false, protein: false });
 
   useEffect(() => {
     getProfile()
@@ -73,10 +75,17 @@ export default function ProfilePage() {
 
   const set = <K extends keyof Form>(k: K) => (v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
 
-  // Changing phase resets rate to that phase's default and clears the protein override
-  // so the phase default applies. User can re-edit afterwards.
+  // Reset rate/protein to the new phase's defaults unless the user hand-edited them this session.
   function changePhase(phase: Phase) {
-    setForm((f) => ({ ...f, phase, rate_lb_per_wk: String(defaultRate(phase)), protein_g_per_lb: "" }));
+    setForm((f) => {
+      if (f.phase === phase) return f;
+      return {
+        ...f,
+        phase,
+        rate_lb_per_wk: touched.rate ? f.rate_lb_per_wk : String(defaultRate(phase)),
+        protein_g_per_lb: touched.protein ? f.protein_g_per_lb : "",
+      };
+    });
   }
 
   const profile = useMemo(() => toProfile(form), [form]);
@@ -97,7 +106,10 @@ export default function ProfilePage() {
   return (
     <AuthGuard>
       <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-10 pt-6 text-foreground">
-        <h1 className="text-xl font-bold tracking-tight">Profile &amp; targets</h1>
+        <div className="flex items-baseline justify-between">
+          <h1 className="text-xl font-bold tracking-tight">Profile &amp; targets</h1>
+          <Link href="/" className="text-sm font-medium text-muted active:text-foreground">Back</Link>
+        </div>
         {loading ? (
           <p className="text-sm text-muted">Loading…</p>
         ) : (
@@ -113,6 +125,7 @@ export default function ProfilePage() {
               <label className="flex flex-col gap-1">
                 <span className={labelCls}>Birth date</span>
                 <input className={inputCls} type="date" value={form.birth_date}
+                  max={new Date().toISOString().slice(0, 10)}
                   onChange={(e) => set("birth_date")(e.target.value)} />
               </label>
               <label className="flex flex-col gap-1">
@@ -155,14 +168,14 @@ export default function ProfilePage() {
                 <span className={labelCls}>Rate (lb / week)</span>
                 <input className={inputCls} inputMode="decimal" value={form.rate_lb_per_wk}
                   disabled={form.phase === "maintain"}
-                  onChange={(e) => set("rate_lb_per_wk")(e.target.value)} />
+                  onChange={(e) => { set("rate_lb_per_wk")(e.target.value); setTouched((t) => ({ ...t, rate: true })); }} />
               </label>
               <label className="flex flex-col gap-1">
                 <span className={labelCls}>Protein (g / lb)</span>
                 <input className={inputCls} inputMode="decimal"
                   placeholder={`${defaultProteinPerLb(form.phase)} (default)`}
                   value={form.protein_g_per_lb}
-                  onChange={(e) => set("protein_g_per_lb")(e.target.value)} />
+                  onChange={(e) => { set("protein_g_per_lb")(e.target.value); setTouched((t) => ({ ...t, protein: true })); }} />
               </label>
             </div>
 

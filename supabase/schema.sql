@@ -1,3 +1,7 @@
+-- Append-only log of what has been applied to the live Supabase project.
+-- Apply NEW blocks individually in the SQL editor: `create policy` and
+-- `alter publication … add table` are not idempotent and will error if re-run.
+
 create table if not exists meals (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) default auth.uid(),
