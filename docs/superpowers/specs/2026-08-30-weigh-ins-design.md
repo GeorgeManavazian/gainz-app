@@ -58,6 +58,10 @@ Reference cases (unit tests):
 - 7 points in window → `null` → `insufficient_data`. 8 points → a number.
 - EMA: constant series → trend equals the constant; step from 200 to 210 → trend moves 10 × 0.25 = 2.5 on the first post-step point.
 
+Known quirks (deliberate, revisit with sub-project 6/adaptive TDEE):
+- `suggestAdjustment` uses `|slope|`, so a cut where weight is *rising* (+0.5 lb/wk) computes the same shortfall as losing 0.5 lb/wk. The [100, 250] clamp makes the output identical in every reachable case today; a signed formula would only matter once the cap is lifted.
+- Once Apply writes `tdee_override`, TDEE stops tracking bodyweight (fat/protein grams still do, via trend weight). That is the intent — the user has taken manual control — but it means an override set at 170 lb is still in force at 190 lb unless another stall fires or they edit it.
+
 ## Targets link
 
 Dashboard computes `computeTargets({ ...profile, weight_lb: trendWeight ?? profile.weight_lb })`. `profile.weight_lb` remains the seed/fallback. The `/profile` page keeps editing the seed and shows a note when trend weight is overriding it ("Targets currently use trend weight 170 lb").
