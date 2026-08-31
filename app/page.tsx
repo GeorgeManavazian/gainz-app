@@ -3,8 +3,12 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
 import { supabase } from "@/lib/supabase";
-import { getProfile } from "@/lib/profile";
 import { computeTargets, type Targets } from "@/lib/targets";
+import WeighInCard from "@/components/WeighInCard";
+import ProgressCard from "@/components/ProgressCard";
+import { applyAdjustment, getProfile, type ProfileRow } from "@/lib/profile";
+import { listWeighIns, localDateKey, upsertWeighIn, type WeighInRow } from "@/lib/weighins";
+import { addDays, assessProgress, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight } from "@/lib/trend";
 
 type Meal = { id: string; food_name: string; grams: number; calories: number;
   protein_g: number; carbs_g: number; fat_g: number; logged_at: string };
@@ -16,7 +20,8 @@ export default function Dashboard() {
   const [lifts, setLifts] = useState<Lift[]>([]);
 
   const [week, setWeek] = useState<{ day: string; kcal: number }[]>([]);
-  const [targets, setTargets] = useState<Targets | null | "error" | undefined>(undefined); // undefined = loading, null = no profile
+  const [profile, setProfile] = useState<ProfileRow | null | "error" | undefined>(undefined);
+  const [weighIns, setWeighIns] = useState<WeighInRow[]>([]);
 
   const load = useCallback(async () => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
@@ -57,15 +62,40 @@ export default function Dashboard() {
   }, [load]);
 
   const loadTargets = useCallback(() => {
-    setTargets(undefined);
-    getProfile()
-      .then((p) => setTargets(p ? computeTargets(p) : null))
-      .catch(() => setTargets("error"));
+    setProfile(undefined);
+    Promise.all([getProfile(), listWeighIns(addDays(localDateKey(), -120))])
+      .then(([p, w]) => { setWeighIns(w); setProfile(p); })
+      .catch(() => setProfile("error"));
   }, []);
+  useEffect(() => { loadTargets(); }, [loadTargets]);
 
-  useEffect(() => {
+  const today = localDateKey();
+  const trend = trendWeight(weighIns);
+  const targets =
+    profile === undefined ? undefined
+    : profile === null ? null
+    : profile === "error" ? "error"
+    : computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb });
+
+  const todayRow = weighIns.find((r) => r.date === today) ?? null;
+  const last = weighIns.length ? weighIns[weighIns.length - 1] : null;
+  const slope = slopeLbPerWk(weighIns, today);
+  const p = typeof profile === "object" && profile !== null ? profile : null;
+  const phase = p?.phase ?? "cut";
+  const rate = p?.rate_lb_per_wk ?? 0;
+  const assessment = assessProgress(slope, phase, rate);
+  const delta = suggestAdjustment(slope, phase, rate);
+  const newKcal = typeof targets === "object" && targets !== null
+    ? (phase === "cut" ? targets.kcal - delta : targets.kcal + delta) : null;
+  const suppressed = inCooldown(p?.last_adjusted_at ?? null, new Date());
+
+  async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); loadTargets(); }
+  async function apply() {
+    if (!p || typeof targets !== "object" || targets === null) return;
+    const base = p.tdee_override ?? targets.tdee_est;
+    await applyAdjustment(p, phase === "cut" ? base - delta : base + delta);
     loadTargets();
-  }, [loadTargets]);
+  }
 
   const sum = (k: keyof Pick<Meal, "calories" | "protein_g" | "carbs_g" | "fat_g">) =>
     Math.round(meals.reduce((a, m) => a + Number(m[k]), 0));
@@ -77,6 +107,11 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold tracking-tight">Gainz</h1>
           <Link href="/profile" className="text-sm font-medium text-muted active:text-foreground">Profile</Link>
         </div>
+
+        <WeighInCard todayWeight={todayRow?.weight_lb ?? null} lastWeight={last?.weight_lb ?? null}
+          trend={trend} slope={slope} onSave={saveWeight} linkToDetail />
+        <ProgressCard assessment={assessment} slope={slope} rate={rate} phase={phase} delta={delta}
+          newKcal={newKcal} suppressed={suppressed} onApply={apply} />
 
         {targets === undefined ? (
           <section className="grid grid-cols-4 gap-2">

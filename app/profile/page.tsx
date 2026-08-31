@@ -8,6 +8,8 @@ import {
   computeTargets, defaultProteinPerLb, defaultRate,
   type Activity, type Phase, type Profile, type Sex,
 } from "@/lib/targets";
+import { listWeighIns } from "@/lib/weighins";
+import { trendWeight } from "@/lib/trend";
 
 const ACTIVITIES: { value: Activity; label: string }[] = [
   { value: "sedentary", label: "Sedentary (desk, no training)" },
@@ -57,6 +59,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
   const [touched, setTouched] = useState<{ rate: boolean; protein: boolean }>({ rate: false, protein: false });
+  const [trend, setTrend] = useState<number | null>(null);
 
   useEffect(() => {
     getProfile()
@@ -71,6 +74,7 @@ export default function ProfilePage() {
       })
       .catch(() => setErr("Couldn't load profile."))
       .finally(() => setLoading(false));
+    listWeighIns().then((w) => setTrend(trendWeight(w))).catch(() => {});
   }, []);
 
   const set = <K extends keyof Form>(k: K) => (v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
@@ -137,6 +141,9 @@ export default function ProfilePage() {
                 <span className={labelCls}>Weight (lb)</span>
                 <input className={inputCls} inputMode="decimal" placeholder="203" value={form.weight_lb}
                   onChange={(e) => set("weight_lb")(e.target.value)} />
+                {trend !== null && (
+                  <span className="text-[11px] text-muted">Targets currently use trend weight {trend.toFixed(1)} lb</span>
+                )}
               </label>
             </div>
 

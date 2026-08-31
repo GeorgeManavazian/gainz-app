@@ -23,9 +23,11 @@ v1 shipped 2026-08-30 and works end-to-end, but George considers it unfinished a
 - `scripts/vault_sync.py`: mirror of `~/.config/gainz/vault_sync.py` (launchd `com.gainz.vaultsync`, 20 min) — keep both copies identical when editing.
 - Secrets: `.env.local` (URL, anon key, USDA key — mirrored in Vercel env). Service-role key ONLY in `~/.config/gainz/supabase_sync.json`, never in repo/Vercel.
 - `lib/targets.ts`: pure macro-target math (Mifflin-St Jeor TDEE, fat 0.33 g/lb, phase-default protein, carbs fill). Unit-tested in `lib/targets.test.ts` (`npm test`, vitest). `lib/profile.ts` wraps the `profiles` row (one per user, RLS). `/profile` edits it; dashboard calls `computeTargets` — no hardcoded targets anywhere.
+- `lib/trend.ts`: pure weight math — EMA trend (α 0.1), 14-day OLS slope (≥8 points), stall/too-fast assessment, kcal suggestion (100–250, ×500/lb·wk), 14-day cooldown. Tested in `lib/trend.test.ts`. `lib/weighins.ts` wraps `weigh_ins` (one row per user per local date, upsert on `(user_id,date)`, direct writes — not the queue). `/weight` = chart + history; dashboard `WeighInCard` + `ProgressCard`; trend weight feeds `computeTargets`.
 
 ## Docs
 Spec: `docs/superpowers/specs/2026-08-29-gainz-app-design.md`. Build plan: `docs/superpowers/plans/2026-08-29-gainz-app.md`. Macro targets spec: docs/superpowers/specs/2026-08-30-macro-targets-design.md. Plan: docs/superpowers/plans/2026-08-30-macro-targets.md.
+Weigh-ins spec: docs/superpowers/specs/2026-08-30-weigh-ins-design.md. Plan: docs/superpowers/plans/2026-08-30-weigh-ins.md. Design: docs/superpowers/design/2026-08-30-weight-page-12ui-A.png.
 
 ## Known deferred items (from final review)
 - food-search route is unauthenticated on the public URL (USDA quota exposure only)
