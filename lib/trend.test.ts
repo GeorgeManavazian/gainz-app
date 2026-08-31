@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { emaTrend, trendWeight, addDays, dayDiff, slopeLbPerWk, type WeighIn } from "./trend";
+import { emaTrend, trendWeight, addDays, dayDiff, slopeLbPerWk, assessProgress, suggestAdjustment, inCooldown, type WeighIn } from "./trend";
 
 const w = (date: string, weight_lb: number): WeighIn => ({ date, weight_lb });
 
@@ -86,5 +86,70 @@ describe("slopeLbPerWk", () => {
     const ws = [203, 203.4, 202.8, 203.2, 202.9, 203.3, 203.1, 202.7, 203.2, 203.0, 202.8, 203.4, 203.1, 202.9];
     const pts = ws.map((v, i) => w(addDays(today, i - 13), v));
     expect(slopeLbPerWk(pts, today)).toBeCloseTo(-0.0338, 3);
+  });
+});
+
+describe("assessProgress", () => {
+  it("insufficient_data when slope is null", () => {
+    expect(assessProgress(null, "cut", 1.5)).toBe("insufficient_data");
+  });
+  it("maintain is always on_track", () => {
+    expect(assessProgress(0, "maintain", 0)).toBe("on_track");
+    expect(assessProgress(-3, "maintain", 0)).toBe("on_track");
+  });
+  it("cut: stalled at or above −0.25", () => {
+    expect(assessProgress(-0.25, "cut", 1.5)).toBe("stalled");
+    expect(assessProgress(0.1, "cut", 1.5)).toBe("stalled");
+    expect(assessProgress(-0.2, "cut", 1.5)).toBe("stalled");
+  });
+  it("cut: on_track between", () => {
+    expect(assessProgress(-1.0, "cut", 1.5)).toBe("on_track");
+    expect(assessProgress(-1.5, "cut", 1.5)).toBe("on_track");
+    expect(assessProgress(-2.25, "cut", 1.5)).toBe("on_track"); // boundary is exclusive
+  });
+  it("cut: too_fast below −(rate + 0.75)", () => {
+    expect(assessProgress(-2.5, "cut", 1.5)).toBe("too_fast");
+  });
+  it("bulk mirrors cut", () => {
+    expect(assessProgress(0.2, "bulk", 0.5)).toBe("stalled");
+    expect(assessProgress(0.5, "bulk", 0.5)).toBe("on_track");
+    expect(assessProgress(1.5, "bulk", 0.5)).toBe("too_fast");
+  });
+});
+
+describe("suggestAdjustment", () => {
+  it("flat cut at 1.5 → 750 capped to 250", () => {
+    expect(suggestAdjustment(0, "cut", 1.5)).toBe(250);
+  });
+  it("−0.2 on 1.5 → 650 capped to 250", () => {
+    expect(suggestAdjustment(-0.2, "cut", 1.5)).toBe(250);
+  });
+  it("−0.1 on 0.3 → 100", () => {
+    expect(suggestAdjustment(-0.1, "cut", 0.3)).toBe(100);
+  });
+  it("floors at 100 even when shortfall is tiny", () => {
+    expect(suggestAdjustment(-1.4, "cut", 1.5)).toBe(100);
+  });
+  it("rounds to 50", () => {
+    expect(suggestAdjustment(-0.13, "cut", 0.5)).toBe(200); // 0.37 × 500 = 185 → 200
+  });
+  it("bulk uses |slope| the same way", () => {
+    expect(suggestAdjustment(0.1, "bulk", 0.5)).toBe(200);
+  });
+  it("null slope → 0", () => {
+    expect(suggestAdjustment(null, "cut", 1.5)).toBe(0);
+  });
+});
+
+describe("inCooldown", () => {
+  const now = new Date("2026-09-14T12:00:00Z");
+  it("false when never adjusted", () => {
+    expect(inCooldown(null, now)).toBe(false);
+  });
+  it("true within 14 days", () => {
+    expect(inCooldown("2026-09-01T08:00:00Z", now)).toBe(true);
+  });
+  it("false once 14 full days have passed", () => {
+    expect(inCooldown("2026-08-31T08:00:00Z", now)).toBe(false);
   });
 });

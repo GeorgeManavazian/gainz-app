@@ -8,7 +8,7 @@ export function emaTrend(points: WeighIn[], alpha: number = EMA_ALPHA): TrendPoi
   const out: TrendPoint[] = [];
   let prev: number | null = null;
   for (const p of points) {
-    const trend = prev === null ? p.weight_lb : prev + alpha * (p.weight_lb - prev);
+    const trend: number = prev === null ? p.weight_lb : prev + alpha * (p.weight_lb - prev);
     out.push({ ...p, trend });
     prev = trend;
   }
@@ -68,4 +68,40 @@ export function slopeLbPerWk(
     den += (xs[i] - mx) ** 2;
   }
   return (num / den) * 7;
+}
+
+export type TrendPhase = "cut" | "maintain" | "bulk";
+export type Assessment = "insufficient_data" | "on_track" | "stalled" | "too_fast";
+
+export const STALL_SLOPE = 0.25;        // lb/wk: cut slope ≥ −0.25 (bulk ≤ +0.25) is a stall
+export const TOO_FAST_MARGIN = 0.75;    // lb/wk beyond the target rate
+export const KCAL_PER_LB_PER_WK = 500;  // 1 lb/wk ≈ 500 kcal/day
+export const ADJUST_MIN = 100;
+export const ADJUST_MAX = 250;
+
+export function assessProgress(slope: number | null, phase: TrendPhase, rate: number): Assessment {
+  if (slope === null) return "insufficient_data";
+  if (phase === "maintain") return "on_track";
+  // Normalise so "progress" is positive for both cut and bulk.
+  const progress = phase === "cut" ? -slope : slope;
+  if (progress <= STALL_SLOPE) return "stalled";
+  if (progress > rate + TOO_FAST_MARGIN) return "too_fast";
+  return "on_track";
+}
+
+/** kcal/day to subtract (cut) or add (bulk) when stalled. 0 if slope is null. */
+export function suggestAdjustment(slope: number | null, phase: TrendPhase, rate: number): number {
+  if (slope === null || phase === "maintain") return 0;
+  const shortfall = Math.max(0, rate - Math.abs(slope));
+  const raw = Math.round((shortfall * KCAL_PER_LB_PER_WK) / 50) * 50;
+  return Math.min(ADJUST_MAX, Math.max(ADJUST_MIN, raw));
+}
+
+export const COOLDOWN_DAYS = 14;
+
+/** True if an adjustment was applied less than COOLDOWN_DAYS ago. */
+export function inCooldown(lastAdjustedIso: string | null, now: Date): boolean {
+  if (!lastAdjustedIso) return false;
+  const elapsedDays = (now.getTime() - new Date(lastAdjustedIso).getTime()) / 86_400_000;
+  return elapsedDays < COOLDOWN_DAYS;
 }
