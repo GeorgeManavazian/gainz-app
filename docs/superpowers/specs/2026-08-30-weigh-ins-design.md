@@ -38,7 +38,7 @@ alter table profiles add column if not exists last_adjusted_at timestamptz;
 
 Input everywhere: `WeighIn[] = { date: string /* YYYY-MM-DD */, weight_lb: number }[]`, sorted ascending by date, at most one per date.
 
-**`emaTrend(points, alpha = 0.1): { date, weight_lb, trend }[]`** — exponential moving average in weigh-in order (gaps in dates are ignored; each recorded point is one step). First point's trend = its weight. Returns the input with a `trend` field. `trendWeight(points)` = last `trend` value, or `null` if no points.
+**`emaTrend(points, alpha = 0.25): { date, weight_lb, trend }[]`** — exponential moving average in weigh-in order (gaps in dates are ignored; each recorded point is one step). First point's trend = its weight. α was 0.1 in the first draft (Hacker's Diet / Happy Scale style); a render check on a −1.4 lb/wk series showed that lags the scale by ~1.8 lb, which reads as wrong and inflates targets. 0.25 gives a mean lag of (1−α)/α ≈ 3 days (≈ 0.6 lb at 1.5 lb/wk) while still cutting noise variance to α/(2−α) ≈ 14 %. Returns the input with a `trend` field. `trendWeight(points)` = last `trend` value, or `null` if no points.
 
 **`slopeLbPerWk(points, today, windowDays = 14): number | null`** — ordinary least-squares slope of raw `weight_lb` against day-offset, over points whose date is within `[today − windowDays + 1, today]`. Returns `null` when fewer than **8** points fall in the window (a week of daily weigh-ins is the minimum for a two-week verdict; also guarantees nothing fires in the first week). Units: lb per week (slope per day × 7).
 
@@ -56,7 +56,7 @@ Reference cases (unit tests):
 - Actual −1.0 on rate 1.5 → `on_track` (−1.0 < −0.25). Actual −0.2 → `stalled`, suggestion `(1.5 − 0.2) × 500 = 650 → 250`. Actual −0.1 with rate 0.3 → `(0.3 − 0.1) × 500 = 100 → 100`.
 - −2.5 on rate 1.5 → `too_fast` (−2.5 < −2.25).
 - 7 points in window → `null` → `insufficient_data`. 8 points → a number.
-- EMA: constant series → trend equals the constant; step from 200 to 210 → trend moves 10 × 0.1 = 1.0 on the first post-step point.
+- EMA: constant series → trend equals the constant; step from 200 to 210 → trend moves 10 × 0.25 = 2.5 on the first post-step point.
 
 ## Targets link
 

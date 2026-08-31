@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-const fmtSlope = (s: number) => `${s > 0 ? "+" : "−"}${Math.abs(s).toFixed(1)} lb/wk`;
+const fmtSlope = (s: number) => { const a = Math.abs(s); const sign = a < 0.05 ? "" : s > 0 ? "+" : "−"; return `${sign}${a.toFixed(1)} lb/wk`; };
 
 export default function WeighInCard({ todayWeight, lastWeight, trend, slope, onSave, linkToDetail = false }: {
   todayWeight: number | null; lastWeight: number | null; trend: number | null; slope: number | null;

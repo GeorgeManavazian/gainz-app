@@ -1,7 +1,7 @@
 export type WeighIn = { date: string /* YYYY-MM-DD */; weight_lb: number };
 export type TrendPoint = WeighIn & { trend: number };
 
-export const EMA_ALPHA = 0.1;
+export const EMA_ALPHA = 0.25;
 
 /** Exponential moving average over weigh-ins. Input must be sorted ascending by date, one point per date; gaps between dates are ignored (each point is one step). */
 export function emaTrend(points: WeighIn[], alpha: number = EMA_ALPHA): TrendPoint[] {

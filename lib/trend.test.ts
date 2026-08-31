@@ -13,10 +13,10 @@ describe("emaTrend", () => {
     expect(emaTrend(pts).map((p) => p.trend)).toEqual([203, 203, 203]);
   });
 
-  it("moves alpha of the gap on a step (200→210 → 201.0)", () => {
+  it("moves alpha of the gap on a step (200→210 → 202.5)", () => {
     const pts = [w("2026-09-01", 200), w("2026-09-02", 200), w("2026-09-03", 200), w("2026-09-04", 210)];
     const t = emaTrend(pts);
-    expect(t[3].trend).toBeCloseTo(201.0, 6);
+    expect(t[3].trend).toBeCloseTo(202.5, 6);
     expect(t[3]).toMatchObject({ date: "2026-09-04", weight_lb: 210 });
   });
 
@@ -32,7 +32,7 @@ describe("trendWeight", () => {
   });
   it("last EMA value", () => {
     const pts = [w("2026-09-01", 200), w("2026-09-02", 210)];
-    expect(trendWeight(pts)).toBeCloseTo(201, 6);
+    expect(trendWeight(pts)).toBeCloseTo(202.5, 6);
   });
 });
 

@@ -15,7 +15,7 @@ export default function ProgressCard({ assessment, slope, rate, phase, delta, ne
   if (assessment !== "stalled" && assessment !== "too_fast") return null;
 
   const goal = phase === "cut" ? `−${rate}` : `+${rate}`;
-  const fmt = (s: number) => `${s > 0 ? "+" : "−"}${Math.abs(s).toFixed(1)}`;
+  const fmt = (s: number) => { const a = Math.abs(s); const sign = a < 0.05 ? "" : s > 0 ? "+" : "−"; return `${sign}${a.toFixed(1)}`; };
 
   async function apply() {
     setApplying(true); setErr("");

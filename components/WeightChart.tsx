@@ -26,7 +26,7 @@ export default function WeightChart({ points }: { points: TrendPoint[] }) {
     const lo = Math.floor(Math.min(...ws) - 1), hi = Math.ceil(Math.max(...ws) + 1);
     const step = niceStep(hi - lo);
     const yMin = Math.floor(lo / step) * step, yMax = Math.ceil(hi / step) * step;
-    const x = (d: string) => PAD.left + (dayDiff(first, d) / spanDays) * (W - PAD.left - PAD.right);
+    const x = (d: string) => points.length === 1 ? (PAD.left + W - PAD.right) / 2 : PAD.left + (dayDiff(first, d) / spanDays) * (W - PAD.left - PAD.right);
     const y = (v: number) => PAD.top + (1 - (v - yMin) / (yMax - yMin)) * (H - PAD.top - PAD.bottom);
     const yTicks: number[] = [];
     for (let v = yMin; v <= yMax; v += step) yTicks.push(v);
@@ -53,7 +53,7 @@ export default function WeightChart({ points }: { points: TrendPoint[] }) {
   const hp = hover === null ? null : points[hover];
 
   return (
-    <div className="relative">
+    <div>
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Body weight with trend line"
         className="block touch-none select-none"
         onPointerMove={onMove} onPointerDown={onMove} onPointerLeave={() => setHover(null)}>
@@ -63,9 +63,12 @@ export default function WeightChart({ points }: { points: TrendPoint[] }) {
             <text x={PAD.left - 6} y={y(v) + 3} textAnchor="end" fontSize={9} fill="var(--muted)">{v}</text>
           </g>
         ))}
-        {xTicks.map((d) => (
-          <text key={d} x={x(d)} y={H - 6} textAnchor="middle" fontSize={8} fill="var(--muted)">{fmtDate(d)}</text>
-        ))}
+        {xTicks.map((d, i) => {
+          const isFirst = i === 0;
+          const isLast = i === xTicks.length - 1;
+          const anchor = xTicks.length === 1 ? "middle" : isFirst ? "start" : isLast ? "end" : "middle";
+          return <text key={d} x={x(d)} y={H - 6} textAnchor={anchor} fontSize={8} fill="var(--muted)">{fmtDate(d)}</text>;
+        })}
         {hp && <line x1={x(hp.date)} x2={x(hp.date)} y1={PAD.top} y2={H - PAD.bottom} stroke="var(--border)" strokeWidth={1} />}
         {points.map((p) => (
           <circle key={p.date} cx={x(p.date)} cy={y(p.weight_lb)} r={4} fill="var(--muted)" stroke="var(--surface)" strokeWidth={2} />
@@ -73,12 +76,13 @@ export default function WeightChart({ points }: { points: TrendPoint[] }) {
         <path d={path} fill="none" stroke="var(--accent)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
         {hp && <circle cx={x(hp.date)} cy={y(hp.trend)} r={4} fill="var(--accent)" stroke="var(--surface)" strokeWidth={2} />}
       </svg>
-      {hp && (
-        <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-xs shadow">
-          <span className="font-semibold tabular-nums text-foreground">{hp.weight_lb.toFixed(1)} lb</span>
-          <span className="text-muted"> · trend {hp.trend.toFixed(1)} · {fmtDate(hp.date)}</span>
-        </div>
-      )}
+      {(() => { const p = hp ?? points[points.length - 1]; return (
+        <p className="mt-1 h-4 text-center text-[11px] text-muted">
+          <span className="font-semibold tabular-nums text-foreground">{p.weight_lb.toFixed(1)} lb</span>
+          {" · trend "}<span className="tabular-nums">{p.trend.toFixed(1)}</span>{" · "}{fmtDate(p.date)}
+          {hp === null && <span> (latest)</span>}
+        </p>
+      ); })()}
       <div className="mt-2 flex justify-center gap-5 text-[11px] text-muted">
         <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-muted" />Daily weigh-in</span>
         <span className="flex items-center gap-1.5"><span className="inline-block h-0.5 w-4 rounded bg-accent" />Trend</span>
