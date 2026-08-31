@@ -16,7 +16,7 @@ Single-user fitness-logging PWA for George — meals (USDA macro lookup) + lifts
 v1 shipped 2026-08-30 and works end-to-end, but George considers it unfinished and is chat-logging in his vault until it's polished. Ask him for his backlog before assuming what to build.
 
 ## Stack & shape
-- Next.js 15 App Router + TS + Tailwind. Pages: `/` (dashboard: totals vs TARGETS, 7-day trend, realtime), `/login`, `/log/meal`, `/log/lift`.
+- Next.js 15 App Router + TS + Tailwind. Pages: `/` (dashboard: totals vs profile-derived targets, 7-day trend, realtime), `/login`, `/log/meal`, `/log/lift`.
 - Supabase: auth (single user), `meals`/`lifts` tables w/ RLS (`supabase/schema.sql`), realtime publication on both.
 - `lib/queue.ts`: offline queue (idb-keyval). Idempotent inserts (client UUID = row PK, 23505 = settled), isFlushing guard, session-gated flush, permanent-vs-transient error split, dead-letter key. Do not weaken these invariants.
 - `app/api/food-search/route.ts`: server-side USDA proxy — `USDA_API_KEY` must never get a `NEXT_PUBLIC_` prefix.

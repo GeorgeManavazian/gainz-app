@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [lifts, setLifts] = useState<Lift[]>([]);
 
   const [week, setWeek] = useState<{ day: string; kcal: number }[]>([]);
-  const [targets, setTargets] = useState<Targets | null | undefined>(undefined); // undefined = loading, null = no profile
+  const [targets, setTargets] = useState<Targets | null | "error" | undefined>(undefined); // undefined = loading, null = no profile
 
   const load = useCallback(async () => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
@@ -56,11 +56,16 @@ export default function Dashboard() {
     return () => { supabase.removeChannel(ch); };
   }, [load]);
 
-  useEffect(() => {
+  const loadTargets = useCallback(() => {
+    setTargets(undefined);
     getProfile()
       .then((p) => setTargets(p ? computeTargets(p) : null))
-      .catch(() => setTargets(null));
+      .catch(() => setTargets("error"));
   }, []);
+
+  useEffect(() => {
+    loadTargets();
+  }, [loadTargets]);
 
   const sum = (k: keyof Pick<Meal, "calories" | "protein_g" | "carbs_g" | "fat_g">) =>
     Math.round(meals.reduce((a, m) => a + Number(m[k]), 0));
@@ -79,6 +84,12 @@ export default function Dashboard() {
               <div key={label} className="h-[74px] rounded-2xl border border-border bg-surface" />
             ))}
           </section>
+        ) : targets === "error" ? (
+          <button type="button" onClick={loadTargets}
+            className="rounded-2xl border border-border bg-surface p-4 text-left text-sm active:bg-surface-2">
+            <p className="font-semibold text-foreground">Couldn&apos;t load targets</p>
+            <p className="mt-1 text-muted">Tap to retry.</p>
+          </button>
         ) : targets === null ? (
           <Link href="/profile"
             className="rounded-2xl border border-accent/40 bg-surface p-4 text-sm active:bg-surface-2">
