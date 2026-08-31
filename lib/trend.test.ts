@@ -157,4 +157,7 @@ describe("inCooldown", () => {
   it("false once 14 full days have passed", () => {
     expect(inCooldown("2026-08-31T08:00:00Z", now)).toBe(false);
   });
+  it("false at exactly 14 days (boundary is exclusive)", () => {
+    expect(inCooldown("2026-08-31T12:00:00Z", new Date("2026-09-14T12:00:00Z"))).toBe(false);
+  });
 });

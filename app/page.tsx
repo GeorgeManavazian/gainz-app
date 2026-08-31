@@ -26,7 +26,6 @@ export default function Dashboard() {
   const load = useCallback(async () => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
     const weekStart = new Date(start); weekStart.setDate(weekStart.getDate() - 6);
-    const localKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const [m, l, w] = await Promise.all([
       supabase.from("meals").select("*").gte("logged_at", start.toISOString()).order("logged_at"),
       supabase.from("lifts").select("*").gte("logged_at", start.toISOString()).order("logged_at"),
@@ -37,17 +36,17 @@ export default function Dashboard() {
     const byDay = new Map<string, number>();
     for (let i = 0; i < 7; i++) {
       const d = new Date(weekStart); d.setDate(d.getDate() + i); d.setHours(0, 0, 0, 0);
-      byDay.set(localKey(d), 0);
+      byDay.set(localDateKey(d), 0);
     }
     for (const row of (w.data ?? []) as { logged_at: string; calories: number }[]) {
       const d = new Date(row.logged_at); d.setHours(0, 0, 0, 0);
-      byDay.set(localKey(d), (byDay.get(localKey(d)) ?? 0) + Number(row.calories));
+      byDay.set(localDateKey(d), (byDay.get(localDateKey(d)) ?? 0) + Number(row.calories));
     }
     const weekArray: { day: string; kcal: number }[] = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(weekStart); d.setDate(d.getDate() + i); d.setHours(0, 0, 0, 0);
       const day = d.toLocaleDateString("en-US", { weekday: "short" });
-      weekArray.push({ day, kcal: Math.round(byDay.get(localKey(d)) ?? 0) });
+      weekArray.push({ day, kcal: Math.round(byDay.get(localDateKey(d)) ?? 0) });
     }
     setWeek(weekArray);
   }, []);
@@ -63,9 +62,10 @@ export default function Dashboard() {
 
   const loadTargets = useCallback((soft = false) => {
     if (!soft) setProfile(undefined);
-    Promise.all([getProfile(), listWeighIns(addDays(localDateKey(), -120))])
-      .then(([p, w]) => { setWeighIns(w); setProfile(p); })
-      .catch(() => setProfile("error"));
+    return Promise.allSettled([getProfile(), listWeighIns(addDays(localDateKey(), -120))]).then(([p, w]) => {
+      setWeighIns(w.status === "fulfilled" ? w.value : []);
+      setProfile(p.status === "fulfilled" ? p.value : "error");
+    });
   }, []);
   useEffect(() => { loadTargets(); }, [loadTargets]);
 
@@ -89,12 +89,12 @@ export default function Dashboard() {
     ? (phase === "cut" ? targets.kcal - delta : targets.kcal + delta) : null;
   const suppressed = inCooldown(p?.last_adjusted_at ?? null, new Date());
 
-  async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); loadTargets(true); }
+  async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); await loadTargets(true); }
   async function apply() {
     if (!p || typeof targets !== "object" || targets === null) return;
     const base = p.tdee_override ?? targets.tdee_est;
     await applyAdjustment(p, phase === "cut" ? base - delta : base + delta);
-    loadTargets(true);
+    await loadTargets(true);
   }
 
   const sum = (k: keyof Pick<Meal, "calories" | "protein_g" | "carbs_g" | "fat_g">) =>

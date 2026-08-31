@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 const fmtSlope = (s: number) => { const a = Math.abs(s); const sign = a < 0.05 ? "" : s > 0 ? "+" : "−"; return `${sign}${a.toFixed(1)} lb/wk`; };
@@ -11,10 +11,14 @@ export default function WeighInCard({ todayWeight, lastWeight, trend, slope, onS
   const [value, setValue] = useState(todayWeight === null ? "" : String(todayWeight));
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
-  useEffect(() => { setValue(todayWeight === null ? "" : String(todayWeight)); }, [todayWeight]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (document.activeElement === inputRef.current) return; // user is typing — don't resync
+    setValue(todayWeight === null ? "" : String(todayWeight));
+  }, [todayWeight]);
 
   const parsed = parseFloat(value);
-  const valid = Number.isFinite(parsed) && parsed > 0;
+  const valid = Number.isFinite(parsed) && parsed >= 50 && parsed <= 600;
 
   async function save() {
     if (!valid) return;
@@ -43,7 +47,7 @@ export default function WeighInCard({ todayWeight, lastWeight, trend, slope, onS
       {linkToDetail ? <Link href="/weight" className="active:opacity-80">{hero}</Link> : hero}
       <div className="flex w-[45%] flex-col justify-center gap-2">
         <label className="relative">
-          <input className="h-11 w-full rounded-xl border border-border bg-surface-2 px-4 pr-9 text-base tabular-nums text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+          <input ref={inputRef} className="h-11 w-full rounded-xl border border-border bg-surface-2 px-4 pr-9 text-base tabular-nums text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
             inputMode="decimal" placeholder={lastWeight === null ? "203.0" : lastWeight.toFixed(1)}
             value={value} onChange={(e) => setValue(e.target.value)} aria-label="Today's weight in pounds" />
           <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">lb</span>

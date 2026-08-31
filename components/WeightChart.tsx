@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { dayDiff, type TrendPoint } from "@/lib/trend";
 
 const W = 360, H = 180;
@@ -17,6 +17,8 @@ function fmtDate(iso: string): string {
 
 export default function WeightChart({ points }: { points: TrendPoint[] }) {
   const [hover, setHover] = useState<number | null>(null); // index into points
+
+  useEffect(() => { setHover(null); }, [points]);
 
   const geo = useMemo(() => {
     if (points.length === 0) return null;
@@ -55,19 +57,19 @@ export default function WeightChart({ points }: { points: TrendPoint[] }) {
   return (
     <div>
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Body weight with trend line"
-        className="block touch-none select-none"
+        className="block touch-pan-y select-none"
         onPointerMove={onMove} onPointerDown={onMove} onPointerLeave={() => setHover(null)}>
         {yTicks.map((v) => (
           <g key={v}>
             <line x1={PAD.left} x2={W - PAD.right} y1={y(v)} y2={y(v)} stroke="var(--surface-2)" strokeWidth={1} />
-            <text x={PAD.left - 6} y={y(v) + 3} textAnchor="end" fontSize={9} fill="var(--muted)">{v}</text>
+            <text x={PAD.left - 6} y={y(v) + 3} textAnchor="end" fontSize={12} fill="var(--muted)">{v}</text>
           </g>
         ))}
         {xTicks.map((d, i) => {
           const isFirst = i === 0;
           const isLast = i === xTicks.length - 1;
           const anchor = xTicks.length === 1 ? "middle" : isFirst ? "start" : isLast ? "end" : "middle";
-          return <text key={d} x={x(d)} y={H - 6} textAnchor={anchor} fontSize={8} fill="var(--muted)">{fmtDate(d)}</text>;
+          return <text key={d} x={x(d)} y={H - 6} textAnchor={anchor} fontSize={11} fill="var(--muted)">{fmtDate(d)}</text>;
         })}
         {hp && <line x1={x(hp.date)} x2={x(hp.date)} y1={PAD.top} y2={H - PAD.bottom} stroke="var(--border)" strokeWidth={1} />}
         {points.map((p) => (

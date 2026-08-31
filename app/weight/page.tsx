@@ -24,10 +24,10 @@ export default function WeightPage() {
   const [err, setErr] = useState("");
 
   const load = useCallback(async () => {
-    try {
-      const [w, p] = await Promise.all([listWeighIns(), getProfile()]);
-      setRows(w); setProfile(p); setErr("");
-    } catch { setErr("Couldn't load weigh-ins."); }
+    const [w, p] = await Promise.allSettled([listWeighIns(), getProfile()]);
+    if (w.status === "fulfilled") { setRows(w.value); setErr(""); }
+    else { setErr("Couldn't load weigh-ins."); }
+    setProfile(p.status === "fulfilled" ? p.value : null);
   }, []);
   useEffect(() => { load(); }, [load]);
 
