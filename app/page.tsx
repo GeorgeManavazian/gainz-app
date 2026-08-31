@@ -8,7 +8,7 @@ import WeighInCard from "@/components/WeighInCard";
 import ProgressCard from "@/components/ProgressCard";
 import { applyAdjustment, getProfile, type ProfileRow } from "@/lib/profile";
 import { listWeighIns, localDateKey, upsertWeighIn, type WeighInRow } from "@/lib/weighins";
-import { addDays, assessProgress, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight } from "@/lib/trend";
+import { addDays, assessProgress, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight, type Assessment } from "@/lib/trend";
 
 type Meal = { id: string; food_name: string; grams: number; calories: number;
   protein_g: number; carbs_g: number; fat_g: number; logged_at: string };
@@ -61,8 +61,8 @@ export default function Dashboard() {
     return () => { supabase.removeChannel(ch); };
   }, [load]);
 
-  const loadTargets = useCallback(() => {
-    setProfile(undefined);
+  const loadTargets = useCallback((soft = false) => {
+    if (!soft) setProfile(undefined);
     Promise.all([getProfile(), listWeighIns(addDays(localDateKey(), -120))])
       .then(([p, w]) => { setWeighIns(w); setProfile(p); })
       .catch(() => setProfile("error"));
@@ -83,18 +83,18 @@ export default function Dashboard() {
   const p = typeof profile === "object" && profile !== null ? profile : null;
   const phase = p?.phase ?? "cut";
   const rate = p?.rate_lb_per_wk ?? 0;
-  const assessment = assessProgress(slope, phase, rate);
+  const assessment: Assessment = p ? assessProgress(slope, phase, rate) : "insufficient_data";
   const delta = suggestAdjustment(slope, phase, rate);
   const newKcal = typeof targets === "object" && targets !== null
     ? (phase === "cut" ? targets.kcal - delta : targets.kcal + delta) : null;
   const suppressed = inCooldown(p?.last_adjusted_at ?? null, new Date());
 
-  async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); loadTargets(); }
+  async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); loadTargets(true); }
   async function apply() {
     if (!p || typeof targets !== "object" || targets === null) return;
     const base = p.tdee_override ?? targets.tdee_est;
     await applyAdjustment(p, phase === "cut" ? base - delta : base + delta);
-    loadTargets();
+    loadTargets(true);
   }
 
   const sum = (k: keyof Pick<Meal, "calories" | "protein_g" | "carbs_g" | "fat_g">) =>
@@ -120,7 +120,7 @@ export default function Dashboard() {
             ))}
           </section>
         ) : targets === "error" ? (
-          <button type="button" onClick={loadTargets}
+          <button type="button" onClick={() => loadTargets()}
             className="rounded-2xl border border-border bg-surface p-4 text-left text-sm active:bg-surface-2">
             <p className="font-semibold text-foreground">Couldn&apos;t load targets</p>
             <p className="mt-1 text-muted">Tap to retry.</p>

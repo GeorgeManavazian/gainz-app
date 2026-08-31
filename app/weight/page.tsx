@@ -8,7 +8,7 @@ import ProgressCard from "@/components/ProgressCard";
 import { getProfile, applyAdjustment, type ProfileRow } from "@/lib/profile";
 import { computeTargets } from "@/lib/targets";
 import { deleteWeighIn, listWeighIns, localDateKey, upsertWeighIn, type WeighInRow } from "@/lib/weighins";
-import { addDays, assessProgress, emaTrend, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight } from "@/lib/trend";
+import { addDays, assessProgress, emaTrend, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight, type Assessment } from "@/lib/trend";
 
 type Range = 30 | 90 | "all";
 
@@ -45,14 +45,17 @@ export default function WeightPage() {
   const slope = slopeLbPerWk(rows, today);
   const phase = profile?.phase ?? "cut";
   const rate = profile?.rate_lb_per_wk ?? 0;
-  const assessment = assessProgress(slope, phase, rate);
+  const assessment: Assessment = profile ? assessProgress(slope, phase, rate) : "insufficient_data";
   const delta = suggestAdjustment(slope, phase, rate);
   const targets = profile ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }) : null;
   const newKcal = targets ? (phase === "cut" ? targets.kcal - delta : targets.kcal + delta) : null;
   const suppressed = inCooldown(profile?.last_adjusted_at ?? null, new Date());
 
   async function save(weight_lb: number) { await upsertWeighIn(today, weight_lb); await load(); }
-  async function remove(id: string) { await deleteWeighIn(id); await load(); }
+  async function remove(id: string) {
+    try { await deleteWeighIn(id); await load(); }
+    catch { setErr("Couldn't delete weigh-in."); }
+  }
   async function apply() {
     if (!profile || !targets) return;
     const base = profile.tdee_override ?? targets.tdee_est;
