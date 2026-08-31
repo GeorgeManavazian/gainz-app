@@ -87,6 +87,11 @@ describe("slopeLbPerWk", () => {
     const pts = ws.map((v, i) => w(addDays(today, i - 13), v));
     expect(slopeLbPerWk(pts, today)).toBeCloseTo(-0.0338, 3);
   });
+
+  it("null when all in-window points share one date (degenerate OLS)", () => {
+    const pts = Array.from({ length: 8 }, (_, i) => w(today, 203 + i * 0.1));
+    expect(slopeLbPerWk(pts, today)).toBeNull();
+  });
 });
 
 describe("assessProgress", () => {

@@ -3,7 +3,7 @@ export type TrendPoint = WeighIn & { trend: number };
 
 export const EMA_ALPHA = 0.1;
 
-/** Exponential moving average over weigh-ins in order. Gaps between dates are ignored. */
+/** Exponential moving average over weigh-ins. Input must be sorted ascending by date, one point per date; gaps between dates are ignored (each point is one step). */
 export function emaTrend(points: WeighIn[], alpha: number = EMA_ALPHA): TrendPoint[] {
   const out: TrendPoint[] = [];
   let prev: number | null = null;
@@ -67,6 +67,7 @@ export function slopeLbPerWk(
     num += (xs[i] - mx) * (ys[i] - my);
     den += (xs[i] - mx) ** 2;
   }
+  if (den === 0) return null;
   return (num / den) * 7;
 }
 
