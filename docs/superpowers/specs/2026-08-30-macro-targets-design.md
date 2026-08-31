@@ -31,6 +31,8 @@ Rate default by phase when creating a profile: cut 1.5, maintain 0, bulk 0.5. Ra
 
 Rounding: round `kcal`, `fat_g`, `protein_g` to integers first, then compute `carbs_g` from the rounded values and round it. This keeps displayed macros consistent with displayed kcal to within a few kcal. If `kcal < 9·fat_g + 4·protein_g` the carbs floor at 0 and the result carries `warning: "kcal too low for fat + protein floors"` — UI shows it; no silent clamping.
 
+Known edge (deliberately unhandled for now): nothing floors `kcal` itself. A small TDEE with a large cut rate yields a negative or absurdly low kcal; the warning fires and carbs floor at 0, but the kcal target itself is displayed as computed. Revisit when weigh-ins (sub-project 3) start moving `rate` automatically — that is the first point where a sanity floor (e.g. never below BMR × 1.0) earns its place.
+
 Reference check (must be a unit test): 170 lb, cut, rate 1.5, protein 1.1 g/lb, override 3100 → 2350 kcal / 223 g protein / 67 g fat / 214 g carbs (855 kcal remaining after rounded fat + protein; 855 / 4 = 213.75 → 214). Profile.md's hand-rounded 225/212 differ slightly; the function's output is canonical from now on.
 
 ## Data model
