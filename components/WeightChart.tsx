@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { dayDiff, type TrendPoint } from "@/lib/trend";
 
-const W = 360, H = 190;
-const PAD = { top: 14, right: 14, bottom: 22, left: 34 };
+const W = 360, H = 210;
+const PAD = { top: 10, right: 6, bottom: 20, left: 30 };
 
 function niceStep(range: number): number {
   for (const s of [1, 2, 4, 5, 10, 20]) if (range / s <= 5) return s;
@@ -83,13 +83,14 @@ export default function WeightChart({ points }: { points: TrendPoint[] }) {
       onPointerMove={onMove} onPointerDown={onMove} onPointerLeave={() => setHover(null)}>
       <defs>
         <linearGradient id="weight-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="var(--accent)" stopOpacity="0.30" />
-          <stop offset="1" stopColor="var(--accent)" stopOpacity="0.02" />
+          <stop offset="0" stopColor="var(--accent)" stopOpacity="0.45" />
+          <stop offset="0.55" stopColor="var(--accent)" stopOpacity="0.16" />
+          <stop offset="1" stopColor="var(--accent)" stopOpacity="0.03" />
         </linearGradient>
       </defs>
       {yTicks.map((v) => (
         <g key={v}>
-          <line x1={PAD.left} x2={W - PAD.right} y1={y(v)} y2={y(v)} stroke="var(--surface-2)" strokeWidth={1} />
+          <line x1={PAD.left} x2={W - PAD.right} y1={y(v)} y2={y(v)} stroke="var(--border)" strokeWidth={0.5} opacity={0.35} />
           <text x={PAD.left - 6} y={y(v) + 3} textAnchor="end" fontSize={11} fill="var(--muted)">{v}</text>
         </g>
       ))}
@@ -100,7 +101,7 @@ export default function WeightChart({ points }: { points: TrendPoint[] }) {
         return <text key={d} x={x(d)} y={H - 6} textAnchor={anchor} fontSize={10} fill="var(--muted)">{fmtDate(d)}</text>;
       })}
       {area && <path d={area} fill="url(#weight-fill)" />}
-      <path d={line} fill="none" stroke="var(--accent)" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+      <path d={line} fill="none" stroke="var(--accent)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
       {points.map((p) => (
         <circle key={p.date} cx={x(p.date)} cy={y(p.weight_lb)} r={3.5} fill="var(--accent)" stroke="var(--surface)" strokeWidth={1.5} opacity={0.9} />
       ))}

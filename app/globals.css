@@ -11,8 +11,8 @@
   --accent-foreground: #1e1e2e;
   --danger: #f38ba8;
   --success: #a6e3a1;
-  --surface-hi: #31324a;
-  --surface-lo: #232438;
+  --surface-hi: #2c2d49;
+  --surface-lo: #1f2038;
 }
 
 @theme inline {
