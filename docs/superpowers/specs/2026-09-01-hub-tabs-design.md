@@ -70,7 +70,7 @@ Charts: `components/LineChart.tsx` — generic inline-SVG polyline with dots and
 
 ## Data
 
-No new tables. Reads: `meals` (today; last 7 days), `lifts` (all, newest-first, `listRecentLifts(2000)`), `workouts` (completed, 30), `weigh_ins`, `profiles`. Realtime: the HUB keeps today's `meals`/`lifts` channels as now.
+No new tables. Reads: `meals` (today; last 7 days), `lifts` (all, newest-first, `listRecentLifts(2000)`), `workouts` (completed, 30), `weigh_ins`, `profiles`. Realtime: the HUB keeps today's `meals`/`lifts` channels as now; the `lifts` channel reloads the active/done workout row (matches the restored implementation) so the workout row and set count refresh when sets land.
 
 ## Visual design
 
@@ -84,6 +84,8 @@ No new tables. Reads: `meals` (today; last 7 days), `lifts` (all, newest-first, 
 No other hex values anywhere; components keep using tokens.
 
 **Design notes from the chosen image:** hero ring is a 270° open gauge (gap at the bottom) with a soft glow and a flame icon above the number — the red overage lap draws along the same 270° track; macro gauges show `88` + `left` inside and `88 / 206g` beneath with thin vertical dividers; header has the GAINZ italic wordmark left and a burn pill (flame + kcal) + profile circle right — the burn pill renders only when a burn number exists (Oura, later; hidden until then), profile circle links to `/profile`; Today rows have small icon bubbles (meal-type glyphs deferred — use a generic bowl glyph) and the workout row a filled green check circle; weigh-in row carries a tiny sparkline of the last ~10 weigh-ins; tab bar is a rounded pill container with the active tab as a lavender-tinted pill. Diagram thumbnails remain deferred.
+
+Deferred from the render: the weigh-in row sparkline and the Today rows' icon bubbles — polish for a later pass.
 
 ## Out of scope
 
