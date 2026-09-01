@@ -1,8 +1,8 @@
 // components/WorkoutSummary.tsx
 "use client";
 import Link from "next/link";
-import { findExercise, muscleLabel, muscleShort } from "@/lib/exercises";
-import { beatLastTime, formatElapsed, groupByExercise, lastSession, totalSets, totalVolume,
+import { findExercise, muscleShort } from "@/lib/exercises";
+import { beatLastTime, formatElapsed, groupByExercise, lastSession, totalSets, totalVolume, workoutTitle,
   type LiftRow, type WorkoutRow } from "@/lib/workouts";
 
 export default function WorkoutSummary({ workout, logged, history }: {
@@ -12,9 +12,10 @@ export default function WorkoutSummary({ workout, logged, history }: {
   const ended = new Date(workout.ended_at ?? workout.started_at);
   const previousRows = history.filter((r) => r.logged_at < workout.started_at);
   const groups = groupByExercise(logged);
-  const beats = groups.filter((g) => beatLastTime(g.rows, lastSession(g.exercise, previousRows))).length;
-  const title = workout.muscle_groups.map(muscleLabel).join(" · ");
-  const when = started.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  const cards = groups.map((g) => ({ ...g, beat: beatLastTime(g.rows, lastSession(g.exercise, previousRows)) }));
+  const beats = cards.filter((c) => c.beat).length;
+  const title = workoutTitle(workout.muscle_groups);
+  const when = `${started.toLocaleDateString(undefined, { month: "short", day: "numeric" })} at ${started.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}`;
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-28 pt-6 text-foreground">
@@ -44,8 +45,8 @@ export default function WorkoutSummary({ workout, logged, history }: {
         </div>
       </section>
 
-      {groups.map((g) => {
-        const beat = beatLastTime(g.rows, lastSession(g.exercise, previousRows));
+      {cards.map((g) => {
+        const beat = g.beat;
         return (
           <section key={g.exercise} className="rounded-2xl border border-border bg-surface p-4">
             <div className="flex items-center gap-3">

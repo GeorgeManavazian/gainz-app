@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { beatLastTime, bestE1rm, e1rm, formatElapsed, formatSession, groupByExercise, lastSession,
-  localDateOf, recentExercises, totalSets, totalVolume, type LiftRow } from "./workouts";
+  localDateOf, recentExercises, totalSets, totalVolume, workoutTitle, type LiftRow } from "./workouts";
 
 const row = (o: Partial<LiftRow> & { exercise: string; logged_at: string }): LiftRow => ({
   id: o.id ?? o.logged_at, sets: 1, reps: 6, weight: 95, workout_id: null, ...o });
@@ -81,5 +81,15 @@ describe("summary helpers", () => {
   });
   it("localDateOf returns a YYYY-MM-DD string", () => {
     expect(localDateOf("2026-09-03T14:10:00Z")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe("workoutTitle", () => {
+  it("names presets and joins otherwise", () => {
+    expect(workoutTitle(["chest", "back", "shoulders", "biceps", "triceps"])).toBe("Upper");
+    expect(workoutTitle(["triceps", "biceps", "shoulders", "back", "chest"])).toBe("Upper");
+    expect(workoutTitle(["quads", "hamstrings_glutes", "core"])).toBe("Lower");
+    expect(workoutTitle(["chest", "triceps"])).toBe("Chest · Triceps");
+    expect(workoutTitle([])).toBe("");
   });
 });

@@ -1,8 +1,17 @@
-import { findExercise, normalizeName, type MuscleGroup } from "./exercises";
+import { PRESETS, findExercise, muscleLabel, normalizeName, type MuscleGroup } from "./exercises";
 
 export type LiftRow = { id: string; exercise: string; sets: number; reps: number; weight: number;
   logged_at: string; workout_id: string | null };
 export type WorkoutRow = { id: string; started_at: string; ended_at: string | null; muscle_groups: MuscleGroup[] };
+
+const sameSet = (a: MuscleGroup[], b: MuscleGroup[]) => a.length === b.length && a.every((x) => b.includes(x));
+
+/** "Upper" / "Lower" when the groups equal a preset exactly, else labels joined with " · ". */
+export function workoutTitle(groups: MuscleGroup[]): string {
+  if (sameSet(groups, PRESETS.upper)) return "Upper";
+  if (sameSet(groups, PRESETS.lower)) return "Lower";
+  return groups.map(muscleLabel).join(" · ");
+}
 
 export function localDateOf(iso: string): string {
   const d = new Date(iso);

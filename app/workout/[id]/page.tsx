@@ -7,15 +7,11 @@ import AuthGuard from "@/components/AuthGuard";
 import ExerciseRow from "@/components/ExerciseRow";
 import SetSheet, { type SheetState } from "@/components/SetSheet";
 import WorkoutSummary from "@/components/WorkoutSummary";
-import { MUSCLE_GROUPS, PRESETS, exercisesFor, findExercise, muscleLabel, normalizeName, searchExercises,
-  type MuscleGroup } from "@/lib/exercises";
-import { formatElapsed, lastSession, recentExercises, type LiftRow, type WorkoutRow } from "@/lib/workouts";
+import { MUSCLE_GROUPS, exercisesFor, findExercise, normalizeName, searchExercises } from "@/lib/exercises";
+import { formatElapsed, lastSession, recentExercises, workoutTitle, type LiftRow, type WorkoutRow } from "@/lib/workouts";
 import { deleteWorkout, endWorkout, getWorkout, listLiftsForWorkout, listRecentLifts, logSet } from "@/lib/workouts-db";
 
 const DEFAULT_STATE: SheetState = { sets: 1, reps: 8, weight: 0 };
-
-const sameSet = (a: MuscleGroup[], b: MuscleGroup[]) =>
-  a.length === b.length && a.every((x) => b.includes(x));
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
@@ -92,9 +88,7 @@ export default function WorkoutPage() {
 
   const q = query.trim();
   const searchHits = q ? searchExercises(q) : [];
-  const title = sameSet(groups, PRESETS.upper)
-    ? "Upper" : sameSet(groups, PRESETS.lower)
-    ? "Lower" : groups.map(muscleLabel).join(" · ");
+  const title = workoutTitle(groups);
   const openMuscle = open ? findExercise(open)?.muscles[0] : undefined;
 
   return (
