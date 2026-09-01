@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 const NUTRIENTS = { kcal: 1008, protein: 1003, carbs: 1005, fat: 1004 } as const;
 
-const TYPE_RANK: Record<string, number> = { Foundation: 0, "SR Legacy": 1, "Survey (FNDDS)": 2, Branded: 3 };
+// FNDDS first: its names are the human ones ("Chicken breast, grilled") and it carries household portions.
+const TYPE_RANK: Record<string, number> = { "Survey (FNDDS)": 0, Foundation: 1, "SR Legacy": 2, Branded: 3 };
 
 const COOKED_RE = /\b(cooked|roasted|grilled|braised|boiled|baked|fried|broiled|stewed|steamed|saut[ée]ed)\b/i;
 const RAW_RE = /\braw\b/i;
