@@ -7,7 +7,7 @@ const row = (o: Partial<LiftRow> & { exercise: string; logged_at: string }): Lif
 
 // newest-first, as listRecentLifts returns them
 const HISTORY: LiftRow[] = [
-  row({ exercise: "DB Chest Press", logged_at: "2026-09-03T14:10:00Z", workout_id: "w2", reps: 7, weight: 90 }),
+  row({ exercise: "db chest press", logged_at: "2026-09-03T14:10:00Z", workout_id: "w2", reps: 7, weight: 90 }),
   row({ exercise: "DB Chest Press", logged_at: "2026-09-03T14:05:00Z", workout_id: "w2", reps: 6, weight: 95 }),
   row({ exercise: "Lat Pulldown", logged_at: "2026-09-03T14:00:00Z", workout_id: "w2", reps: 10, weight: 140 }),
   row({ exercise: "db chest press", logged_at: "2026-08-31T15:00:00Z", workout_id: null, reps: 5, weight: 95 }),
@@ -16,7 +16,9 @@ const HISTORY: LiftRow[] = [
 ];
 
 describe("recentExercises", () => {
-  it("dedupes case-insensitively keeping first casing, newest-first, filtered by group", () => {
+  it("dedupes case-insensitively, newest-first, filtered by group; library matches show the canonical name", () => {
+    // HISTORY's newest row is logged as "db chest press" — recentExercises must show the
+    // library's canonical casing ("DB Chest Press"), not the row's own casing.
     expect(recentExercises(HISTORY, ["chest"])).toEqual(["DB Chest Press", "Shoulder press"]);
   });
   it("custom (non-library) names are always included; library names need a group match", () => {

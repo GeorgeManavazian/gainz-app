@@ -60,7 +60,7 @@ export const EXERCISES: Exercise[]; // ~120–150 entries
 
 ## Recently used & last time — `lib/workouts.ts`
 
-**`recentExercises(rows: LiftRow[], groups: MuscleGroup[], limit = 8): string[]`** — distinct `exercise` names from `rows` (already newest-first), deduped case-insensitively, keeping the first-seen casing. An exercise is included if it is **not in the library** (custom name — always shown) **or** its library `muscles` intersect `groups`. Returns at most `limit`.
+**`recentExercises(rows: LiftRow[], groups: MuscleGroup[], limit = 8): string[]`** — distinct `exercise` names from `rows` (already newest-first), deduped case-insensitively; library matches are shown under the library's canonical name, custom names keep first-seen casing. An exercise is included if it is **not in the library** (custom name — always shown) **or** its library `muscles` intersect `groups`. Returns at most `limit`.
 
 **`lastSession(exercise: string, rows: LiftRow[]): LiftRow[]`** — `rows` filtered to `exercise` (case-insensitive), newest-first. Take the most recent row; the session is every row sharing its `workout_id` — or, when that is `null` (historic / chat-logged), every row with the same local calendar date. Returned **oldest-first** so the display reads in set order. Empty array when the exercise has never been logged.
 

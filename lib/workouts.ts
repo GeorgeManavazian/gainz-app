@@ -30,7 +30,7 @@ export function recentExercises(rows: LiftRow[], groups: MuscleGroup[], limit = 
     seen.add(key);
     const lib = findExercise(r.exercise);
     if (lib && !lib.muscles.some((m) => set.has(m))) continue;
-    out.push(r.exercise.trim());
+    out.push(lib?.name ?? r.exercise.trim());
     if (out.length >= limit) break;
   }
   return out;
