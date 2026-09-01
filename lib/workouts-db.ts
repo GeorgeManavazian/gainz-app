@@ -99,6 +99,13 @@ export async function getWorkout(id: string): Promise<WorkoutRow | null> {
   return w;
 }
 
+export async function listCompletedWorkouts(limit = 30): Promise<WorkoutRow[]> {
+  const { data, error } = await supabase.from("workouts").select("*")
+    .not("ended_at", "is", null).order("started_at", { ascending: false }).limit(limit);
+  if (error) throw error;
+  return (data ?? []).map(toWorkout);
+}
+
 export async function listLiftsForWorkout(id: string): Promise<LiftRow[]> {
   const queued = (await readQueue())
     .filter((q) => q.table === "lifts" && q.op === "insert" && q.entry.workout_id === id)
