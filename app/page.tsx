@@ -9,6 +9,8 @@ import ProgressCard from "@/components/ProgressCard";
 import { applyAdjustment, getProfile, type ProfileRow } from "@/lib/profile";
 import { listWeighIns, localDateKey, upsertWeighIn, type WeighInRow } from "@/lib/weighins";
 import { addDays, assessProgress, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight, type Assessment } from "@/lib/trend";
+import { getActiveWorkout } from "@/lib/workouts-db";
+import { formatElapsed, type WorkoutRow } from "@/lib/workouts";
 
 type Meal = { id: string; food_name: string; grams: number; calories: number;
   protein_g: number; carbs_g: number; fat_g: number; logged_at: string };
@@ -22,6 +24,7 @@ export default function Dashboard() {
   const [week, setWeek] = useState<{ day: string; kcal: number }[]>([]);
   const [profile, setProfile] = useState<ProfileRow | null | "error" | undefined>(undefined);
   const [weighIns, setWeighIns] = useState<WeighInRow[]>([]);
+  const [active, setActive] = useState<WorkoutRow | null>(null);
 
   const load = useCallback(async () => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
@@ -68,6 +71,10 @@ export default function Dashboard() {
     });
   }, []);
   useEffect(() => { loadTargets(); }, [loadTargets]);
+
+  useEffect(() => {
+    getActiveWorkout().then(setActive).catch(() => setActive(null));
+  }, []);
 
   const today = localDateKey();
   const trend = trendWeight(weighIns);
@@ -159,12 +166,21 @@ export default function Dashboard() {
           >
             + Meal
           </Link>
-          <Link
-            className="flex-1 rounded-xl border border-border bg-surface px-4 py-4 text-center text-base font-semibold text-foreground active:bg-surface-2"
-            href="/log/lift"
-          >
-            + Lift
-          </Link>
+          {active ? (
+            <Link
+              className="flex-1 rounded-xl border border-accent/60 bg-surface px-4 py-4 text-center text-base font-semibold text-accent active:bg-surface-2"
+              href={`/workout/${active.id}`}
+            >
+              Resume · {formatElapsed(Date.now() - new Date(active.started_at).getTime()).replace(/:\d\d$/, "")} min
+            </Link>
+          ) : (
+            <Link
+              className="flex-1 rounded-xl border border-border bg-surface px-4 py-4 text-center text-base font-semibold text-foreground active:bg-surface-2"
+              href="/workout/new"
+            >
+              Start workout
+            </Link>
+          )}
         </div>
 
         <section className="flex flex-col gap-2">
