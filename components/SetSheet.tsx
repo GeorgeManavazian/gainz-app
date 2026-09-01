@@ -1,6 +1,6 @@
 // components/SetSheet.tsx
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Wheel, { range } from "@/components/Wheel";
 import { muscleShort, type MuscleGroup } from "@/lib/exercises";
 import { formatSession, localDateOf, type LiftRow } from "@/lib/workouts";
@@ -29,17 +29,26 @@ export default function SetSheet({ exercise, muscle, previous, logged, state, on
     try { await onAdd(); } catch { setErr("Couldn't save. Please try again."); } finally { setBusy(false); }
   }
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
   return (
     <>
       <div className="fixed inset-0 z-10 bg-black/60" onClick={onClose} />
-      <div className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-3xl border-t border-border bg-surface px-4 pb-6 pt-3 shadow-2xl">
+      <div role="dialog" aria-modal="true" aria-labelledby="set-sheet-title"
+        className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-3xl border-t border-border bg-surface px-4 pb-6 pt-3 shadow-2xl">
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" />
         <div className="flex items-start gap-3">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-[11px] font-semibold text-muted">
             {muscleShort(muscle)}
           </span>
           <div className="flex-1">
-            <h2 className="text-[22px] font-bold leading-tight">{exercise}</h2>
+            <h2 id="set-sheet-title" className="text-[22px] font-bold leading-tight">{exercise}</h2>
             <p className="text-sm text-muted">
               {previous.length ? `Last: ${formatSession(previous)} · ${shortDate(previous[0].logged_at)}` : "First time"}
             </p>
