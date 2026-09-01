@@ -171,9 +171,20 @@ async function counterpart(name: string, want: "raw" | "cooked") {
     const items = want === "raw"
       ? rank(await usdaSearch(`${q} raw`, 25, "raw"), `${q} raw`).items
       : rank(await usdaSearch(q, 40), q).items;
-    const hit = items.find((i) => i.strict && i.badge === want)
-      ?? items.find((i) => i.badge === want && normalize(i.name) === normalize(name));
-    return NextResponse.json({ item: hit ?? null });
+    // Among same-badge candidates prefer the plain fresh cut: "thigh, meat only, raw" over
+    // "skin (drumsticks and thighs), raw"; "egg, whole, raw, fresh" over "frozen, pasteurized".
+    const pref = (i: Item) => {
+      const d = i.description;
+      let p = 0;
+      if (/meat only|skinless|boneless|\bfresh\b|\blean\b/i.test(d)) p -= 3;
+      if (/\bskin\b(?! not eaten)|separable fat|giblets|gizzard|liver|heart|back\b|neck\b|frozen|pasteurized|dried|powder|liquid|grass-fed|organic|wagyu|bison|canned|salted|smoked|cured/i.test(d)) p += 5;
+      return p;
+    };
+    const cands = items
+      .map((i, idx) => ({ i, idx }))
+      .filter(({ i }) => i.badge === want && (i.strict || normalize(i.name) === normalize(name)))
+      .sort((x, y) => (pref(x.i) + x.idx * 0.1) - (pref(y.i) + y.idx * 0.1));
+    return NextResponse.json({ item: cands[0]?.i ?? null });
   } catch (e) {
     console.error("food-search pair failed", name, want, e instanceof Error ? e.message : e);
     return NextResponse.json({ item: null }, { status: 502 });
