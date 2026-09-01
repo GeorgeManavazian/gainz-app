@@ -1,0 +1,4869 @@
+[
+ {
+  "name": "Chicken breast",
+  "aliases": [
+   "baked chicken",
+   "chicken",
+   "chicken breast",
+   "chicken breasts",
+   "chicken tenderloin",
+   "chicken tenderloins",
+   "chicken tenders plain",
+   "grilled chicken",
+   "grilled chicken tenders",
+   "roasted chicken breast",
+   "tenderloins"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2705956,
+   "description": "Chicken breast, baked, broiled, or roasted, skin not eaten, from raw",
+   "kcal": 161,
+   "protein": 30.22,
+   "carbs": 0,
+   "fat": 3.52
+  },
+  "raw": {
+   "fdcId": 171077,
+   "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+   "kcal": 120,
+   "protein": 22.5,
+   "carbs": 0,
+   "fat": 2.62
+  },
+  "notes": "Cooked = FNDDS baked/broiled/roasted skin not eaten (161 kcal/30 P). FNDDS 'Chicken breast, grilled without sauce, skin not eaten' (2705968, 176 kcal/5.5 F) is a plausible alternative but reads high in fat for skinless breast."
+ },
+ {
+  "name": "Chicken thigh, skinless",
+  "aliases": [
+   "boneless skinless thigh",
+   "chicken thigh",
+   "chicken thigh skinless",
+   "chicken thighs",
+   "skinless chicken thigh"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2706030,
+   "description": "Chicken thigh, baked, broiled, or roasted, skin not eaten, from raw",
+   "kcal": 178,
+   "protein": 24.61,
+   "carbs": 0,
+   "fat": 8.1
+  },
+  "raw": {
+   "fdcId": 173627,
+   "description": "Chicken, broilers or fryers, dark meat, thigh, meat only, raw",
+   "kcal": 121,
+   "protein": 19.7,
+   "carbs": 0,
+   "fat": 4.12
+  }
+ },
+ {
+  "name": "Chicken drumstick",
+  "aliases": [
+   "chicken drumstick",
+   "chicken drumsticks",
+   "chicken leg",
+   "drumstick",
+   "drumsticks"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2706003,
+   "description": "Chicken drumstick, baked, broiled, or roasted, skin not eaten, from raw",
+   "kcal": 154,
+   "protein": 24.1,
+   "carbs": 0,
+   "fat": 5.67
+  },
+  "raw": {
+   "fdcId": 173614,
+   "description": "Chicken, broilers or fryers, dark meat, drumstick, meat only, raw",
+   "kcal": 116,
+   "protein": 19.4,
+   "carbs": 0,
+   "fat": 3.71
+  },
+  "notes": "Skin not eaten. Raw is SR 'dark meat, drumstick, meat only, raw'."
+ },
+ {
+  "name": "Chicken wing",
+  "aliases": [
+   "chicken wing",
+   "chicken wings",
+   "plain wings",
+   "wings"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2706057,
+   "description": "Chicken wing, baked, broiled, or roasted, from raw",
+   "kcal": 252,
+   "protein": 23.6,
+   "carbs": 0,
+   "fat": 16.74
+  },
+  "raw": {
+   "fdcId": 172390,
+   "description": "Chicken, broilers or fryers, wing, meat and skin, raw",
+   "kcal": 191,
+   "protein": 17.5,
+   "carbs": 0,
+   "fat": 12.8
+  },
+  "notes": "Both halves are meat AND skin (wings are eaten with skin). Cooked is plain baked/roasted from raw, not sauced or breaded."
+ },
+ {
+  "name": "Chicken leg (drumstick + thigh)",
+  "aliases": [
+   "chicken leg",
+   "chicken leg quarter",
+   "chicken legs",
+   "drumstick and thigh",
+   "leg quarter"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2705985,
+   "description": "Chicken leg, drumstick and thigh, baked or broiled, skin not eaten",
+   "kcal": 168,
+   "protein": 24.41,
+   "carbs": 0,
+   "fat": 7.13
+  },
+  "raw": {
+   "fdcId": 173619,
+   "description": "Chicken, broilers or fryers, leg, meat only, raw",
+   "kcal": 120,
+   "protein": 19.2,
+   "carbs": 0,
+   "fat": 4.22
+  },
+  "notes": "Skin not eaten. Raw is SR 'leg, meat only, raw'."
+ },
+ {
+  "name": "Rotisserie chicken, meat only",
+  "aliases": [
+   "costco chicken",
+   "roast chicken",
+   "rotisserie",
+   "rotisserie chicken",
+   "whole chicken"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2705937,
+   "description": "Chicken, NS as to part, rotisserie, skin not eaten",
+   "kcal": 164,
+   "protein": 26.79,
+   "carbs": 0,
+   "fat": 6.36
+  },
+  "raw": {
+   "fdcId": 171052,
+   "description": "Chicken, broilers or fryers, meat only, raw",
+   "kcal": 119,
+   "protein": 21.4,
+   "carbs": 0,
+   "fat": 3.08
+  },
+  "notes": "Cooked is FNDDS rotisserie, part not specified, skin not eaten. Raw is SR whole broiler/fryer meat only raw (closest same-food raw; rotisserie birds are brined so cooked sodium differs, macros comparable)."
+ },
+ {
+  "name": "Ground chicken",
+  "aliases": [
+   "chicken crumbles",
+   "chicken mince",
+   "ground chicken",
+   "minced chicken"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2706091,
+   "description": "Chicken, ground",
+   "kcal": 201,
+   "protein": 27.14,
+   "carbs": 0,
+   "fat": 10.31
+  },
+  "raw": {
+   "fdcId": 171116,
+   "description": "Chicken, ground, raw",
+   "kcal": 143,
+   "protein": 17.4,
+   "carbs": 0.04,
+   "fat": 8.1
+  },
+  "notes": "Cooked is FNDDS 'Chicken, ground' (as consumed, cooked); raw is SR 'Chicken, ground, raw'. USDA does not distinguish fat % for ground chicken."
+ },
+ {
+  "name": "Chicken tenders, breaded",
+  "aliases": [
+   "breaded chicken strips",
+   "breaded chicken tenders",
+   "chicken fingers",
+   "chicken strips",
+   "chicken tenders"
+  ],
+  "cooked": {
+   "fdcId": 2706102,
+   "description": "Chicken tenders or strips, breaded, from frozen",
+   "kcal": 240,
+   "protein": 14.62,
+   "carbs": 14.86,
+   "fat": 13.58
+  },
+  "raw": null,
+  "notes": "FNDDS breaded, from frozen, cooked. No raw half by design."
+ },
+ {
+  "name": "Chicken nuggets",
+  "aliases": [
+   "chicken nugget",
+   "chicken nuggets",
+   "mcnuggets",
+   "nuggets"
+  ],
+  "cooked": {
+   "fdcId": 2706092,
+   "description": "Chicken nuggets, NFS",
+   "kcal": 307,
+   "protein": 15.92,
+   "carbs": 14.93,
+   "fat": 20.36
+  },
+  "raw": null,
+  "notes": "FNDDS 'Chicken nuggets, NFS' (cooked, generic). No raw half by design."
+ },
+ {
+  "name": "Chicken sausage",
+  "aliases": [
+   "chicken sausage",
+   "chicken sausage link",
+   "chicken sausages",
+   "turkey or chicken sausage"
+  ],
+  "cooked": {
+   "fdcId": 2706200,
+   "description": "Turkey or chicken sausage",
+   "kcal": 193,
+   "protein": 19.65,
+   "carbs": 1.09,
+   "fat": 12.24
+  },
+  "raw": null,
+  "notes": "FNDDS combines turkey and chicken sausage into one item; cooked/as-eaten only."
+ },
+ {
+  "name": "Chicken liver",
+  "aliases": [
+   "chicken liver",
+   "chicken livers",
+   "liver"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 171061,
+   "description": "Chicken, liver, all classes, cooked, simmered",
+   "kcal": 167,
+   "protein": 24.5,
+   "carbs": 0.87,
+   "fat": 6.51
+  },
+  "raw": {
+   "fdcId": 171060,
+   "description": "Chicken, liver, all classes, raw",
+   "kcal": 119,
+   "protein": 16.9,
+   "carbs": 0.73,
+   "fat": 4.83
+  },
+  "notes": "Cooked = simmered."
+ },
+ {
+  "name": "Turkey breast, roasted",
+  "aliases": [
+   "roast turkey",
+   "roasted turkey",
+   "turkey",
+   "turkey breast",
+   "turkey breast roasted",
+   "turkey light meat"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 174516,
+   "description": "Turkey, retail parts, breast, meat only, cooked, roasted",
+   "kcal": 136,
+   "protein": 29.5,
+   "carbs": 0,
+   "fat": 1.97
+  },
+  "raw": {
+   "fdcId": 174515,
+   "description": "Turkey, retail parts, breast, meat only, raw",
+   "kcal": 114,
+   "protein": 23.3,
+   "carbs": 0,
+   "fat": 2.33
+  },
+  "notes": "SR 'retail parts, breast, meat only' pair (roasted / raw)."
+ },
+ {
+  "name": "Ground turkey, 93/7",
+  "aliases": [
+   "93% ground turkey",
+   "93/7 turkey",
+   "ground turkey",
+   "ground turkey 93/7",
+   "lean ground turkey",
+   "turkey crumbles",
+   "turkey mince"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 746785,
+   "description": "Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles",
+   "kcal": 220,
+   "protein": 27.1,
+   "carbs": 0,
+   "fat": 11.6
+  },
+  "raw": {
+   "fdcId": 172850,
+   "description": "Turkey, ground, 93% lean, 7% fat, raw",
+   "kcal": 150,
+   "protein": 18.7,
+   "carbs": 0,
+   "fat": 8.34
+  },
+  "notes": "Cooked = pan-broiled crumbles."
+ },
+ {
+  "name": "Ground turkey, 85/15",
+  "aliases": [
+   "85% ground turkey",
+   "85/15 turkey",
+   "ground turkey 85",
+   "ground turkey 85/15"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 174494,
+   "description": "Turkey, ground, 85% lean, 15% fat, pan-broiled crumbles",
+   "kcal": 258,
+   "protein": 25.1,
+   "carbs": 0,
+   "fat": 17.4
+  },
+  "raw": {
+   "fdcId": 174493,
+   "description": "Turkey, ground, 85% lean, 15% fat, raw",
+   "kcal": 180,
+   "protein": 16.9,
+   "carbs": 0,
+   "fat": 12.5
+  },
+  "notes": "Cooked = pan-broiled crumbles."
+ },
+ {
+  "name": "Deli turkey breast",
+  "aliases": [
+   "deli turkey",
+   "deli turkey breast",
+   "sliced turkey",
+   "turkey cold cuts",
+   "turkey deli meat",
+   "turkey lunch meat",
+   "turkey slices"
+  ],
+  "cooked": {
+   "fdcId": 2706215,
+   "description": "Turkey, prepackaged or deli, luncheon meat",
+   "kcal": 106,
+   "protein": 14.81,
+   "carbs": 2.2,
+   "fat": 3.77
+  },
+  "raw": null,
+  "notes": "FNDDS 'Turkey, prepackaged or deli, luncheon meat'. No raw state."
+ },
+ {
+  "name": "Turkey bacon",
+  "aliases": [
+   "turkey bacon",
+   "turkey bacon strips"
+  ],
+  "cooked": {
+   "fdcId": 2706135,
+   "description": "Turkey bacon, cooked",
+   "kcal": 368,
+   "protein": 29.5,
+   "carbs": 4.24,
+   "fat": 25.87
+  },
+  "raw": null,
+  "notes": "FNDDS cooked turkey bacon. No raw half (unprepared turkey bacon not meaningfully logged)."
+ },
+ {
+  "name": "Turkey sausage",
+  "aliases": [
+   "turkey breakfast sausage",
+   "turkey sausage",
+   "turkey sausage link",
+   "turkey sausage patty",
+   "turkey sausages"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 173871,
+   "description": "Sausage, turkey, fresh, cooked",
+   "kcal": 196,
+   "protein": 23.9,
+   "carbs": 0,
+   "fat": 10.4
+  },
+  "raw": {
+   "fdcId": 174617,
+   "description": "Sausage, turkey, fresh, raw",
+   "kcal": 155,
+   "protein": 18.8,
+   "carbs": 0.47,
+   "fat": 8.08
+  },
+  "notes": "SR 'Sausage, turkey, fresh' pair (cooked / raw)."
+ },
+ {
+  "name": "Duck breast, skin-on",
+  "aliases": [
+   "duck",
+   "duck breast",
+   "duck breast with skin",
+   "pekin duck breast",
+   "roasted duck breast"
+  ],
+  "cooked": {
+   "fdcId": 171510,
+   "description": "Duck, young duckling, domesticated, White Pekin, breast, meat and skin, boneless, cooked, roasted",
+   "kcal": 202,
+   "protein": 24.5,
+   "carbs": 0,
+   "fat": 10.8
+  },
+  "raw": null,
+  "notes": "SR White Pekin duck breast, meat and skin, boneless, roasted. The matching raw item (same description, raw) was not returned by the endpoint after 3 attempts, so raw is null. See 'Duck, skinless' for a raw/cooked pair."
+ },
+ {
+  "name": "Duck, skinless",
+  "aliases": [
+   "duck meat",
+   "duck meat only",
+   "duck skin not eaten",
+   "duck skinless"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2706140,
+   "description": "Duck, roasted, skin not eaten",
+   "kcal": 200,
+   "protein": 23.38,
+   "carbs": 0,
+   "fat": 11.15
+  },
+  "raw": {
+   "fdcId": 172410,
+   "description": "Duck, domesticated, meat only, raw",
+   "kcal": 135,
+   "protein": 18.3,
+   "carbs": 0.94,
+   "fat": 5.95
+  },
+  "notes": "Cooked = FNDDS 'Duck, roasted, skin not eaten'; raw = SR 'Duck, domesticated, meat only, raw'. Whole-duck meat, not breast-specific."
+ },
+ {
+  "name": "Ground beef, 80/20",
+  "aliases": [
+   "80/20",
+   "80/20 ground beef",
+   "ground beef 80% lean",
+   "ground beef 80/20",
+   "hamburger 80/20"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 171797,
+   "description": "Beef, ground, 80% lean meat / 20% fat, patty, cooked, broiled",
+   "kcal": 270,
+   "protein": 25.8,
+   "carbs": 0,
+   "fat": 17.8
+  },
+  "raw": {
+   "fdcId": 174036,
+   "description": "Beef, ground, 80% lean meat / 20% fat, raw",
+   "kcal": 254,
+   "protein": 17.2,
+   "carbs": 0,
+   "fat": 20
+  }
+ },
+ {
+  "name": "Ground beef, 85/15",
+  "aliases": [
+   "85/15",
+   "85/15 ground beef",
+   "ground beef 85% lean",
+   "ground beef 85/15",
+   "hamburger 85/15"
+  ],
+  "default": "cooked",
+  "cooked": {
+   "fdcId": 174032,
+   "description": "Beef, ground, 85% lean meat / 15% fat, patty, cooked, broiled",
+   "kcal": 250,
+   "protein": 25.9,
+   "carbs": 0,
+   "fat": 15.4
+  },
+  "raw": null,
+  "notes": "Generic 'Beef, ground, 85% lean meat / 15% fat, raw' never surfaced in 4 queries (only the Australian grass-fed 85/15 raw did, which is a different food). Left raw null rather than pair a different lean %."
+ },
+ {
+  "name": "Ground beef, 90/10",
+  "aliases": [
+   "90/10",
+   "90/10 ground beef",
+   "ground beef 90% lean",
+   "ground beef 90/10",
+   "hamburger 90/10",
+   "lean ground beef"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 174031,
+   "description": "Beef, ground, 90% lean meat / 10% fat, patty, cooked, broiled",
+   "kcal": 217,
+   "protein": 26.1,
+   "carbs": 0,
+   "fat": 11.8
+  },
+  "raw": {
+   "fdcId": 174030,
+   "description": "Beef, ground, 90% lean meat / 10% fat, raw",
+   "kcal": 176,
+   "protein": 20,
+   "carbs": 0,
+   "fat": 10
+  }
+ },
+ {
+  "name": "Ground beef, 93/7",
+  "aliases": [
+   "93/7",
+   "93/7 ground beef",
+   "extra lean ground beef",
+   "ground beef 93% lean",
+   "ground beef 93/7",
+   "hamburger 93/7"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 174752,
+   "description": "Beef, ground, 93% lean meat / 7% fat, patty, cooked, broiled",
+   "kcal": 193,
+   "protein": 26.2,
+   "carbs": 0,
+   "fat": 8.94
+  },
+  "raw": {
+   "fdcId": 173110,
+   "description": "Beef, ground, 93% lean meat / 7% fat, raw",
+   "kcal": 152,
+   "protein": 20.8,
+   "carbs": 0,
+   "fat": 7
+  }
+ },
+ {
+  "name": "Sirloin steak",
+  "aliases": [
+   "beef",
+   "beef steak",
+   "grilled steak",
+   "sirloin",
+   "sirloin steak",
+   "steak",
+   "steaks",
+   "top sirloin",
+   "top sirloin steak"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 168635,
+   "description": "Beef, top sirloin, steak, separable lean only, trimmed to 0\" fat, choice, cooked, broiled",
+   "kcal": 188,
+   "protein": 30.3,
+   "carbs": 0,
+   "fat": 6.55
+  },
+  "raw": {
+   "fdcId": 174763,
+   "description": "Beef, top sirloin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw",
+   "kcal": 135,
+   "protein": 21.9,
+   "carbs": 0,
+   "fat": 4.62
+  },
+  "notes": "Same cut, both separable lean only, but USDA raw is the 1/8\" trim entry and cooked is the 0\" trim entry (a 0\" raw / 1/8\" broiled match did not surface in 4 queries). Lean-only values differ only marginally between trims."
+ },
+ {
+  "name": "Ribeye steak",
+  "aliases": [
+   "rib eye",
+   "rib eye steak",
+   "ribeye",
+   "ribeye steak",
+   "ribeye steaks"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 172144,
+   "description": "Beef, rib eye steak, boneless, lip off, separable lean only, trimmed to 0\" fat, choice, cooked, grilled",
+   "kcal": 215,
+   "protein": 27.4,
+   "carbs": 0,
+   "fat": 11.8
+  },
+  "raw": {
+   "fdcId": 173380,
+   "description": "Beef, rib eye steak, boneless, lip off, separable lean only, trimmed to 0\" fat, choice, raw",
+   "kcal": 162,
+   "protein": 21.4,
+   "carbs": 0,
+   "fat": 8.5
+  },
+  "notes": "Lean-only (trimmed) ribeye; a ribeye eaten with the fat cap will run higher."
+ },
+ {
+  "name": "NY strip steak",
+  "aliases": [
+   "kansas city strip",
+   "new york strip",
+   "new york strip steak",
+   "ny strip",
+   "ny strip steak",
+   "strip steak",
+   "top loin steak"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 173119,
+   "description": "Beef, short loin, top loin, steak, separable lean only, trimmed to 1/8\" fat, choice, cooked, broiled",
+   "kcal": 201,
+   "protein": 29.2,
+   "carbs": 0,
+   "fat": 8.45
+  },
+  "raw": {
+   "fdcId": 173116,
+   "description": "Beef, short loin, top loin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw",
+   "kcal": 155,
+   "protein": 22.8,
+   "carbs": 0,
+   "fat": 6.43
+  }
+ },
+ {
+  "name": "Filet mignon",
+  "aliases": [
+   "beef tenderloin",
+   "filet",
+   "filet mignon",
+   "fillet",
+   "tenderloin",
+   "tenderloin steak"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 173117,
+   "description": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\" fat, choice, cooked, broiled",
+   "kcal": 206,
+   "protein": 29,
+   "carbs": 0,
+   "fat": 9.1
+  },
+  "raw": {
+   "fdcId": 174762,
+   "description": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw",
+   "kcal": 158,
+   "protein": 22.2,
+   "carbs": 0,
+   "fat": 7.07
+  }
+ },
+ {
+  "name": "Flank steak",
+  "aliases": [
+   "beef flank",
+   "flank",
+   "flank steak"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 168611,
+   "description": "Beef, flank, steak, separable lean only, trimmed to 0\" fat, choice, cooked, broiled",
+   "kcal": 194,
+   "protein": 27.8,
+   "carbs": 0,
+   "fat": 8.32
+  },
+  "raw": {
+   "fdcId": 168609,
+   "description": "Beef, flank, steak, separable lean only, trimmed to 0\" fat, choice, raw",
+   "kcal": 149,
+   "protein": 21.7,
+   "carbs": 0,
+   "fat": 6.29
+  }
+ },
+ {
+  "name": "Skirt steak",
+  "aliases": [
+   "carne asada",
+   "inside skirt",
+   "skirt",
+   "skirt steak"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 173375,
+   "description": "Beef, plate steak, boneless, inside skirt, separable lean only, trimmed to 0\" fat, choice, cooked, grilled",
+   "kcal": 242,
+   "protein": 29.6,
+   "carbs": 0,
+   "fat": 13.7
+  },
+  "raw": {
+   "fdcId": 172137,
+   "description": "Beef, plate steak, boneless, inside skirt, separable lean only, trimmed to 0\" fat, choice, raw",
+   "kcal": 171,
+   "protein": 20.9,
+   "carbs": 0,
+   "fat": 9.76
+  }
+ },
+ {
+  "name": "Chuck roast",
+  "aliases": [
+   "beef chuck",
+   "chuck",
+   "chuck roast",
+   "chuck shoulder",
+   "pot roast",
+   "shoulder roast"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 171198,
+   "description": "Beef, shoulder pot roast, boneless, separable lean only, trimmed to 0\" fat, choice, cooked, braised",
+   "kcal": 200,
+   "protein": 31.3,
+   "carbs": 0,
+   "fat": 8.3
+  },
+  "raw": {
+   "fdcId": 169481,
+   "description": "Beef, shoulder pot roast or steak, boneless, separable lean only, trimmed to 0\" fat, choice, raw",
+   "kcal": 125,
+   "protein": 21.4,
+   "carbs": 0.11,
+   "fat": 4.35
+  },
+  "notes": "Used the chuck shoulder pot roast pair because it is an exact raw/braised match. The 'chuck, arm pot roast' entries only existed as 1/8\" raw vs 0\" braised (trim mismatch)."
+ },
+ {
+  "name": "Brisket",
+  "aliases": [
+   "beef brisket",
+   "brisket",
+   "brisket flat"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 170601,
+   "description": "Beef, brisket, flat half, separable lean only, trimmed to 0\" fat, choice, cooked, braised",
+   "kcal": 212,
+   "protein": 32.6,
+   "carbs": 0,
+   "fat": 8.07
+  },
+  "raw": {
+   "fdcId": 168658,
+   "description": "Beef, brisket, flat half, boneless, separable lean only, trimmed to 0\" fat, select, raw",
+   "kcal": 124,
+   "protein": 21.7,
+   "carbs": 0,
+   "fat": 4.14
+  },
+  "notes": "Same cut (flat half, lean only, 0\" trim) but USDA grade differs: raw entry is select, cooked is choice. Only US brisket pair available; the alternative was New Zealand navel end."
+ },
+ {
+  "name": "Beef jerky",
+  "aliases": [
+   "beef jerky",
+   "jerky"
+  ],
+  "cooked": {
+   "fdcId": 2705860,
+   "description": "Beef jerky",
+   "kcal": 410,
+   "protein": 33.2,
+   "carbs": 11,
+   "fat": 25.6
+  },
+  "raw": null
+ },
+ {
+  "name": "Roast beef, deli",
+  "aliases": [
+   "deli roast beef",
+   "roast beef",
+   "roast beef deli",
+   "roast beef lunch meat",
+   "sliced roast beef"
+  ],
+  "cooked": {
+   "fdcId": 174570,
+   "description": "Roast beef, deli style, prepackaged, sliced",
+   "kcal": 115,
+   "protein": 18.6,
+   "carbs": 0.64,
+   "fat": 3.69
+  },
+  "raw": null
+ },
+ {
+  "name": "Pork chop",
+  "aliases": [
+   "boneless pork chop",
+   "pork chop",
+   "pork chops",
+   "pork loin chop"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 168253,
+   "description": "Pork, fresh, loin, top loin (chops), boneless, separable lean only, cooked, broiled",
+   "kcal": 173,
+   "protein": 27.6,
+   "carbs": 0,
+   "fat": 6.08
+  },
+  "raw": {
+   "fdcId": 168251,
+   "description": "Pork, fresh, loin, top loin (chops), boneless, separable lean only, raw",
+   "kcal": 127,
+   "protein": 22.4,
+   "carbs": 0,
+   "fat": 3.42
+  },
+  "notes": "Boneless top loin chop, lean only. Chosen over bone-in center chops because gram weights of bone-in chops include bone."
+ },
+ {
+  "name": "Pork tenderloin",
+  "aliases": [
+   "pork fillet",
+   "pork tenderloin",
+   "tenderloin pork"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 168250,
+   "description": "Pork, fresh, loin, tenderloin, separable lean only, cooked, roasted",
+   "kcal": 143,
+   "protein": 26.2,
+   "carbs": 0,
+   "fat": 3.51
+  },
+  "raw": {
+   "fdcId": 168249,
+   "description": "Pork, fresh, loin, tenderloin, separable lean only, raw",
+   "kcal": 109,
+   "protein": 21,
+   "carbs": 0,
+   "fat": 2.17
+  }
+ },
+ {
+  "name": "Pork loin",
+  "aliases": [
+   "pork loin",
+   "pork loin roast",
+   "pork roast",
+   "roast pork"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 168233,
+   "description": "Pork, fresh, loin, whole, separable lean only, cooked, roasted",
+   "kcal": 209,
+   "protein": 28.6,
+   "carbs": 0,
+   "fat": 9.63
+  },
+  "raw": {
+   "fdcId": 168230,
+   "description": "Pork, fresh, loin, whole, separable lean only, raw",
+   "kcal": 143,
+   "protein": 21.4,
+   "carbs": 0,
+   "fat": 5.66
+  }
+ },
+ {
+  "name": "Ground pork",
+  "aliases": [
+   "ground pork",
+   "minced pork",
+   "pork ground",
+   "pork mince"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 169192,
+   "description": "Pork, ground, 84% lean / 16% fat, cooked, crumbles",
+   "kcal": 289,
+   "protein": 26.7,
+   "carbs": 0.58,
+   "fat": 20
+  },
+  "raw": {
+   "fdcId": 168372,
+   "description": "Pork, ground, 84% lean / 16% fat, raw",
+   "kcal": 218,
+   "protein": 18,
+   "carbs": 0.44,
+   "fat": 16
+  }
+ },
+ {
+  "name": "Pork ribs",
+  "aliases": [
+   "pork ribs",
+   "pork spare ribs",
+   "ribs",
+   "spare ribs",
+   "spareribs"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 167854,
+   "description": "Pork, fresh, spareribs, separable lean and fat, cooked, braised",
+   "kcal": 397,
+   "protein": 29.1,
+   "carbs": 0,
+   "fat": 30.3
+  },
+  "raw": {
+   "fdcId": 167853,
+   "description": "Pork, fresh, spareribs, separable lean and fat, raw",
+   "kcal": 277,
+   "protein": 15.5,
+   "carbs": 0,
+   "fat": 23.4
+  },
+  "notes": "Spareribs, lean and fat, no sauce. Values are per 100 g of edible meat (bone excluded)."
+ },
+ {
+  "name": "Bacon",
+  "aliases": [
+   "bacon",
+   "bacon strips",
+   "pork bacon"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2705889,
+   "description": "Pork bacon, smoked or cured, cooked",
+   "kcal": 468,
+   "protein": 33.92,
+   "carbs": 1.7,
+   "fat": 35.09
+  },
+  "raw": {
+   "fdcId": 168277,
+   "description": "Pork, cured, bacon, unprepared",
+   "kcal": 393,
+   "protein": 13.7,
+   "carbs": 0,
+   "fat": 37.1
+  },
+  "notes": "Cooked is the FNDDS generic cooked bacon; raw is SR uncooked cured bacon. Bacon loses ~2/3 of its weight cooking, so raw vs cooked grams differ a lot."
+ },
+ {
+  "name": "Ham, deli",
+  "aliases": [
+   "deli ham",
+   "ham",
+   "ham lunch meat",
+   "ham slices",
+   "sliced ham"
+  ],
+  "cooked": {
+   "fdcId": 332397,
+   "description": "Ham, sliced, pre-packaged, deli meat (96%fat free, water added)",
+   "kcal": 106,
+   "protein": 16.7,
+   "carbs": 0.27,
+   "fat": 3.73
+  },
+  "raw": null,
+  "notes": "Foundation Foods analyzed deli ham. FNDDS generic 'Ham' (2705878, 117 kcal) is the alternative."
+ },
+ {
+  "name": "Breakfast sausage",
+  "aliases": [
+   "breakfast sausage",
+   "pork sausage",
+   "sausage",
+   "sausage links",
+   "sausage patties",
+   "sausage patty"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 174578,
+   "description": "Pork sausage, link/patty, cooked, pan-fried",
+   "kcal": 325,
+   "protein": 18.5,
+   "carbs": 1.42,
+   "fat": 27.2
+  },
+  "raw": {
+   "fdcId": 172934,
+   "description": "Pork sausage, link/patty, unprepared",
+   "kcal": 288,
+   "protein": 15.4,
+   "carbs": 0.93,
+   "fat": 24.8
+  }
+ },
+ {
+  "name": "Italian sausage",
+  "aliases": [
+   "italian sausage",
+   "italian sausages",
+   "mild italian sausage",
+   "sweet italian sausage"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 746780,
+   "description": "Sausage, Italian, pork, mild, cooked, pan-fried",
+   "kcal": 322,
+   "protein": 18.2,
+   "carbs": 2.15,
+   "fat": 26.2
+  },
+  "raw": {
+   "fdcId": 171631,
+   "description": "Sausage, Italian, pork, mild, raw",
+   "kcal": 290,
+   "protein": 13.9,
+   "carbs": 2.97,
+   "fat": 24.3
+  }
+ },
+ {
+  "name": "Hot dog",
+  "aliases": [
+   "beef hot dog",
+   "frankfurter",
+   "hot dog",
+   "hot dogs",
+   "hotdog",
+   "wiener"
+  ],
+  "cooked": {
+   "fdcId": 2706167,
+   "description": "Hot dog, beef",
+   "kcal": 310,
+   "protein": 11.7,
+   "carbs": 2.89,
+   "fat": 28
+  },
+  "raw": null
+ },
+ {
+  "name": "Pepperoni",
+  "aliases": [
+   "pepperoni",
+   "pepperoni slices"
+  ],
+  "cooked": {
+   "fdcId": 174575,
+   "description": "Pepperoni, beef and pork, sliced",
+   "kcal": 504,
+   "protein": 19.2,
+   "carbs": 1.18,
+   "fat": 46.3
+  },
+  "raw": null
+ },
+ {
+  "name": "Salami",
+  "aliases": [
+   "dry salami",
+   "genoa salami",
+   "hard salami",
+   "salami"
+  ],
+  "cooked": {
+   "fdcId": 172938,
+   "description": "Salami, dry or hard, pork",
+   "kcal": 407,
+   "protein": 22.6,
+   "carbs": 1.6,
+   "fat": 33.7
+  },
+  "raw": null
+ },
+ {
+  "name": "Lamb chop",
+  "aliases": [
+   "lamb",
+   "lamb chop",
+   "lamb chops",
+   "lamb loin",
+   "lamb loin chop"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 174413,
+   "description": "Lamb, Australian, imported, fresh, loin, separable lean only, trimmed to 1/8\" fat, cooked, broiled",
+   "kcal": 192,
+   "protein": 26.5,
+   "carbs": 0,
+   "fat": 8.75
+  },
+  "raw": {
+   "fdcId": 172588,
+   "description": "Lamb, Australian, imported, fresh, loin, separable lean only, trimmed to 1/8\" fat, raw",
+   "kcal": 146,
+   "protein": 21,
+   "carbs": 0,
+   "fat": 6.24
+  },
+  "notes": "Australian loin pair used because it is an exact raw/broiled match; the US domestic 'Lamb, loin, lean only, 1/4\" fat, choice' raw entry never surfaced. Most US retail lamb is Australian anyway."
+ },
+ {
+  "name": "Ground lamb",
+  "aliases": [
+   "ground lamb",
+   "lamb ground",
+   "lamb mince",
+   "minced lamb"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 172544,
+   "description": "Lamb, ground, cooked, broiled",
+   "kcal": 283,
+   "protein": 24.8,
+   "carbs": 0,
+   "fat": 19.6
+  },
+  "raw": {
+   "fdcId": 174370,
+   "description": "Lamb, ground, raw",
+   "kcal": 282,
+   "protein": 16.6,
+   "carbs": 0,
+   "fat": 23.4
+  }
+ },
+ {
+  "name": "Ground bison",
+  "aliases": [
+   "bison",
+   "bison burger",
+   "bison ground",
+   "buffalo ground",
+   "ground bison",
+   "ground buffalo"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 174422,
+   "description": "Game meat, bison, ground, cooked, pan-broiled",
+   "kcal": 238,
+   "protein": 23.8,
+   "carbs": 0,
+   "fat": 15.1
+  },
+  "raw": {
+   "fdcId": 174421,
+   "description": "Game meat , bison, ground, raw",
+   "kcal": 223,
+   "protein": 18.7,
+   "carbs": 0,
+   "fat": 15.9
+  }
+ },
+ {
+  "name": "Salmon, Atlantic (farmed)",
+  "aliases": [
+   "atlantic salmon",
+   "baked salmon",
+   "farmed salmon",
+   "grilled salmon",
+   "salmon",
+   "salmon filet",
+   "salmon fillet"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 175168,
+   "description": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
+   "kcal": 206,
+   "protein": 22.1,
+   "carbs": 0,
+   "fat": 12.4
+  },
+  "raw": {
+   "fdcId": 175167,
+   "description": "Fish, salmon, Atlantic, farmed, raw",
+   "kcal": 208,
+   "protein": 20.4,
+   "carbs": 0,
+   "fat": 13.4
+  }
+ },
+ {
+  "name": "Salmon, sockeye (wild)",
+  "aliases": [
+   "red salmon",
+   "sockeye",
+   "sockeye salmon",
+   "wild salmon",
+   "wild sockeye"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 173692,
+   "description": "Fish, salmon, sockeye, cooked, dry heat",
+   "kcal": 156,
+   "protein": 26.5,
+   "carbs": 0,
+   "fat": 5.57
+  },
+  "raw": {
+   "fdcId": 173691,
+   "description": "Fish, salmon, sockeye, raw",
+   "kcal": 131,
+   "protein": 22.2,
+   "carbs": 0,
+   "fat": 4.69
+  }
+ },
+ {
+  "name": "Tuna, canned in water",
+  "aliases": [
+   "canned tuna",
+   "chunk light tuna",
+   "tuna",
+   "tuna can",
+   "tuna in water",
+   "tuna packet",
+   "tuna pouch"
+  ],
+  "cooked": {
+   "fdcId": 334194,
+   "description": "Fish, tuna, light, canned in water, drained solids",
+   "kcal": 90,
+   "protein": 19,
+   "carbs": 0.08,
+   "fat": 0.94
+  },
+  "raw": null,
+  "notes": "Drained solids. Light (skipjack) tuna; albacore in water was not searched to save quota."
+ },
+ {
+  "name": "Tuna, canned in oil",
+  "aliases": [
+   "canned tuna in oil",
+   "oil packed tuna",
+   "tuna in oil",
+   "tuna in olive oil"
+  ],
+  "cooked": {
+   "fdcId": 173708,
+   "description": "Fish, tuna, light, canned in oil, drained solids",
+   "kcal": 198,
+   "protein": 29.1,
+   "carbs": 0,
+   "fat": 8.21
+  },
+  "raw": null,
+  "notes": "Drained solids."
+ },
+ {
+  "name": "Tuna steak (yellowfin)",
+  "aliases": [
+   "ahi",
+   "ahi tuna",
+   "fresh tuna",
+   "seared tuna",
+   "tuna steak",
+   "tuna steaks",
+   "yellowfin tuna"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 172006,
+   "description": "Fish, tuna, yellowfin, fresh, cooked, dry heat",
+   "kcal": 130,
+   "protein": 29.2,
+   "carbs": 0,
+   "fat": 0.59
+  },
+  "raw": {
+   "fdcId": 175159,
+   "description": "Fish, tuna, fresh, yellowfin, raw",
+   "kcal": 109,
+   "protein": 24.4,
+   "carbs": 0,
+   "fat": 0.49
+  }
+ },
+ {
+  "name": "Tilapia",
+  "aliases": [
+   "baked tilapia",
+   "tilapia",
+   "tilapia filet",
+   "tilapia fillet"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 175177,
+   "description": "Fish, tilapia, cooked, dry heat",
+   "kcal": 128,
+   "protein": 26.2,
+   "carbs": 0,
+   "fat": 2.65
+  },
+  "raw": {
+   "fdcId": 175176,
+   "description": "Fish, tilapia, raw",
+   "kcal": 96,
+   "protein": 20.1,
+   "carbs": 0,
+   "fat": 1.7
+  }
+ },
+ {
+  "name": "Cod",
+  "aliases": [
+   "atlantic cod",
+   "baked cod",
+   "cod",
+   "cod filet",
+   "cod fillet",
+   "white fish"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 171956,
+   "description": "Fish, cod, Atlantic, cooked, dry heat",
+   "kcal": 105,
+   "protein": 22.8,
+   "carbs": 0,
+   "fat": 0.86
+  },
+  "raw": {
+   "fdcId": 171955,
+   "description": "Fish, cod, Atlantic, raw",
+   "kcal": 82,
+   "protein": 17.8,
+   "carbs": 0,
+   "fat": 0.67
+  }
+ },
+ {
+  "name": "Halibut",
+  "aliases": [
+   "halibut",
+   "halibut fillet",
+   "halibut steak"
+  ],
+  "default": "raw",
+  "cooked": null,
+  "raw": {
+   "fdcId": 174200,
+   "description": "Fish, halibut, Atlantic and Pacific, raw",
+   "kcal": 91,
+   "protein": 18.6,
+   "carbs": 0,
+   "fat": 1.33
+  },
+  "notes": "Cooked half missing: 'Fish, halibut, Atlantic and Pacific, cooked, dry heat' never surfaced in 4 queries. Only FNDDS 'Fish, halibut' (2706260) came back, and its 7.79 g carbs show it is a breaded/fried average, so it was rejected. Cooked plain halibut is roughly raw x1.28 (about 117 kcal / 23.8 P / 1.7 F per 100 g) if a manual fill is ever wanted."
+ },
+ {
+  "name": "Mahi mahi",
+  "aliases": [
+   "dolphinfish",
+   "dorado",
+   "mahi",
+   "mahi mahi",
+   "mahi-mahi",
+   "mahimahi"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 171992,
+   "description": "Fish, mahimahi, cooked, dry heat",
+   "kcal": 109,
+   "protein": 23.7,
+   "carbs": 0,
+   "fat": 0.9
+  },
+  "raw": {
+   "fdcId": 171959,
+   "description": "Fish, mahimahi, raw",
+   "kcal": 85,
+   "protein": 18.5,
+   "carbs": 0,
+   "fat": 0.7
+  }
+ },
+ {
+  "name": "Shrimp",
+  "aliases": [
+   "boiled shrimp",
+   "grilled shrimp",
+   "prawn",
+   "prawns",
+   "shrimp",
+   "shrimps",
+   "steamed shrimp"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 175180,
+   "description": "Crustaceans, shrimp, cooked",
+   "kcal": 99,
+   "protein": 24,
+   "carbs": 0.2,
+   "fat": 0.28
+  },
+  "raw": {
+   "fdcId": 174210,
+   "description": "Crustaceans, shrimp, mixed species, raw (may contain additives to retain moisture)",
+   "kcal": 71,
+   "protein": 13.6,
+   "carbs": 0.91,
+   "fat": 1.01
+  },
+  "notes": "Cooked is the Foundation 'Crustaceans, shrimp, cooked' item; raw is SR Legacy mixed-species shrimp that may include moisture-retaining additives (phosphates), which is why raw protein looks low relative to cooked. Both are plain shrimp, no breading."
+ },
+ {
+  "name": "Scallops",
+  "aliases": [
+   "bay scallops",
+   "scallop",
+   "scallops",
+   "sea scallops",
+   "seared scallops"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 167742,
+   "description": "Mollusks, scallop, (bay and sea), cooked, steamed",
+   "kcal": 111,
+   "protein": 20.5,
+   "carbs": 5.41,
+   "fat": 0.84
+  },
+  "raw": {
+   "fdcId": 174220,
+   "description": "Mollusks, scallop, mixed species, raw",
+   "kcal": 69,
+   "protein": 12.1,
+   "carbs": 3.18,
+   "fat": 0.49
+  },
+  "notes": "Cooked is '(bay and sea), steamed' and raw is 'mixed species'; both are generic plain scallop (no breading), just different USDA wording. Only other cooked options were breaded/fried."
+ },
+ {
+  "name": "Crab",
+  "aliases": [
+   "blue crab",
+   "crab",
+   "crab legs",
+   "crab meat",
+   "crabmeat",
+   "steamed crab"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 174205,
+   "description": "Crustaceans, crab, blue, cooked, moist heat",
+   "kcal": 83,
+   "protein": 17.9,
+   "carbs": 0,
+   "fat": 0.74
+  },
+  "raw": {
+   "fdcId": 174204,
+   "description": "Crustaceans, crab, blue, raw",
+   "kcal": 87,
+   "protein": 18.1,
+   "carbs": 0.04,
+   "fat": 1.08
+  },
+  "notes": "Blue crab used as the generic crab; king/Dungeness/snow crab are separate USDA items and were not searched."
+ },
+ {
+  "name": "Lobster",
+  "aliases": [
+   "boiled lobster",
+   "lobster",
+   "lobster meat",
+   "lobster tail",
+   "steamed lobster"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 174209,
+   "description": "Crustaceans, lobster, northern, cooked, moist heat",
+   "kcal": 89,
+   "protein": 19,
+   "carbs": 0,
+   "fat": 0.86
+  },
+  "raw": {
+   "fdcId": 174208,
+   "description": "Crustaceans, lobster, northern, raw",
+   "kcal": 77,
+   "protein": 16.5,
+   "carbs": 0,
+   "fat": 0.75
+  }
+ },
+ {
+  "name": "Sardines, canned",
+  "aliases": [
+   "canned sardines",
+   "sardine",
+   "sardines",
+   "sardines in oil",
+   "tinned sardines"
+  ],
+  "cooked": {
+   "fdcId": 175139,
+   "description": "Fish, sardine, Atlantic, canned in oil, drained solids with bone",
+   "kcal": 208,
+   "protein": 24.6,
+   "carbs": 0,
+   "fat": 11.4
+  },
+  "raw": null,
+  "notes": "Oil-packed, drained, with bone (the standard tin). Water-packed sardines were not searched."
+ },
+ {
+  "name": "Smoked salmon",
+  "aliases": [
+   "cold smoked salmon",
+   "gravlax",
+   "lox",
+   "nova lox",
+   "smoked salmon"
+  ],
+  "cooked": {
+   "fdcId": 2706292,
+   "description": "Fish, salmon, smoked",
+   "kcal": 117,
+   "protein": 18.28,
+   "carbs": 0,
+   "fat": 4.32
+  },
+  "raw": null,
+  "notes": "FNDDS generic smoked salmon; the SR Legacy 'Fish, salmon, chinook, smoked' item never surfaced. Only branded lox items otherwise."
+ },
+ {
+  "name": "Fish sticks",
+  "aliases": [
+   "breaded fish sticks",
+   "fish fingers",
+   "fish stick",
+   "fish sticks",
+   "frozen fish sticks"
+  ],
+  "cooked": {
+   "fdcId": 174195,
+   "description": "Fish, fish sticks, frozen, prepared",
+   "kcal": 277,
+   "protein": 11,
+   "carbs": 21.7,
+   "fat": 16.2
+  },
+  "raw": null
+ },
+ {
+  "name": "Egg, whole",
+  "aliases": [
+   "boiled egg",
+   "boiled eggs",
+   "egg",
+   "eggs",
+   "hard boiled egg",
+   "hard boiled eggs",
+   "hardboiled egg",
+   "whole egg",
+   "whole eggs"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 173424,
+   "description": "Egg, whole, cooked, hard-boiled",
+   "kcal": 155,
+   "protein": 12.6,
+   "carbs": 1.12,
+   "fat": 10.6
+  },
+  "raw": {
+   "fdcId": 171287,
+   "description": "Egg, whole, raw, fresh",
+   "kcal": 143,
+   "protein": 12.6,
+   "carbs": 0.72,
+   "fat": 9.51
+  },
+  "notes": "Chicken egg only. Duck/goose/turkey/quail items were returned by the same queries and deliberately skipped."
+ },
+ {
+  "name": "Egg white",
+  "aliases": [
+   "boiled egg white",
+   "cooked egg whites",
+   "egg white",
+   "egg whites",
+   "whites"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2707170,
+   "description": "Egg, white, cooked, no added fat",
+   "kcal": 52,
+   "protein": 10.67,
+   "carbs": 2.35,
+   "fat": 0
+  },
+  "raw": {
+   "fdcId": 172183,
+   "description": "Egg, white, raw, fresh",
+   "kcal": 52,
+   "protein": 10.9,
+   "carbs": 0.73,
+   "fat": 0.17
+  },
+  "notes": "Cooked is FNDDS, raw is SR Legacy; same food (chicken egg white). No SR cooked-only egg white exists."
+ },
+ {
+  "name": "Egg yolk",
+  "aliases": [
+   "egg yolk",
+   "egg yolks",
+   "yolk",
+   "yolks"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2707174,
+   "description": "Egg, yolk only, cooked, no added fat",
+   "kcal": 327,
+   "protein": 16.15,
+   "carbs": 1.02,
+   "fat": 28.71
+  },
+  "raw": {
+   "fdcId": 172184,
+   "description": "Egg, yolk, raw, fresh",
+   "kcal": 322,
+   "protein": 15.9,
+   "carbs": 3.59,
+   "fat": 26.5
+  },
+  "notes": "Cooked is FNDDS, raw is SR Legacy; same food (chicken egg yolk)."
+ },
+ {
+  "name": "Scrambled eggs",
+  "aliases": [
+   "egg scramble",
+   "omelet",
+   "omelette",
+   "plain omelet",
+   "scramble",
+   "scrambled egg",
+   "scrambled eggs"
+  ],
+  "cooked": {
+   "fdcId": 2707205,
+   "description": "Egg omelet or scrambled egg, no added fat",
+   "kcal": 143,
+   "protein": 12.36,
+   "carbs": 0.96,
+   "fat": 9.93
+  },
+  "raw": null,
+  "notes": "No-added-fat version chosen per brief. SR 'Egg, whole, cooked, scrambled' (172187, 149 kcal) assumes milk and butter and was skipped."
+ },
+ {
+  "name": "Liquid egg whites (carton)",
+  "aliases": [
+   "carton egg whites",
+   "egg beaters whites",
+   "egg whites carton",
+   "liquid egg white",
+   "liquid egg whites",
+   "pasteurized egg whites"
+  ],
+  "default": "raw",
+  "cooked": null,
+  "raw": {
+   "fdcId": 2408230,
+   "description": "LIQUID EGG WHITES",
+   "kcal": 54,
+   "protein": 10.9,
+   "carbs": 0,
+   "fat": 0
+  },
+  "notes": "Raw only by design: cartons are logged by pour weight before cooking. This is a generically named branded item whose label values match every major carton (25 kcal / 5 g protein per 46 g). For a cooked weight, use the 'Egg white' row instead."
+ },
+ {
+  "name": "Fried egg",
+  "aliases": [
+   "fried egg",
+   "fried eggs",
+   "over easy",
+   "over hard",
+   "over medium",
+   "sunny side up"
+  ],
+  "cooked": {
+   "fdcId": 2707156,
+   "description": "Egg, whole, fried no added fat",
+   "kcal": 143,
+   "protein": 12.36,
+   "carbs": 0.96,
+   "fat": 9.93
+  },
+  "raw": null,
+  "notes": "No-added-fat version; if cooked in butter or oil, log the fat separately."
+ },
+ {
+  "name": "Rice, white",
+  "aliases": [
+   "basmati rice",
+   "cooked rice",
+   "jasmine rice",
+   "long grain rice",
+   "rice",
+   "rice, white",
+   "steamed rice",
+   "white rice"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2708408,
+   "description": "Rice, white, cooked, no added fat",
+   "kcal": 129,
+   "protein": 2.67,
+   "carbs": 27.99,
+   "fat": 0.28
+  },
+  "raw": {
+   "fdcId": 168877,
+   "description": "Rice, white, long-grain, regular, raw, enriched",
+   "kcal": 365,
+   "protein": 7.13,
+   "carbs": 80,
+   "fat": 0.66
+  },
+  "notes": "Jasmine and basmati aliased here: USDA has no generic jasmine/basmati entry (only branded), and macros are within noise of long-grain white."
+ },
+ {
+  "name": "Rice, brown",
+  "aliases": [
+   "brown rice",
+   "brown rice cooked",
+   "rice, brown"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2708414,
+   "description": "Rice, brown, cooked, no added fat",
+   "kcal": 123,
+   "protein": 2.43,
+   "carbs": 25.76,
+   "fat": 1.11
+  },
+  "raw": {
+   "fdcId": 169703,
+   "description": "Rice, brown, long-grain, raw (Includes foods for USDA's Food Distribution Program)",
+   "kcal": 367,
+   "protein": 7.54,
+   "carbs": 76.2,
+   "fat": 3.2
+  }
+ },
+ {
+  "name": "Rice, wild",
+  "aliases": [
+   "rice, wild",
+   "wild rice"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2708424,
+   "description": "Rice, wild, 100%, cooked, no added fat",
+   "kcal": 100,
+   "protein": 3.97,
+   "carbs": 21.21,
+   "fat": 0.34
+  },
+  "raw": {
+   "fdcId": 169726,
+   "description": "Wild rice, raw",
+   "kcal": 357,
+   "protein": 14.7,
+   "carbs": 74.9,
+   "fat": 1.08
+  }
+ },
+ {
+  "name": "Quinoa",
+  "aliases": [
+   "quinoa",
+   "quinoa cooked"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 168917,
+   "description": "Quinoa, cooked",
+   "kcal": 120,
+   "protein": 4.4,
+   "carbs": 21.3,
+   "fat": 1.92
+  },
+  "raw": {
+   "fdcId": 168874,
+   "description": "Quinoa, uncooked",
+   "kcal": 368,
+   "protein": 14.1,
+   "carbs": 64.2,
+   "fat": 6.07
+  }
+ },
+ {
+  "name": "Oats, rolled",
+  "aliases": [
+   "oatmeal",
+   "oats",
+   "oats, rolled",
+   "old fashioned oats",
+   "porridge",
+   "quick oats",
+   "rolled oats",
+   "steel cut oats",
+   "steel-cut oats"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2708381,
+   "description": "Oatmeal, regular or quick, made with water, no added fat",
+   "kcal": 64,
+   "protein": 2.21,
+   "carbs": 11.36,
+   "fat": 1.09
+  },
+  "raw": {
+   "fdcId": 2708489,
+   "description": "Oats, raw",
+   "kcal": 379,
+   "protein": 13.15,
+   "carbs": 67.7,
+   "fat": 6.52
+  },
+  "notes": "Cooked = made with water, no added fat. Steel-cut aliased here: USDA only has branded steel-cut entries (378/13.3/66.7/6.7 dry), identical to Oats, raw within rounding."
+ },
+ {
+  "name": "Oatmeal, instant",
+  "aliases": [
+   "instant oatmeal",
+   "instant oats",
+   "oatmeal packet",
+   "oatmeal, instant"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2708387,
+   "description": "Oatmeal, instant, plain, made with water, no added fat",
+   "kcal": 68,
+   "protein": 2.26,
+   "carbs": 13.15,
+   "fat": 1.3
+  },
+  "raw": {
+   "fdcId": 171661,
+   "description": "Cereals, oats, instant, fortified, plain, dry",
+   "kcal": 362,
+   "protein": 11.9,
+   "carbs": 69.5,
+   "fat": 6.9
+  },
+  "notes": "Cooked = plain, made with water, no added fat. Dry = SR Legacy fortified plain instant oats."
+ },
+ {
+  "name": "Cream of rice",
+  "aliases": [
+   "cream of rice",
+   "rice cereal hot"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2708415,
+   "description": "Cream of rice",
+   "kcal": 69,
+   "protein": 1.17,
+   "carbs": 15.28,
+   "fat": 0.09
+  },
+  "raw": {
+   "fdcId": 173900,
+   "description": "Cereals, CREAM OF RICE, dry",
+   "kcal": 370,
+   "protein": 6.3,
+   "carbs": 82.4,
+   "fat": 0.5
+  },
+  "notes": "Cooked entry is FNDDS 'Cream of rice' (prepared)."
+ },
+ {
+  "name": "Pasta",
+  "aliases": [
+   "fettuccine",
+   "linguine",
+   "macaroni",
+   "noodles",
+   "pasta",
+   "pasta cooked",
+   "penne",
+   "rigatoni",
+   "spaghetti"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2708357,
+   "description": "Pasta, cooked",
+   "kcal": 157,
+   "protein": 5.76,
+   "carbs": 30.68,
+   "fat": 0.92
+  },
+  "raw": {
+   "fdcId": 169736,
+   "description": "Pasta, dry, enriched",
+   "kcal": 371,
+   "protein": 13,
+   "carbs": 74.7,
+   "fat": 1.51
+  },
+  "notes": "Penne aliased here: only branded penne in USDA; generic pasta values apply. FNDDS 'Pasta, cooked' 157 kcal vs SR boiled ~158, consistent."
+ },
+ {
+  "name": "Pasta, whole wheat",
+  "aliases": [
+   "pasta, whole wheat",
+   "whole grain pasta",
+   "whole wheat pasta",
+   "whole wheat penne",
+   "whole wheat spaghetti"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 168910,
+   "description": "Pasta, whole-wheat, cooked (Includes foods for USDA's Food Distribution Program)",
+   "kcal": 149,
+   "protein": 5.99,
+   "carbs": 30.1,
+   "fat": 1.71
+  },
+  "raw": {
+   "fdcId": 169738,
+   "description": "Pasta, whole-wheat, dry (Includes foods for USDA's Food Distribution Program)",
+   "kcal": 352,
+   "protein": 13.9,
+   "carbs": 73.4,
+   "fat": 2.93
+  }
+ },
+ {
+  "name": "Macaroni and cheese",
+  "aliases": [
+   "mac & cheese",
+   "mac and cheese",
+   "mac n cheese",
+   "macaroni and cheese"
+  ],
+  "cooked": {
+   "fdcId": 2708811,
+   "description": "Macaroni or noodles with cheese",
+   "kcal": 223,
+   "protein": 8.68,
+   "carbs": 23.08,
+   "fat": 10.5
+  },
+  "raw": null,
+  "notes": "Generic FNDDS homemade/NFS version; Easy Mac / boxed-mix versions exist (2708815, 2708813) if needed."
+ },
+ {
+  "name": "Rice noodles",
+  "aliases": [
+   "pho noodles",
+   "rice noodle",
+   "rice noodles",
+   "vermicelli rice"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2708356,
+   "description": "Rice noodles, cooked",
+   "kcal": 107,
+   "protein": 1.78,
+   "carbs": 23.87,
+   "fat": 0.2
+  },
+  "raw": {
+   "fdcId": 169742,
+   "description": "Rice noodles, dry",
+   "kcal": 364,
+   "protein": 5.95,
+   "carbs": 80.2,
+   "fat": 0.56
+  }
+ },
+ {
+  "name": "Couscous",
+  "aliases": [
+   "cous cous",
+   "couscous"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2708441,
+   "description": "Couscous, plain, cooked",
+   "kcal": 111,
+   "protein": 3.77,
+   "carbs": 23.11,
+   "fat": 0.16
+  },
+  "raw": {
+   "fdcId": 169699,
+   "description": "Couscous, dry",
+   "kcal": 376,
+   "protein": 12.8,
+   "carbs": 77.4,
+   "fat": 0.64
+  }
+ },
+ {
+  "name": "Potato, russet",
+  "aliases": [
+   "baked potato",
+   "idaho potato",
+   "potato",
+   "potato, russet",
+   "potatoes",
+   "russet potato",
+   "white potato"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 170030,
+   "description": "Potatoes, Russet, flesh and skin, baked",
+   "kcal": 95,
+   "protein": 2.63,
+   "carbs": 21.4,
+   "fat": 0.13
+  },
+  "raw": {
+   "fdcId": 170027,
+   "description": "Potatoes, russet, flesh and skin, raw (Includes foods for USDA's Food Distribution Program)",
+   "kcal": 79,
+   "protein": 2.14,
+   "carbs": 18.1,
+   "fat": 0.08
+  },
+  "notes": "Both halves flesh and skin, SR Legacy. Baked without added fat."
+ },
+ {
+  "name": "Potato, red",
+  "aliases": [
+   "baby potatoes",
+   "potato, red",
+   "red potato",
+   "red potatoes"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 170435,
+   "description": "Potatoes, red, flesh and skin, baked",
+   "kcal": 87,
+   "protein": 2.3,
+   "carbs": 19.6,
+   "fat": 0.15
+  },
+  "raw": {
+   "fdcId": 170029,
+   "description": "Potatoes, red, flesh and skin, raw",
+   "kcal": 70,
+   "protein": 1.89,
+   "carbs": 15.9,
+   "fat": 0.14
+  },
+  "notes": "Both halves flesh and skin, baked."
+ },
+ {
+  "name": "Mashed potatoes",
+  "aliases": [
+   "mashed potato",
+   "mashed potatoes",
+   "potato mash"
+  ],
+  "cooked": {
+   "fdcId": 2709492,
+   "description": "Potato, mashed, NFS",
+   "kcal": 114,
+   "protein": 2.15,
+   "carbs": 17.6,
+   "fat": 4.07
+  },
+  "raw": null,
+  "notes": "FNDDS NFS (includes typical milk/butter). Cooked-only."
+ },
+ {
+  "name": "French fries",
+  "aliases": [
+   "chips (fries)",
+   "french fries",
+   "fries",
+   "potato fries"
+  ],
+  "cooked": {
+   "fdcId": 2709456,
+   "description": "Potato, french fries, NFS",
+   "kcal": 225,
+   "protein": 2.5,
+   "carbs": 23.23,
+   "fat": 14.07
+  },
+  "raw": null,
+  "notes": "FNDDS 'Potato, french fries, NFS' (225 kcal). Fast-food fries run ~312 kcal/100g (170698) if he logs those specifically."
+ },
+ {
+  "name": "Sweet potato",
+  "aliases": [
+   "baked sweet potato",
+   "sweet potato",
+   "sweet potatoes",
+   "yam"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709699,
+   "description": "Sweet potato, baked, no added fat",
+   "kcal": 82,
+   "protein": 1.64,
+   "carbs": 17.98,
+   "fat": 0.39
+  },
+  "raw": {
+   "fdcId": 168482,
+   "description": "Sweet potato, raw, unprepared (Includes foods for USDA's Food Distribution Program)",
+   "kcal": 86,
+   "protein": 1.57,
+   "carbs": 20.1,
+   "fat": 0.05
+  },
+  "notes": "Cooked = FNDDS baked, no added fat (82 kcal) vs raw 86 kcal; FNDDS baked value is lower than SR baked-in-skin (90) because it averages peel-eaten/not."
+ },
+ {
+  "name": "Bread, white",
+  "aliases": [
+   "bread",
+   "bread, white",
+   "sandwich bread",
+   "toast",
+   "white bread"
+  ],
+  "cooked": {
+   "fdcId": 2707598,
+   "description": "Bread, white",
+   "kcal": 267,
+   "protein": 9.43,
+   "carbs": 49.2,
+   "fat": 3.59
+  },
+  "raw": null
+ },
+ {
+  "name": "Bread, whole wheat",
+  "aliases": [
+   "bread, whole wheat",
+   "brown bread",
+   "wheat bread",
+   "whole grain bread",
+   "whole wheat bread"
+  ],
+  "cooked": {
+   "fdcId": 2707709,
+   "description": "Bread, whole wheat",
+   "kcal": 254,
+   "protein": 12.3,
+   "carbs": 43.1,
+   "fat": 3.55
+  },
+  "raw": null
+ },
+ {
+  "name": "Bread, sourdough",
+  "aliases": [
+   "bread, sourdough",
+   "french bread",
+   "sourdough",
+   "sourdough bread"
+  ],
+  "cooked": {
+   "fdcId": 172675,
+   "description": "Bread, french or vienna (includes sourdough)",
+   "kcal": 272,
+   "protein": 10.8,
+   "carbs": 51.9,
+   "fat": 2.42
+  },
+  "raw": null,
+  "notes": "USDA groups sourdough with French/Vienna bread; no separate generic sourdough entry."
+ },
+ {
+  "name": "Bagel, plain",
+  "aliases": [
+   "bagel",
+   "bagel, plain",
+   "bagels",
+   "plain bagel"
+  ],
+  "cooked": {
+   "fdcId": 175049,
+   "description": "Bagels, plain, enriched, without calcium propionate (includes onion, poppy, sesame)",
+   "kcal": 275,
+   "protein": 10.5,
+   "carbs": 53.4,
+   "fat": 1.6
+  },
+  "raw": null,
+  "notes": "SR Legacy plain enriched bagel; FNDDS 'Bagel' (2707684, 264 kcal) is the alternative."
+ },
+ {
+  "name": "English muffin",
+  "aliases": [
+   "english muffin",
+   "english muffins"
+  ],
+  "cooked": {
+   "fdcId": 2707698,
+   "description": "Muffin, English",
+   "kcal": 227,
+   "protein": 8.87,
+   "carbs": 44.17,
+   "fat": 1.69
+  },
+  "raw": null
+ },
+ {
+  "name": "Tortilla, flour",
+  "aliases": [
+   "burrito tortilla",
+   "flour tortilla",
+   "tortilla",
+   "tortilla, flour",
+   "tortillas",
+   "wrap"
+  ],
+  "cooked": {
+   "fdcId": 2707824,
+   "description": "Tortilla, flour",
+   "kcal": 306,
+   "protein": 8.2,
+   "carbs": 49.38,
+   "fat": 7.99
+  },
+  "raw": null
+ },
+ {
+  "name": "Tortilla, corn",
+  "aliases": [
+   "corn tortilla",
+   "corn tortillas",
+   "taco tortilla",
+   "tortilla, corn"
+  ],
+  "cooked": {
+   "fdcId": 2707823,
+   "description": "Tortilla, corn",
+   "kcal": 218,
+   "protein": 5.7,
+   "carbs": 44.64,
+   "fat": 2.85
+  },
+  "raw": null
+ },
+ {
+  "name": "Pita",
+  "aliases": [
+   "pita",
+   "pita bread",
+   "pitas",
+   "pocket bread"
+  ],
+  "cooked": {
+   "fdcId": 2707616,
+   "description": "Bread, pita",
+   "kcal": 275,
+   "protein": 9.1,
+   "carbs": 55.7,
+   "fat": 1.2
+  },
+  "raw": null
+ },
+ {
+  "name": "Rice cakes",
+  "aliases": [
+   "puffed rice cake",
+   "rice cake",
+   "rice cakes"
+  ],
+  "cooked": {
+   "fdcId": 2708162,
+   "description": "Rice cake",
+   "kcal": 392,
+   "protein": 7.1,
+   "carbs": 81.1,
+   "fat": 4.3
+  },
+  "raw": null
+ },
+ {
+  "name": "Crackers, saltine",
+  "aliases": [
+   "crackers",
+   "crackers, saltine",
+   "saltine",
+   "saltine crackers",
+   "saltines"
+  ],
+  "cooked": {
+   "fdcId": 2708167,
+   "description": "Crackers, saltine",
+   "kcal": 418,
+   "protein": 9.46,
+   "carbs": 74.05,
+   "fat": 8.64
+  },
+  "raw": null
+ },
+ {
+  "name": "Granola",
+  "aliases": [
+   "granola",
+   "granola cereal"
+  ],
+  "cooked": {
+   "fdcId": 2708461,
+   "description": "Cereal, granola",
+   "kcal": 420,
+   "protein": 9.82,
+   "carbs": 67.35,
+   "fat": 13.01
+  },
+  "raw": null
+ },
+ {
+  "name": "Cheerios",
+  "aliases": [
+   "cheerio",
+   "cheerios",
+   "plain cheerios"
+  ],
+  "cooked": {
+   "fdcId": 173884,
+   "description": "Cereals ready-to-eat, GENERAL MILLS, CHEERIOS",
+   "kcal": 372,
+   "protein": 12.4,
+   "carbs": 73.2,
+   "fat": 6.6
+  },
+  "raw": null
+ },
+ {
+  "name": "Black beans",
+  "aliases": [
+   "black bean",
+   "black beans",
+   "canned black beans"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2707363,
+   "description": "Black beans, from canned, no added fat",
+   "kcal": 134,
+   "protein": 8.87,
+   "carbs": 24.34,
+   "fat": 0.43
+  },
+  "raw": {
+   "fdcId": 173734,
+   "description": "Beans, black, mature seeds, raw",
+   "kcal": 341,
+   "protein": 21.6,
+   "carbs": 62.4,
+   "fat": 1.42
+  },
+  "notes": "Cooked = from canned, no added fat (what he eats). Dry = mature seeds, raw. Boiled-from-dry alternative: 173735 (132 kcal)."
+ },
+ {
+  "name": "Pinto beans",
+  "aliases": [
+   "pinto bean",
+   "pinto beans",
+   "pintos"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2707375,
+   "description": "Pinto beans, from canned, no added fat",
+   "kcal": 137,
+   "protein": 7.66,
+   "carbs": 25.27,
+   "fat": 0.93
+  },
+  "raw": {
+   "fdcId": 175199,
+   "description": "Beans, pinto, mature seeds, raw (Includes foods for USDA's Food Distribution Program)",
+   "kcal": 347,
+   "protein": 21.4,
+   "carbs": 62.6,
+   "fat": 1.23
+  },
+  "notes": "Cooked = from canned, no added fat. Dry = mature seeds, raw."
+ },
+ {
+  "name": "Kidney beans",
+  "aliases": [
+   "kidney bean",
+   "kidney beans",
+   "red beans",
+   "red kidney beans"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2707383,
+   "description": "Kidney beans, from canned, no added fat",
+   "kcal": 135,
+   "protein": 8.7,
+   "carbs": 24.72,
+   "fat": 0.6
+  },
+  "raw": {
+   "fdcId": 173744,
+   "description": "Beans, kidney, red, mature seeds, raw",
+   "kcal": 337,
+   "protein": 22.5,
+   "carbs": 61.3,
+   "fat": 1.06
+  },
+  "notes": "Cooked = from canned, no added fat. Dry = red kidney, mature seeds, raw."
+ },
+ {
+  "name": "Chickpeas",
+  "aliases": [
+   "canned chickpeas",
+   "chickpea",
+   "chickpeas",
+   "garbanzo beans",
+   "garbanzos"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2707418,
+   "description": "Chickpeas, from canned, no added fat",
+   "kcal": 146,
+   "protein": 8.19,
+   "carbs": 22.45,
+   "fat": 3.24
+  },
+  "raw": {
+   "fdcId": 173756,
+   "description": "Chickpeas (garbanzo beans, bengal gram), mature seeds, raw",
+   "kcal": 378,
+   "protein": 20.5,
+   "carbs": 63,
+   "fat": 6.04
+  },
+  "notes": "Cooked = from canned, no added fat. Dry = mature seeds, raw."
+ },
+ {
+  "name": "Lentils",
+  "aliases": [
+   "cooked lentils",
+   "lentil",
+   "lentils"
+  ],
+  "default": "cooked",
+  "rawLabel": "Dry",
+  "cooked": {
+   "fdcId": 2707425,
+   "description": "Lentils, from dried, no added fat",
+   "kcal": 115,
+   "protein": 8.97,
+   "carbs": 20.01,
+   "fat": 0.38
+  },
+  "raw": {
+   "fdcId": 172420,
+   "description": "Lentils, raw",
+   "kcal": 352,
+   "protein": 24.6,
+   "carbs": 63.4,
+   "fat": 1.06
+  },
+  "notes": "Cooked = from dried, no added fat."
+ },
+ {
+  "name": "Edamame",
+  "aliases": [
+   "edamame",
+   "shelled edamame",
+   "soybeans green"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2707436,
+   "description": "Edamame, cooked",
+   "kcal": 140,
+   "protein": 11.54,
+   "carbs": 8.63,
+   "fat": 7.58
+  },
+  "raw": {
+   "fdcId": 168410,
+   "description": "Edamame, frozen, unprepared",
+   "kcal": 109,
+   "protein": 11.2,
+   "carbs": 7.61,
+   "fat": 4.73
+  },
+  "notes": "Raw = frozen, unprepared (how edamame is sold)."
+ },
+ {
+  "name": "Hummus",
+  "aliases": [
+   "houmous",
+   "hummous",
+   "hummus"
+  ],
+  "cooked": {
+   "fdcId": 2707402,
+   "description": "Hummus, plain",
+   "kcal": 243,
+   "protein": 7.35,
+   "carbs": 14.9,
+   "fat": 17.1
+  },
+  "raw": null
+ },
+ {
+  "name": "Popcorn",
+  "aliases": [
+   "air popped popcorn",
+   "popcorn",
+   "popped corn"
+  ],
+  "cooked": {
+   "fdcId": 2708219,
+   "description": "Popcorn, air-popped, no butter added",
+   "kcal": 385,
+   "protein": 12.89,
+   "carbs": 77.47,
+   "fat": 4.52
+  },
+  "raw": null,
+  "notes": "Air-popped, no butter. No generic unpopped-kernel entry in USDA (branded only), so no Dry half. Microwave plain popcorn = 2708224 (518 kcal)."
+ },
+ {
+  "name": "Pretzels",
+  "aliases": [
+   "hard pretzels",
+   "pretzel",
+   "pretzels"
+  ],
+  "cooked": {
+   "fdcId": 2708249,
+   "description": "Pretzels, hard, plain, salted",
+   "kcal": 384,
+   "protein": 10.04,
+   "carbs": 80.39,
+   "fat": 2.93
+  },
+  "raw": null
+ },
+ {
+  "name": "Rice Krispies Treat",
+  "aliases": [
+   "krispy treat",
+   "rice krispie treat",
+   "rice krispies treat",
+   "rice krispies treats",
+   "rice krispy treat"
+  ],
+  "cooked": {
+   "fdcId": 169687,
+   "description": "Snacks, KELLOGG, KELLOGG'S RICE KRISPIES TREATS Squares",
+   "kcal": 417,
+   "protein": 3.4,
+   "carbs": 80.5,
+   "fat": 9
+  },
+  "raw": null,
+  "notes": "Kellogg's branded (SR Legacy). Pre-gym snack."
+ },
+ {
+  "name": "Milk, whole",
+  "aliases": [
+   "3% milk",
+   "full fat milk",
+   "milk",
+   "milk whole",
+   "vitamin d milk",
+   "whole milk"
+  ],
+  "cooked": {
+   "fdcId": 2705385,
+   "description": "Milk, whole",
+   "kcal": 61,
+   "protein": 3.27,
+   "carbs": 4.63,
+   "fat": 3.2
+  },
+  "raw": null
+ },
+ {
+  "name": "Milk, 2%",
+  "aliases": [
+   "2 percent milk",
+   "2% milk",
+   "milk 2%",
+   "reduced fat milk",
+   "two percent milk"
+  ],
+  "cooked": {
+   "fdcId": 2705386,
+   "description": "Milk, reduced fat (2%)",
+   "kcal": 50,
+   "protein": 3.36,
+   "carbs": 4.9,
+   "fat": 1.9
+  },
+  "raw": null
+ },
+ {
+  "name": "Milk, 1%",
+  "aliases": [
+   "1 percent milk",
+   "1% milk",
+   "low fat milk",
+   "lowfat milk",
+   "milk 1%",
+   "one percent milk"
+  ],
+  "cooked": {
+   "fdcId": 2705387,
+   "description": "Milk, low fat (1%)",
+   "kcal": 43,
+   "protein": 3.38,
+   "carbs": 5.18,
+   "fat": 0.95
+  },
+  "raw": null
+ },
+ {
+  "name": "Milk, skim",
+  "aliases": [
+   "fat free milk",
+   "fat-free milk",
+   "milk skim",
+   "non-fat milk",
+   "nonfat milk",
+   "skim milk"
+  ],
+  "cooked": {
+   "fdcId": 2705388,
+   "description": "Milk, fat free (skim)",
+   "kcal": 34,
+   "protein": 3.43,
+   "carbs": 4.92,
+   "fat": 0.08
+  },
+  "raw": null
+ },
+ {
+  "name": "Almond milk, unsweetened",
+  "aliases": [
+   "almond milk",
+   "almond milk unsweetened",
+   "almondmilk",
+   "unsweetened almond milk"
+  ],
+  "cooked": {
+   "fdcId": 2705409,
+   "description": "Almond milk, unsweetened",
+   "kcal": 15,
+   "protein": 0.55,
+   "carbs": 0.34,
+   "fat": 1.22
+  },
+  "raw": null
+ },
+ {
+  "name": "Oat milk",
+  "aliases": [
+   "oat milk",
+   "oatly",
+   "oatmilk",
+   "planet oat"
+  ],
+  "cooked": {
+   "fdcId": 2705412,
+   "description": "Oat milk",
+   "kcal": 45,
+   "protein": 0.66,
+   "carbs": 5.37,
+   "fat": 2.33
+  },
+  "raw": null
+ },
+ {
+  "name": "Fairlife 2% milk",
+  "aliases": [
+   "fairlife",
+   "fairlife 2%",
+   "fairlife 2% milk",
+   "fairlife milk",
+   "ultra filtered milk",
+   "ultra-filtered milk"
+  ],
+  "cooked": {
+   "fdcId": 2757397,
+   "description": "Fairlife Milk, Ultra- Filtered",
+   "kcal": 41.7,
+   "protein": 5.42,
+   "carbs": 2.5,
+   "fat": 1.04
+  },
+  "raw": null,
+  "notes": "Branded label entry (Fairlife ultra-filtered reduced fat 2%). Numbers are per 100 g derived from the 240 mL label serving."
+ },
+ {
+  "name": "Fairlife fat free milk",
+  "aliases": [
+   "fairlife 0%",
+   "fairlife fat free",
+   "fairlife fat free milk",
+   "fairlife skim"
+  ],
+  "cooked": {
+   "fdcId": 2756934,
+   "description": "Fairlife Fat Free Ultra- Filtered Milk",
+   "kcal": 33.3,
+   "protein": 5.42,
+   "carbs": 2.5,
+   "fat": 0
+  },
+  "raw": null,
+  "notes": "Branded label entry."
+ },
+ {
+  "name": "Fairlife whole milk",
+  "aliases": [
+   "fairlife 3.5%",
+   "fairlife whole",
+   "fairlife whole milk"
+  ],
+  "cooked": {
+   "fdcId": 2757704,
+   "description": "Fairlife Whole Ultra- Filtered Milk",
+   "kcal": 62.5,
+   "protein": 5.42,
+   "carbs": 2.5,
+   "fat": 3.33
+  },
+  "raw": null,
+  "notes": "Branded label entry."
+ },
+ {
+  "name": "Greek yogurt, nonfat",
+  "aliases": [
+   "0% greek yogurt",
+   "chobani nonfat",
+   "fage 0%",
+   "fat free greek yogurt",
+   "greek yogurt",
+   "greek yogurt nonfat",
+   "nonfat greek yogurt",
+   "oikos triple zero",
+   "plain greek yogurt"
+  ],
+  "cooked": {
+   "fdcId": 2705424,
+   "description": "Yogurt, Greek, nonfat milk, plain",
+   "kcal": 59,
+   "protein": 10.3,
+   "carbs": 3.64,
+   "fat": 0.37
+  },
+  "raw": null
+ },
+ {
+  "name": "Greek yogurt, 2%",
+  "aliases": [
+   "2% greek yogurt",
+   "fage 2%",
+   "greek yogurt 2%",
+   "greek yogurt low fat",
+   "low fat greek yogurt",
+   "lowfat greek yogurt"
+  ],
+  "cooked": {
+   "fdcId": 2705423,
+   "description": "Yogurt, Greek, low fat milk, plain",
+   "kcal": 67,
+   "protein": 10.2,
+   "carbs": 3.6,
+   "fat": 1.36
+  },
+  "raw": null
+ },
+ {
+  "name": "Greek yogurt, whole milk",
+  "aliases": [
+   "5% greek yogurt",
+   "fage 5%",
+   "full fat greek yogurt",
+   "greek yogurt whole milk",
+   "whole milk greek yogurt"
+  ],
+  "cooked": {
+   "fdcId": 2705422,
+   "description": "Yogurt, Greek, whole milk, plain",
+   "kcal": 94,
+   "protein": 8.78,
+   "carbs": 4.75,
+   "fat": 4.39
+  },
+  "raw": null
+ },
+ {
+  "name": "Greek yogurt, vanilla",
+  "aliases": [
+   "chobani vanilla",
+   "flavored greek yogurt",
+   "greek yogurt flavored",
+   "greek yogurt vanilla",
+   "oikos vanilla",
+   "vanilla greek yogurt"
+  ],
+  "cooked": {
+   "fdcId": 170907,
+   "description": "Yogurt, Greek, vanilla, lowfat",
+   "kcal": 95,
+   "protein": 8.64,
+   "carbs": 9.54,
+   "fat": 2.5
+  },
+  "raw": null,
+  "notes": "SR Legacy lowfat vanilla Greek; flavored/sweetened Greek yogurts vary a lot by brand."
+ },
+ {
+  "name": "Yogurt, plain",
+  "aliases": [
+   "plain yogurt",
+   "regular yogurt",
+   "whole milk yogurt",
+   "yoghurt",
+   "yogurt",
+   "yogurt plain"
+  ],
+  "cooked": {
+   "fdcId": 2705418,
+   "description": "Yogurt, whole milk, plain",
+   "kcal": 78,
+   "protein": 3.82,
+   "carbs": 5.57,
+   "fat": 4.48
+  },
+  "raw": null,
+  "notes": "Whole-milk plain (non-Greek) yogurt."
+ },
+ {
+  "name": "Yogurt, plain, low fat",
+  "aliases": [
+   "low fat yogurt",
+   "lowfat yogurt",
+   "plain low fat yogurt",
+   "yogurt low fat"
+  ],
+  "cooked": {
+   "fdcId": 2705419,
+   "description": "Yogurt, low fat milk, plain",
+   "kcal": 63,
+   "protein": 5.25,
+   "carbs": 7.04,
+   "fat": 1.55
+  },
+  "raw": null
+ },
+ {
+  "name": "Cottage cheese, 2%",
+  "aliases": [
+   "2% cottage cheese",
+   "cottage cheese",
+   "cottage cheese 2%",
+   "good culture",
+   "low fat cottage cheese",
+   "lowfat cottage cheese"
+  ],
+  "cooked": {
+   "fdcId": 328841,
+   "description": "Cheese, cottage, lowfat, 2% milkfat",
+   "kcal": 84,
+   "protein": 11,
+   "carbs": 4.31,
+   "fat": 2.3
+  },
+  "raw": null
+ },
+ {
+  "name": "Cottage cheese, 1%",
+  "aliases": [
+   "1% cottage cheese",
+   "cottage cheese 1%",
+   "cottage cheese nonfat"
+  ],
+  "cooked": {
+   "fdcId": 173417,
+   "description": "Cheese, cottage, lowfat, 1% milkfat",
+   "kcal": 72,
+   "protein": 12.4,
+   "carbs": 2.72,
+   "fat": 1.02
+  },
+  "raw": null
+ },
+ {
+  "name": "Cheddar cheese",
+  "aliases": [
+   "cheddar",
+   "cheddar cheese",
+   "cheese",
+   "sharp cheddar",
+   "shredded cheddar"
+  ],
+  "cooked": {
+   "fdcId": 2705709,
+   "description": "Cheese, Cheddar",
+   "kcal": 409,
+   "protein": 23.3,
+   "carbs": 2.44,
+   "fat": 34
+  },
+  "raw": null
+ },
+ {
+  "name": "Mozzarella, part skim",
+  "aliases": [
+   "low moisture mozzarella",
+   "mozzarella",
+   "mozzarella cheese",
+   "part skim mozzarella",
+   "shredded mozzarella"
+  ],
+  "cooked": {
+   "fdcId": 2705723,
+   "description": "Cheese, Mozzarella, part skim",
+   "kcal": 296,
+   "protein": 23.7,
+   "carbs": 4.44,
+   "fat": 20.4
+  },
+  "raw": null
+ },
+ {
+  "name": "American cheese",
+  "aliases": [
+   "american",
+   "american cheese",
+   "cheese slice",
+   "kraft singles",
+   "processed cheese"
+  ],
+  "cooked": {
+   "fdcId": 2705764,
+   "description": "Cheese, American",
+   "kcal": 340,
+   "protein": 16.79,
+   "carbs": 7.16,
+   "fat": 27.16
+  },
+  "raw": null
+ },
+ {
+  "name": "Parmesan cheese",
+  "aliases": [
+   "grated parmesan",
+   "parmesan",
+   "parmesan cheese",
+   "parmigiano",
+   "parmigiano reggiano"
+  ],
+  "cooked": {
+   "fdcId": 2705730,
+   "description": "Cheese, Parmesan, hard",
+   "kcal": 412,
+   "protein": 29.87,
+   "carbs": 8.36,
+   "fat": 28.75
+  },
+  "raw": null
+ },
+ {
+  "name": "Feta cheese",
+  "aliases": [
+   "crumbled feta",
+   "feta",
+   "feta cheese"
+  ],
+  "cooked": {
+   "fdcId": 2705714,
+   "description": "Cheese, Feta",
+   "kcal": 273,
+   "protein": 19.71,
+   "carbs": 5.58,
+   "fat": 19.08
+  },
+  "raw": null
+ },
+ {
+  "name": "Cream cheese",
+  "aliases": [
+   "cream cheese",
+   "cream cheese plain",
+   "philadelphia"
+  ],
+  "cooked": {
+   "fdcId": 2705760,
+   "description": "Cream cheese, regular, plain",
+   "kcal": 343,
+   "protein": 5.79,
+   "carbs": 4.56,
+   "fat": 33.49
+  },
+  "raw": null
+ },
+ {
+  "name": "String cheese",
+  "aliases": [
+   "cheese stick",
+   "cheese sticks",
+   "frigo string cheese",
+   "mozzarella stick",
+   "string cheese"
+  ],
+  "cooked": {
+   "fdcId": 2553837,
+   "description": "STRING CHEESE",
+   "kcal": 286,
+   "protein": 25,
+   "carbs": 3.57,
+   "fat": 17.9
+  },
+  "raw": null,
+  "notes": "Branded-label 'STRING CHEESE' (part-skim mozzarella stick). Generic FNDDS 'Cheese, Mozzarella, part skim' (2705723) is nearly identical if this id ever disappears."
+ },
+ {
+  "name": "Butter",
+  "aliases": [
+   "butter",
+   "butter salted",
+   "kerrygold",
+   "salted butter",
+   "stick butter"
+  ],
+  "cooked": {
+   "fdcId": 173410,
+   "description": "Butter, salted",
+   "kcal": 717,
+   "protein": 0.85,
+   "carbs": 0.06,
+   "fat": 81.1
+  },
+  "raw": null
+ },
+ {
+  "name": "Whey protein powder",
+  "aliases": [
+   "protein powder",
+   "protein shake powder",
+   "scoop of protein",
+   "whey",
+   "whey isolate",
+   "whey protein",
+   "whey protein powder"
+  ],
+  "cooked": {
+   "fdcId": 173180,
+   "description": "Beverages, Protein powder whey based",
+   "kcal": 352,
+   "protein": 78.1,
+   "carbs": 6.25,
+   "fat": 1.56
+  },
+  "raw": null,
+  "notes": "Generic SR Legacy whey-based protein powder (~78 g protein/100 g). Real tubs vary; override with label when known."
+ },
+ {
+  "name": "Casein protein powder",
+  "aliases": [
+   "casein",
+   "casein powder",
+   "casein protein",
+   "micellar casein"
+  ],
+  "cooked": {
+   "fdcId": 2412812,
+   "description": "CASEIN PROTEIN 24 G MICELLAR CASEIN POWDER, UNFLAVORED, UNFLAVORED",
+   "kcal": 367,
+   "protein": 80,
+   "carbs": 0,
+   "fat": 0
+  },
+  "raw": null,
+  "notes": "Only branded label entries exist for casein in USDA; this is an unflavored micellar casein (80 g protein/100 g)."
+ },
+ {
+  "name": "Protein bar",
+  "aliases": [
+   "barebells",
+   "built bar",
+   "one bar",
+   "protein bar",
+   "protein bars",
+   "quest bar"
+  ],
+  "cooked": {
+   "fdcId": 2708124,
+   "description": "Nutrition bar (South Beach Living High Protein Bar)",
+   "kcal": 412,
+   "protein": 30.34,
+   "carbs": 38.4,
+   "fat": 15.17
+  },
+  "raw": null,
+  "notes": "Generic placeholder (FNDDS 'High Protein Bar' ~412 kcal / 30 P per 100 g). Real bars vary widely; override with label when known."
+ },
+ {
+  "name": "Peanut butter",
+  "aliases": [
+   "creamy peanut butter",
+   "jif",
+   "natural peanut butter",
+   "pb",
+   "peanut butter",
+   "smooth peanut butter"
+  ],
+  "cooked": {
+   "fdcId": 2707537,
+   "description": "Peanut butter",
+   "kcal": 598,
+   "protein": 22.21,
+   "carbs": 22.31,
+   "fat": 51.36
+  },
+  "raw": null
+ },
+ {
+  "name": "Skippy peanut butter",
+  "aliases": [
+   "skippy",
+   "skippy creamy",
+   "skippy peanut butter"
+  ],
+  "cooked": {
+   "fdcId": 1759570,
+   "description": "SKIPPY, PEANUT BUTTER",
+   "kcal": 594,
+   "protein": 21.9,
+   "carbs": 18.8,
+   "fat": 50
+  },
+  "raw": null,
+  "notes": "Branded label entry."
+ },
+ {
+  "name": "Almond butter",
+  "aliases": [
+   "almond butter",
+   "almond butter creamy"
+  ],
+  "cooked": {
+   "fdcId": 2707533,
+   "description": "Almond butter",
+   "kcal": 641,
+   "protein": 20.67,
+   "carbs": 21.11,
+   "fat": 52.72
+  },
+  "raw": null
+ },
+ {
+  "name": "Almonds",
+  "aliases": [
+   "almond",
+   "almonds",
+   "nuts",
+   "raw almonds",
+   "whole almonds"
+  ],
+  "cooked": {
+   "fdcId": 2707486,
+   "description": "Almonds, unroasted",
+   "kcal": 626,
+   "protein": 21.45,
+   "carbs": 20.03,
+   "fat": 51.09
+  },
+  "raw": null,
+  "notes": "Unroasted (raw) almonds; roasted is within a few percent."
+ },
+ {
+  "name": "Walnuts",
+  "aliases": [
+   "english walnuts",
+   "walnut",
+   "walnut halves",
+   "walnuts"
+  ],
+  "cooked": {
+   "fdcId": 170187,
+   "description": "Nuts, walnuts, english",
+   "kcal": 654,
+   "protein": 15.2,
+   "carbs": 13.7,
+   "fat": 65.2
+  },
+  "raw": null
+ },
+ {
+  "name": "Cashews",
+  "aliases": [
+   "cashew",
+   "cashew nuts",
+   "cashews",
+   "roasted cashews",
+   "salted cashews"
+  ],
+  "cooked": {
+   "fdcId": 2707495,
+   "description": "Cashews, salted",
+   "kcal": 578,
+   "protein": 14.7,
+   "carbs": 31.4,
+   "fat": 47.48
+  },
+  "raw": null,
+  "notes": "Roasted salted; unsalted (2707497) is within 1%."
+ },
+ {
+  "name": "Peanuts",
+  "aliases": [
+   "peanut",
+   "peanuts",
+   "roasted peanuts",
+   "salted peanuts"
+  ],
+  "cooked": {
+   "fdcId": 2707515,
+   "description": "Peanuts, roasted, salted",
+   "kcal": 599,
+   "protein": 28.03,
+   "carbs": 15.26,
+   "fat": 52.5
+  },
+  "raw": null
+ },
+ {
+  "name": "Pistachios",
+  "aliases": [
+   "pistachio",
+   "pistachio nuts",
+   "pistachios",
+   "roasted pistachios",
+   "wonderful pistachios"
+  ],
+  "cooked": {
+   "fdcId": 2707528,
+   "description": "Pistachio nuts, salted",
+   "kcal": 576,
+   "protein": 20.22,
+   "carbs": 27.16,
+   "fat": 46.98
+  },
+  "raw": null,
+  "notes": "Salted, kernel weight (shells removed)."
+ },
+ {
+  "name": "Mixed nuts",
+  "aliases": [
+   "mixed nut",
+   "mixed nuts",
+   "nut mix",
+   "planters mixed nuts"
+  ],
+  "cooked": {
+   "fdcId": 2707507,
+   "description": "Mixed nuts, with peanuts, lightly salted",
+   "kcal": 612,
+   "protein": 19.67,
+   "carbs": 20.99,
+   "fat": 54.04
+  },
+  "raw": null,
+  "notes": "With peanuts, lightly salted."
+ },
+ {
+  "name": "Olive oil",
+  "aliases": [
+   "evoo",
+   "extra virgin olive oil",
+   "oil",
+   "olive oil"
+  ],
+  "cooked": {
+   "fdcId": 2710186,
+   "description": "Olive oil",
+   "kcal": 900,
+   "protein": 0,
+   "carbs": 0,
+   "fat": 100
+  },
+  "raw": null
+ },
+ {
+  "name": "Avocado oil",
+  "aliases": [
+   "avocado oil",
+   "chosen foods"
+  ],
+  "cooked": {
+   "fdcId": 173573,
+   "description": "Oil, avocado",
+   "kcal": 884,
+   "protein": 0,
+   "carbs": 0,
+   "fat": 100
+  },
+  "raw": null
+ },
+ {
+  "name": "Coconut oil",
+  "aliases": [
+   "coconut oil"
+  ],
+  "cooked": {
+   "fdcId": 2710182,
+   "description": "Coconut oil",
+   "kcal": 895,
+   "protein": 0,
+   "carbs": 0.84,
+   "fat": 99.1
+  },
+  "raw": null
+ },
+ {
+  "name": "Mayonnaise",
+  "aliases": [
+   "full fat mayo",
+   "hellmann's",
+   "hellmans",
+   "mayo",
+   "mayonnaise",
+   "regular mayo"
+  ],
+  "cooked": {
+   "fdcId": 2710204,
+   "description": "Mayonnaise, regular",
+   "kcal": 680,
+   "protein": 0.96,
+   "carbs": 0.57,
+   "fat": 74.85
+  },
+  "raw": null
+ },
+ {
+  "name": "Mayonnaise, light",
+  "aliases": [
+   "light mayo",
+   "light mayonnaise",
+   "lite mayo",
+   "mayo light",
+   "reduced fat mayo"
+  ],
+  "cooked": {
+   "fdcId": 2710220,
+   "description": "Mayonnaise, light",
+   "kcal": 238,
+   "protein": 0.37,
+   "carbs": 9.23,
+   "fat": 22.22
+  },
+  "raw": null
+ },
+ {
+  "name": "Ketchup",
+  "aliases": [
+   "catsup",
+   "heinz ketchup",
+   "ketchup",
+   "tomato ketchup"
+  ],
+  "cooked": {
+   "fdcId": 2709733,
+   "description": "Ketchup",
+   "kcal": 109,
+   "protein": 1.08,
+   "carbs": 27.1,
+   "fat": 0.32
+  },
+  "raw": null
+ },
+ {
+  "name": "Mustard",
+  "aliases": [
+   "dijon",
+   "dijon mustard",
+   "mustard",
+   "prepared mustard",
+   "yellow mustard"
+  ],
+  "cooked": {
+   "fdcId": 2710085,
+   "description": "Mustard",
+   "kcal": 69,
+   "protein": 4.25,
+   "carbs": 5.3,
+   "fat": 3.38
+  },
+  "raw": null
+ },
+ {
+  "name": "BBQ sauce",
+  "aliases": [
+   "barbecue sauce",
+   "barbeque sauce",
+   "bbq",
+   "bbq sauce"
+  ],
+  "cooked": {
+   "fdcId": 2709750,
+   "description": "Barbecue sauce",
+   "kcal": 172,
+   "protein": 0.82,
+   "carbs": 40.77,
+   "fat": 0.63
+  },
+  "raw": null
+ },
+ {
+  "name": "Honey",
+  "aliases": [
+   "honey",
+   "raw honey"
+  ],
+  "cooked": {
+   "fdcId": 2710281,
+   "description": "Honey",
+   "kcal": 304,
+   "protein": 0.3,
+   "carbs": 82.4,
+   "fat": 0
+  },
+  "raw": null
+ },
+ {
+  "name": "Maple syrup",
+  "aliases": [
+   "maple syrup",
+   "pure maple syrup",
+   "syrup"
+  ],
+  "cooked": {
+   "fdcId": 169661,
+   "description": "Syrups, maple",
+   "kcal": 260,
+   "protein": 0.04,
+   "carbs": 67,
+   "fat": 0.06
+  },
+  "raw": null
+ },
+ {
+  "name": "Jam",
+  "aliases": [
+   "fruit spread",
+   "grape jelly",
+   "jam",
+   "jelly",
+   "preserves",
+   "strawberry jam"
+  ],
+  "cooked": {
+   "fdcId": 2710301,
+   "description": "Jam",
+   "kcal": 278,
+   "protein": 0.37,
+   "carbs": 68.86,
+   "fat": 0.07
+  },
+  "raw": null
+ },
+ {
+  "name": "Sugar",
+  "aliases": [
+   "cane sugar",
+   "granulated sugar",
+   "sugar",
+   "table sugar",
+   "white sugar"
+  ],
+  "cooked": {
+   "fdcId": 2710258,
+   "description": "Sugar, white, granulated or lump",
+   "kcal": 401,
+   "protein": 0,
+   "carbs": 99.6,
+   "fat": 0.32
+  },
+  "raw": null
+ },
+ {
+  "name": "Sour cream",
+  "aliases": [
+   "daisy sour cream",
+   "regular sour cream",
+   "sour cream"
+  ],
+  "cooked": {
+   "fdcId": 2705614,
+   "description": "Sour cream, regular",
+   "kcal": 196,
+   "protein": 3.07,
+   "carbs": 5.56,
+   "fat": 17.99
+  },
+  "raw": null
+ },
+ {
+  "name": "Ranch dressing",
+  "aliases": [
+   "hidden valley",
+   "ranch",
+   "ranch dip",
+   "ranch dressing"
+  ],
+  "cooked": {
+   "fdcId": 2710212,
+   "description": "Ranch dressing",
+   "kcal": 430,
+   "protein": 1.32,
+   "carbs": 5.9,
+   "fat": 44.54
+  },
+  "raw": null
+ },
+ {
+  "name": "Soy sauce",
+  "aliases": [
+   "kikkoman",
+   "shoyu",
+   "soy sauce",
+   "tamari"
+  ],
+  "cooked": {
+   "fdcId": 2707442,
+   "description": "Soy sauce",
+   "kcal": 53,
+   "protein": 8.14,
+   "carbs": 4.93,
+   "fat": 0.57
+  },
+  "raw": null
+ },
+ {
+  "name": "Hot sauce",
+  "aliases": [
+   "cholula",
+   "frank's red hot",
+   "franks red hot",
+   "hot pepper sauce",
+   "hot sauce",
+   "tabasco"
+  ],
+  "cooked": {
+   "fdcId": 2710093,
+   "description": "Hot pepper sauce",
+   "kcal": 12,
+   "protein": 1.29,
+   "carbs": 0.8,
+   "fat": 0.76
+  },
+  "raw": null
+ },
+ {
+  "name": "Sriracha",
+  "aliases": [
+   "huy fong",
+   "sriracha",
+   "sriracha sauce"
+  ],
+  "cooked": {
+   "fdcId": 171186,
+   "description": "Sauce, hot chile, sriracha",
+   "kcal": 93,
+   "protein": 1.93,
+   "carbs": 19.2,
+   "fat": 0.93
+  },
+  "raw": null,
+  "notes": "Separate from generic hot sauce because sriracha has ~8x the carbs of vinegar-based hot sauce."
+ },
+ {
+  "name": "Salsa",
+  "aliases": [
+   "pico de gallo",
+   "red salsa",
+   "salsa",
+   "salsa roja",
+   "tomato salsa"
+  ],
+  "cooked": {
+   "fdcId": 2709736,
+   "description": "Salsa, NFS",
+   "kcal": 34,
+   "protein": 1.44,
+   "carbs": 6.74,
+   "fat": 0.19
+  },
+  "raw": null
+ },
+ {
+  "name": "Dark chocolate",
+  "aliases": [
+   "70% chocolate",
+   "chocolate",
+   "dark chocolate",
+   "dark chocolate bar",
+   "lindt dark"
+  ],
+  "cooked": {
+   "fdcId": 170271,
+   "description": "Chocolate, dark, 45- 59% cacao solids",
+   "kcal": 546,
+   "protein": 4.88,
+   "carbs": 61.2,
+   "fat": 31.3
+  },
+  "raw": null,
+  "notes": "45-59% cacao entry; 70-85% bars run ~600 kcal/100 g with more fat and fewer carbs."
+ },
+ {
+  "name": "Ice cream, vanilla",
+  "aliases": [
+   "ice cream",
+   "ice cream vanilla",
+   "icecream",
+   "vanilla ice cream"
+  ],
+  "cooked": {
+   "fdcId": 2705630,
+   "description": "Ice cream, vanilla",
+   "kcal": 207,
+   "protein": 3.5,
+   "carbs": 23.6,
+   "fat": 11
+  },
+  "raw": null
+ },
+ {
+  "name": "Heavy cream",
+  "aliases": [
+   "cream",
+   "heavy cream",
+   "heavy whipping cream",
+   "whipping cream"
+  ],
+  "cooked": {
+   "fdcId": 2705597,
+   "description": "Cream, heavy",
+   "kcal": 343,
+   "protein": 2.02,
+   "carbs": 3.8,
+   "fat": 35.56
+  },
+  "raw": null
+ },
+ {
+  "name": "Half and half",
+  "aliases": [
+   "coffee cream",
+   "creamer",
+   "half & half",
+   "half and half",
+   "half-and-half"
+  ],
+  "cooked": {
+   "fdcId": 2705594,
+   "description": "Cream, half and half",
+   "kcal": 131,
+   "protein": 3.13,
+   "carbs": 4.3,
+   "fat": 11.5
+  },
+  "raw": null
+ },
+ {
+  "name": "Banana",
+  "aliases": [
+   "banana",
+   "bananas"
+  ],
+  "cooked": {
+   "fdcId": 2709224,
+   "description": "Banana, raw",
+   "kcal": 97,
+   "protein": 0.74,
+   "carbs": 22.71,
+   "fat": 0.28
+  },
+  "raw": null
+ },
+ {
+  "name": "Apple",
+  "aliases": [
+   "apple",
+   "apples"
+  ],
+  "cooked": {
+   "fdcId": 2709215,
+   "description": "Apple, raw",
+   "kcal": 61,
+   "protein": 0.17,
+   "carbs": 14.8,
+   "fat": 0.15
+  },
+  "raw": null
+ },
+ {
+  "name": "Orange",
+  "aliases": [
+   "navel orange",
+   "orange",
+   "oranges"
+  ],
+  "cooked": {
+   "fdcId": 2709171,
+   "description": "Orange, raw",
+   "kcal": 50,
+   "protein": 0.92,
+   "carbs": 11.78,
+   "fat": 0.14
+  },
+  "raw": null
+ },
+ {
+  "name": "Strawberries",
+  "aliases": [
+   "strawberries",
+   "strawberry"
+  ],
+  "cooked": {
+   "fdcId": 2709283,
+   "description": "Strawberries, raw",
+   "kcal": 36,
+   "protein": 0.64,
+   "carbs": 7.96,
+   "fat": 0.22
+  },
+  "raw": null
+ },
+ {
+  "name": "Blueberries",
+  "aliases": [
+   "blueberries",
+   "blueberry"
+  ],
+  "cooked": {
+   "fdcId": 2709275,
+   "description": "Blueberries, raw",
+   "kcal": 64,
+   "protein": 0.7,
+   "carbs": 14.57,
+   "fat": 0.31
+  },
+  "raw": null
+ },
+ {
+  "name": "Raspberries",
+  "aliases": [
+   "raspberries",
+   "raspberry"
+  ],
+  "cooked": {
+   "fdcId": 2709281,
+   "description": "Raspberries, raw",
+   "kcal": 57,
+   "protein": 1.01,
+   "carbs": 12.9,
+   "fat": 0.19
+  },
+  "raw": null
+ },
+ {
+  "name": "Blackberries",
+  "aliases": [
+   "blackberries",
+   "blackberry"
+  ],
+  "cooked": {
+   "fdcId": 2709273,
+   "description": "Blackberries, raw",
+   "kcal": 43,
+   "protein": 1.39,
+   "carbs": 9.61,
+   "fat": 0.49
+  },
+  "raw": null
+ },
+ {
+  "name": "Grapes",
+  "aliases": [
+   "grape",
+   "grapes",
+   "green grapes",
+   "red grapes"
+  ],
+  "cooked": {
+   "fdcId": 2709237,
+   "description": "Grapes, raw",
+   "kcal": 83,
+   "protein": 0.9,
+   "carbs": 19.4,
+   "fat": 0.2
+  },
+  "raw": null
+ },
+ {
+  "name": "Watermelon",
+  "aliases": [
+   "water melon",
+   "watermelon"
+  ],
+  "cooked": {
+   "fdcId": 2709270,
+   "description": "Watermelon, raw",
+   "kcal": 30,
+   "protein": 0.61,
+   "carbs": 7.55,
+   "fat": 0.15
+  },
+  "raw": null
+ },
+ {
+  "name": "Honeydew",
+  "aliases": [
+   "honeydew",
+   "honeydew melon",
+   "melon"
+  ],
+  "cooked": {
+   "fdcId": 2709241,
+   "description": "Honeydew melon, raw",
+   "kcal": 36,
+   "protein": 0.54,
+   "carbs": 9.09,
+   "fat": 0.14
+  },
+  "raw": null
+ },
+ {
+  "name": "Cantaloupe",
+  "aliases": [
+   "cantaloupe",
+   "cantaloupe melon",
+   "rockmelon"
+  ],
+  "cooked": {
+   "fdcId": 2709226,
+   "description": "Cantaloupe, raw",
+   "kcal": 38,
+   "protein": 0.82,
+   "carbs": 8.16,
+   "fat": 0.18
+  },
+  "raw": null
+ },
+ {
+  "name": "Pineapple",
+  "aliases": [
+   "pineapple",
+   "pineapples"
+  ],
+  "cooked": {
+   "fdcId": 2709260,
+   "description": "Pineapple, raw",
+   "kcal": 60,
+   "protein": 0.46,
+   "carbs": 14.09,
+   "fat": 0.21
+  },
+  "raw": null
+ },
+ {
+  "name": "Mango",
+  "aliases": [
+   "mango",
+   "mangoes",
+   "mangos"
+  ],
+  "cooked": {
+   "fdcId": 2709242,
+   "description": "Mango, raw",
+   "kcal": 60,
+   "protein": 0.82,
+   "carbs": 14.98,
+   "fat": 0.38
+  },
+  "raw": null
+ },
+ {
+  "name": "Peach",
+  "aliases": [
+   "peach",
+   "peaches"
+  ],
+  "cooked": {
+   "fdcId": 2709249,
+   "description": "Peach, raw",
+   "kcal": 46,
+   "protein": 0.91,
+   "carbs": 10.1,
+   "fat": 0.27
+  },
+  "raw": null
+ },
+ {
+  "name": "Pear",
+  "aliases": [
+   "pear",
+   "pears"
+  ],
+  "cooked": {
+   "fdcId": 2709254,
+   "description": "Pear, raw",
+   "kcal": 59,
+   "protein": 0.37,
+   "carbs": 15.18,
+   "fat": 0.15
+  },
+  "raw": null
+ },
+ {
+  "name": "Cherries",
+  "aliases": [
+   "cherries",
+   "cherry",
+   "sweet cherries"
+  ],
+  "cooked": {
+   "fdcId": 2709231,
+   "description": "Cherries, raw",
+   "kcal": 71,
+   "protein": 1.04,
+   "carbs": 16.16,
+   "fat": 0.19
+  },
+  "raw": null
+ },
+ {
+  "name": "Kiwi",
+  "aliases": [
+   "kiwi",
+   "kiwi fruit",
+   "kiwifruit",
+   "kiwis"
+  ],
+  "cooked": {
+   "fdcId": 2709239,
+   "description": "Kiwi fruit, raw",
+   "kcal": 64,
+   "protein": 1.06,
+   "carbs": 14,
+   "fat": 0.44
+  },
+  "raw": null
+ },
+ {
+  "name": "Avocado",
+  "aliases": [
+   "avo",
+   "avocado",
+   "avocados"
+  ],
+  "cooked": {
+   "fdcId": 2709223,
+   "description": "Avocado, raw",
+   "kcal": 160,
+   "protein": 2,
+   "carbs": 8.53,
+   "fat": 14.66
+  },
+  "raw": null
+ },
+ {
+  "name": "Dates",
+  "aliases": [
+   "date",
+   "dates",
+   "dried dates",
+   "medjool dates"
+  ],
+  "cooked": {
+   "fdcId": 2709203,
+   "description": "Date",
+   "kcal": 282,
+   "protein": 2.45,
+   "carbs": 75.03,
+   "fat": 0.39
+  },
+  "raw": null
+ },
+ {
+  "name": "Raisins",
+  "aliases": [
+   "raisin",
+   "raisins"
+  ],
+  "cooked": {
+   "fdcId": 2709212,
+   "description": "Raisins",
+   "kcal": 299,
+   "protein": 3.3,
+   "carbs": 79.32,
+   "fat": 0.25
+  },
+  "raw": null
+ },
+ {
+  "name": "Clementine",
+  "aliases": [
+   "clementine",
+   "clementines",
+   "cutie",
+   "cuties",
+   "mandarin",
+   "mandarin orange",
+   "mandarins",
+   "tangerine"
+  ],
+  "cooked": {
+   "fdcId": 2709164,
+   "description": "Clementine, raw",
+   "kcal": 53,
+   "protein": 0.81,
+   "carbs": 13.34,
+   "fat": 0.31
+  },
+  "raw": null
+ },
+ {
+  "name": "Grapefruit",
+  "aliases": [
+   "grapefruit",
+   "grapefruits"
+  ],
+  "cooked": {
+   "fdcId": 2709165,
+   "description": "Grapefruit, raw",
+   "kcal": 42,
+   "protein": 0.77,
+   "carbs": 10.66,
+   "fat": 0.14
+  },
+  "raw": null
+ },
+ {
+  "name": "Plum",
+  "aliases": [
+   "plum",
+   "plums"
+  ],
+  "cooked": {
+   "fdcId": 2709265,
+   "description": "Plum, raw",
+   "kcal": 46,
+   "protein": 0.7,
+   "carbs": 11.42,
+   "fat": 0.28
+  },
+  "raw": null
+ },
+ {
+  "name": "Cranberries, dried",
+  "aliases": [
+   "craisins",
+   "cranberries",
+   "cranberries dried",
+   "dried cranberries"
+  ],
+  "cooked": {
+   "fdcId": 2709202,
+   "description": "Cranberries, dried",
+   "kcal": 308,
+   "protein": 0.17,
+   "carbs": 82.8,
+   "fat": 1.09
+  },
+  "raw": null
+ },
+ {
+  "name": "Broccoli",
+  "aliases": [
+   "broccoli",
+   "broccoli florets",
+   "steamed broccoli"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709645,
+   "description": "Broccoli, fresh, cooked, no added fat",
+   "kcal": 41,
+   "protein": 2.67,
+   "carbs": 6.51,
+   "fat": 0.35
+  },
+  "raw": {
+   "fdcId": 2709643,
+   "description": "Broccoli, raw",
+   "kcal": 39,
+   "protein": 2.57,
+   "carbs": 6.27,
+   "fat": 0.34
+  }
+ },
+ {
+  "name": "Spinach",
+  "aliases": [
+   "baby spinach",
+   "spinach",
+   "spinach leaves"
+  ],
+  "default": "raw",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709615,
+   "description": "Spinach, fresh, cooked, no added fat",
+   "kcal": 33,
+   "protein": 3.41,
+   "carbs": 3.1,
+   "fat": 0.7
+  },
+  "raw": {
+   "fdcId": 2709614,
+   "description": "Spinach, raw",
+   "kcal": 27,
+   "protein": 2.85,
+   "carbs": 2.41,
+   "fat": 0.62
+  }
+ },
+ {
+  "name": "Kale",
+  "aliases": [
+   "kale",
+   "kale leaves"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709600,
+   "description": "Kale, fresh, cooked, no added fat",
+   "kcal": 46,
+   "protein": 3.13,
+   "carbs": 4.74,
+   "fat": 1.6
+  },
+  "raw": {
+   "fdcId": 2709599,
+   "description": "Kale, raw",
+   "kcal": 43,
+   "protein": 2.92,
+   "carbs": 4.42,
+   "fat": 1.49
+  }
+ },
+ {
+  "name": "Carrots",
+  "aliases": [
+   "baby carrots",
+   "carrot",
+   "carrots"
+  ],
+  "default": "raw",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709664,
+   "description": "Carrots, fresh, cooked, no added fat",
+   "kcal": 50,
+   "protein": 0.98,
+   "carbs": 10.67,
+   "fat": 0.36
+  },
+  "raw": {
+   "fdcId": 2709660,
+   "description": "Carrots, raw",
+   "kcal": 44,
+   "protein": 0.87,
+   "carbs": 9.68,
+   "fat": 0.24
+  }
+ },
+ {
+  "name": "Bell pepper",
+  "aliases": [
+   "bell pepper",
+   "bell peppers",
+   "capsicum",
+   "peppers",
+   "red bell pepper",
+   "red pepper",
+   "sweet pepper"
+  ],
+  "default": "raw",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 170110,
+   "description": "Peppers, sweet, red, cooked, boiled, drained, without salt",
+   "kcal": 28,
+   "protein": 0.92,
+   "carbs": 6.7,
+   "fat": 0.2
+  },
+  "raw": {
+   "fdcId": 2709801,
+   "description": "Peppers, sweet, red, raw",
+   "kcal": 31,
+   "protein": 0.9,
+   "carbs": 6.65,
+   "fat": 0.13
+  },
+  "notes": "Red sweet pepper used as the representative bell pepper. Cooked half is SR Legacy 'boiled, drained, without salt' (the FNDDS 'Peppers, red, cooked' assumes added fat; 'Red pepper, cooked, as ingredient' 2710799 is the fat-free FNDDS alternative)."
+ },
+ {
+  "name": "Onion",
+  "aliases": [
+   "onion",
+   "onions",
+   "red onion",
+   "white onion",
+   "yellow onion"
+  ],
+  "default": "raw",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709950,
+   "description": "Onions, cooked, no added fat",
+   "kcal": 47,
+   "protein": 1.29,
+   "carbs": 10.96,
+   "fat": 0.12
+  },
+  "raw": {
+   "fdcId": 2709795,
+   "description": "Onions, raw",
+   "kcal": 38,
+   "protein": 0.86,
+   "carbs": 8.46,
+   "fat": 0.08
+  }
+ },
+ {
+  "name": "Zucchini",
+  "aliases": [
+   "courgette",
+   "green squash",
+   "summer squash",
+   "zucchini",
+   "zucchinis"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709991,
+   "description": "Summer squash, yellow or green, fresh, cooked, no added fat",
+   "kcal": 21,
+   "protein": 1.3,
+   "carbs": 4.1,
+   "fat": 0.35
+  },
+  "raw": {
+   "fdcId": 2709808,
+   "description": "Summer squash, green, raw",
+   "kcal": 17,
+   "protein": 1.21,
+   "carbs": 3.11,
+   "fat": 0.32
+  },
+  "notes": "FNDDS labels zucchini as 'Summer squash, green, raw'; cooked half is 'yellow or green' summer squash (FNDDS has no zucchini-only cooked item without added fat). SR alternative for raw: 169291 'Squash, summer, zucchini, includes skin, raw'."
+ },
+ {
+  "name": "Asparagus",
+  "aliases": [
+   "asparagus",
+   "asparagus spears"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709834,
+   "description": "Asparagus, fresh, cooked, no added fat",
+   "kcal": 21,
+   "protein": 2.36,
+   "carbs": 4.16,
+   "fat": 0.13
+  },
+  "raw": {
+   "fdcId": 2709767,
+   "description": "Asparagus, raw",
+   "kcal": 20,
+   "protein": 2.2,
+   "carbs": 3.88,
+   "fat": 0.12
+  }
+ },
+ {
+  "name": "Green beans",
+  "aliases": [
+   "french beans",
+   "green bean",
+   "green beans",
+   "haricot verts",
+   "string beans"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709852,
+   "description": "Green beans, fresh, cooked, no added fat",
+   "kcal": 42,
+   "protein": 2.05,
+   "carbs": 7.7,
+   "fat": 0.29
+  },
+  "raw": {
+   "fdcId": 2709769,
+   "description": "Green beans, raw",
+   "kcal": 40,
+   "protein": 1.97,
+   "carbs": 7.41,
+   "fat": 0.28
+  }
+ },
+ {
+  "name": "Cauliflower",
+  "aliases": [
+   "cauliflower",
+   "cauliflower florets"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709897,
+   "description": "Cauliflower, fresh, cooked, no added fat",
+   "kcal": 26,
+   "protein": 1.99,
+   "carbs": 5.16,
+   "fat": 0.29
+  },
+  "raw": {
+   "fdcId": 2709777,
+   "description": "Cauliflower, raw",
+   "kcal": 25,
+   "protein": 1.92,
+   "carbs": 4.97,
+   "fat": 0.28
+  }
+ },
+ {
+  "name": "Brussels sprouts",
+  "aliases": [
+   "brussel sprouts",
+   "brussels sprout",
+   "brussels sprouts",
+   "sprouts"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709881,
+   "description": "Brussels sprouts, fresh, cooked, no added fat",
+   "kcal": 45,
+   "protein": 3.51,
+   "carbs": 9.3,
+   "fat": 0.31
+  },
+  "raw": {
+   "fdcId": 2709772,
+   "description": "Brussels sprouts, raw",
+   "kcal": 43,
+   "protein": 3.38,
+   "carbs": 8.95,
+   "fat": 0.3
+  }
+ },
+ {
+  "name": "Mushrooms",
+  "aliases": [
+   "baby bella",
+   "button mushrooms",
+   "cremini",
+   "mushroom",
+   "mushrooms",
+   "white mushrooms"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709937,
+   "description": "Mushrooms, fresh, cooked, no added fat",
+   "kcal": 39,
+   "protein": 3.61,
+   "carbs": 5.15,
+   "fat": 0.43
+  },
+  "raw": {
+   "fdcId": 2709793,
+   "description": "Mushrooms, raw",
+   "kcal": 31,
+   "protein": 2.9,
+   "carbs": 4.13,
+   "fat": 0.35
+  }
+ },
+ {
+  "name": "Corn",
+  "aliases": [
+   "corn",
+   "corn kernels",
+   "corn on the cob",
+   "sweet corn"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709910,
+   "description": "Corn, fresh, cooked, no added fat",
+   "kcal": 86,
+   "protein": 3.26,
+   "carbs": 18.64,
+   "fat": 1.35
+  },
+  "raw": {
+   "fdcId": 2709783,
+   "description": "Corn, raw",
+   "kcal": 86,
+   "protein": 3.27,
+   "carbs": 18.7,
+   "fat": 1.35
+  }
+ },
+ {
+  "name": "Peas",
+  "aliases": [
+   "garden peas",
+   "green peas",
+   "pea",
+   "peas"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709959,
+   "description": "Green peas, fresh, cooked, no added fat",
+   "kcal": 84,
+   "protein": 5.63,
+   "carbs": 15.01,
+   "fat": 0.42
+  },
+  "raw": {
+   "fdcId": 2709797,
+   "description": "Green peas, raw",
+   "kcal": 81,
+   "protein": 5.42,
+   "carbs": 14.45,
+   "fat": 0.4
+  }
+ },
+ {
+  "name": "Cabbage",
+  "aliases": [
+   "cabbage",
+   "green cabbage",
+   "shredded cabbage"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709889,
+   "description": "Cabbage, green, cooked, no added fat",
+   "kcal": 32,
+   "protein": 1,
+   "carbs": 6.63,
+   "fat": 0.24
+  },
+  "raw": {
+   "fdcId": 2709773,
+   "description": "Cabbage, green, raw",
+   "kcal": 31,
+   "protein": 0.96,
+   "carbs": 6.38,
+   "fat": 0.23
+  }
+ },
+ {
+  "name": "Eggplant",
+  "aliases": [
+   "aubergine",
+   "eggplant",
+   "eggplants"
+  ],
+  "default": "cooked",
+  "rawLabel": "Raw",
+  "cooked": {
+   "fdcId": 2709929,
+   "description": "Eggplant, cooked, no added fat",
+   "kcal": 27,
+   "protein": 1.05,
+   "carbs": 6.3,
+   "fat": 0.19
+  },
+  "raw": {
+   "fdcId": 2709785,
+   "description": "Eggplant, raw",
+   "kcal": 25,
+   "protein": 0.98,
+   "carbs": 5.88,
+   "fat": 0.18
+  }
+ },
+ {
+  "name": "Lettuce, romaine",
+  "aliases": [
+   "lettuce",
+   "romaine",
+   "romaine lettuce",
+   "salad",
+   "salad greens"
+  ],
+  "cooked": {
+   "fdcId": 2709590,
+   "description": "Romaine lettuce, raw",
+   "kcal": 21,
+   "protein": 0.98,
+   "carbs": 4.06,
+   "fat": 0.07
+  },
+  "raw": null
+ },
+ {
+  "name": "Cucumber",
+  "aliases": [
+   "cucumber",
+   "cucumbers",
+   "cuke"
+  ],
+  "cooked": {
+   "fdcId": 2709784,
+   "description": "Cucumber, raw",
+   "kcal": 16,
+   "protein": 0.62,
+   "carbs": 2.95,
+   "fat": 0.18
+  },
+  "raw": null
+ },
+ {
+  "name": "Tomato",
+  "aliases": [
+   "roma tomato",
+   "sliced tomato",
+   "tomato",
+   "tomatoes"
+  ],
+  "cooked": {
+   "fdcId": 2709719,
+   "description": "Tomatoes, raw",
+   "kcal": 20,
+   "protein": 0.82,
+   "carbs": 4.04,
+   "fat": 0.31
+  },
+  "raw": null
+ },
+ {
+  "name": "Celery",
+  "aliases": [
+   "celery",
+   "celery stalk",
+   "celery sticks"
+  ],
+  "cooked": {
+   "fdcId": 2709778,
+   "description": "Celery, raw",
+   "kcal": 17,
+   "protein": 0.49,
+   "carbs": 3.32,
+   "fat": 0.16
+  },
+  "raw": null
+ },
+ {
+  "name": "Garlic",
+  "aliases": [
+   "fresh garlic",
+   "garlic",
+   "garlic clove",
+   "garlic cloves"
+  ],
+  "cooked": {
+   "fdcId": 2709786,
+   "description": "Garlic, raw",
+   "kcal": 143,
+   "protein": 6.62,
+   "carbs": 28.2,
+   "fat": 0.38
+  },
+  "raw": null
+ },
+ {
+  "name": "Cherry tomatoes",
+  "aliases": [
+   "baby tomatoes",
+   "cherry tomato",
+   "cherry tomatoes",
+   "grape tomato",
+   "grape tomatoes"
+  ],
+  "cooked": {
+   "fdcId": 321360,
+   "description": "Tomatoes, grape, raw",
+   "kcal": 27,
+   "protein": 0.83,
+   "carbs": 5.51,
+   "fat": 0.63
+  },
+  "raw": null,
+  "notes": "USDA has no 'cherry tomatoes' item in FNDDS/SR search results; grape tomatoes (Foundation) used as the closest match."
+ },
+ {
+  "name": "Pickles",
+  "aliases": [
+   "dill pickle",
+   "dill pickles",
+   "pickle",
+   "pickled cucumber",
+   "pickles"
+  ],
+  "cooked": {
+   "fdcId": 2710078,
+   "description": "Pickles, dill",
+   "kcal": 14,
+   "protein": 0.48,
+   "carbs": 1.99,
+   "fat": 0.43
+  },
+  "raw": null
+ },
+ {
+  "name": "Olives",
+  "aliases": [
+   "black olives",
+   "kalamata olives",
+   "olive",
+   "olives"
+  ],
+  "cooked": {
+   "fdcId": 2710090,
+   "description": "Olives, black",
+   "kcal": 116,
+   "protein": 0.84,
+   "carbs": 6.04,
+   "fat": 10.9
+  },
+  "raw": null,
+  "notes": "Black olives chosen; green olives are 2710089 (145 kcal, 15.3 g fat)."
+ },
+ {
+  "name": "Sauerkraut",
+  "aliases": [
+   "fermented cabbage",
+   "kraut",
+   "sauerkraut"
+  ],
+  "cooked": {
+   "fdcId": 169279,
+   "description": "Sauerkraut, canned, solids and liquids",
+   "kcal": 19,
+   "protein": 0.91,
+   "carbs": 4.28,
+   "fat": 0.14
+  },
+  "raw": null,
+  "notes": "SR Legacy canned sauerkraut used; the FNDDS 'Sauerkraut' item (2709982) assumes added fat."
+ },
+ {
+  "name": "Kimchi",
+  "aliases": [
+   "kim chi",
+   "kimchee",
+   "kimchi"
+  ],
+  "cooked": {
+   "fdcId": 2710077,
+   "description": "Kimchi",
+   "kcal": 15,
+   "protein": 1.1,
+   "carbs": 2.4,
+   "fat": 0.5
+  },
+  "raw": null
+ },
+ {
+  "name": "Mixed vegetables, frozen",
+  "aliases": [
+   "frozen veg",
+   "frozen vegetables",
+   "mixed veg",
+   "mixed vegetables",
+   "steamed vegetables",
+   "veggie mix"
+  ],
+  "cooked": {
+   "fdcId": 2710013,
+   "description": "Classic mixed vegetables, frozen, cooked, no added fat",
+   "kcal": 65,
+   "protein": 2.85,
+   "carbs": 13.05,
+   "fat": 0.15
+  },
+  "raw": null
+ }
+]

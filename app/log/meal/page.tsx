@@ -5,8 +5,9 @@ import { supabase } from "@/lib/supabase";
 import { logMeal } from "@/lib/log";
 
 type Per100 = { kcal: number; protein: number; carbs: number; fat: number };
-type Item = { fdcId: number; name: string; description: string; group: string; badge: "raw" | "cooked" | null; pairable: boolean; per100g: Per100 };
-type Picked = { name: string; description?: string; fdcId?: number; badge?: "raw" | "cooked" | null; pairable?: boolean; per100g: Per100; fromHistory?: boolean };
+type Item = { fdcId: number; name: string; description: string; group: string; badge: "raw" | "cooked" | null; pairable: boolean; per100g: Per100;
+  curated?: true; rawLabel?: "Raw" | "Dry"; pair?: { raw: Item | null; cooked: Item | null } };
+type Picked = { name: string; description?: string; fdcId?: number; badge?: "raw" | "cooked" | null; pairable?: boolean; rawLabel?: "Raw" | "Dry"; per100g: Per100; fromHistory?: boolean };
 type Weighing = "raw" | "cooked";
 // undefined = still looking, null = USDA has no such version.
 type PairCache = Record<Weighing, Item | null | undefined>;
@@ -93,7 +94,7 @@ export default function LogMeal() {
   }
 
   function toPicked(v: Item): Picked {
-    return { name: v.name, description: v.description, fdcId: v.fdcId, badge: v.badge, pairable: v.pairable, per100g: v.per100g };
+    return { name: v.name, description: v.description, fdcId: v.fdcId, badge: v.badge, pairable: v.pairable, rawLabel: v.rawLabel, per100g: v.per100g };
   }
 
   async function pickItem(v: Item) {
@@ -101,8 +102,9 @@ export default function LogMeal() {
     setAmount("");
     const mine = weighingOf(v);
     const other: Weighing = mine === "raw" ? "cooked" : "raw";
-    setPairs({ raw: undefined, cooked: undefined, [mine]: v });
     loadPortions(v.fdcId);
+    if (v.pair) { setPairs({ raw: v.pair.raw, cooked: v.pair.cooked }); return; }   // curated: both halves already here
+    setPairs({ raw: undefined, cooked: undefined, [mine]: v });
     if (!v.pairable) { setPairs((p) => ({ ...p, [other]: null })); return; }
     // Same food weighed the other way, so the switch is ready by the time you've typed the grams.
     try {
@@ -209,13 +211,13 @@ export default function LogMeal() {
                         onClick={() => swapTo(b)}
                         className={`h-9 flex-1 rounded-full text-[13px] font-semibold capitalize ${
                           on ? "bg-accent/20 text-accent" : "text-muted"} ${loading ? "opacity-50" : ""}`}>
-                        {b === "raw" ? "Raw" : "Cooked"}{loading ? " …" : ""}
+                        {b === "raw" ? (picked.rawLabel ?? "Raw") : "Cooked"}{loading ? " …" : ""}
                       </button>
                     );
                   })}
                 </div>
                 <p className="px-1 text-[12px] text-muted">
-                  {weighingOf(picked) === "cooked" ? "Weigh it after cooking." : "Weigh it before cooking."}
+                  {weighingOf(picked) === "cooked" ? "Weigh it after cooking." : picked.rawLabel === "Dry" ? "Weigh it dry, before cooking." : "Weigh it raw, before cooking."}
                   {" "}{Math.round(picked.per100g.kcal)} kcal · {Math.round(picked.per100g.protein)} g protein per 100 g.
                 </p>
               </div>

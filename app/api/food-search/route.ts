@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { aliasSuggestions } from "@/lib/foodAliases";
+import { searchFoods, foodByFdcId, defaultHalf, normFood, FOODS, type CuratedFood, type FoodHalf } from "@/lib/foods";
 
 const NUTRIENTS = { kcal: 1008, protein: 1003, carbs: 1005, fat: 1004 } as const;
 
@@ -25,7 +26,34 @@ export type Item = {
   strict: boolean;      // every word of the query appears in the USDA name
   pairable: boolean;    // meat/eggs/grains/veg: offer Raw / Cooked weighing switch
   per100g: { kcal: number; protein: number; carbs: number; fat: number };
+  curated?: true;       // from lib/foods — verified pair, no guessing
+  rawLabel?: "Raw" | "Dry";
+  pair?: { raw: Item | null; cooked: Item | null };   // both halves, ready for the switch
 };
+
+const CURATED_IDS = new Set<number>();
+for (const f of FOODS) for (const h of [f.cooked, f.raw]) if (h) CURATED_IDS.add(h.fdcId);
+
+function halfItem(food: CuratedFood, half: "raw" | "cooked", h: FoodHalf): Item {
+  return {
+    fdcId: h.fdcId, name: food.name, description: h.description, group: food.name,
+    badge: food.raw && food.cooked ? half : null, strict: true, pairable: !!(food.raw && food.cooked),
+    per100g: { kcal: h.kcal, protein: h.protein, carbs: h.carbs, fat: h.fat },
+    curated: true, rawLabel: food.rawLabel,
+  };
+}
+
+/** A curated food as a search row: lands on its default half, carries both halves for the switch. */
+function curatedItem(food: CuratedFood): Item {
+  const half = defaultHalf(food);
+  const h = (half === "raw" ? food.raw : food.cooked) ?? food.cooked ?? food.raw!;
+  const item = halfItem(food, half, h);
+  item.pair = {
+    raw: food.raw ? halfItem(food, "raw", food.raw) : null,
+    cooked: food.cooked ? halfItem(food, "cooked", food.cooked) : null,
+  };
+  return item;
+}
 
 function badgeFor(description: string): "raw" | "cooked" | null {
   if (COOKED_RE.test(description)) return "cooked";   // "fried, coated, from raw" is cooked
@@ -140,32 +168,44 @@ export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim();
   if (!q) return NextResponse.json({ items: [] });
 
+  // Curated table first: verified foods with matching raw/cooked halves.
+  const curated = searchFoods(q).map(curatedItem);
+  const items: Item[] = [];
+  const seen = new Set<string>();
+  const push = (it: Item) => {
+    const k = normalize(it.name);
+    if (!seen.has(k) && items.length < 12) { seen.add(k); items.push(it); }
+  };
+  for (const it of curated) push(it);
+  if (items.length >= 12) return NextResponse.json({ items });
+
   try {
-    // Bare word like "chicken": pull the best hit for each thing a person means (breast, thigh, …)
-    // so the list is real foods, one tap from macros — then fill with the generic search.
-    const aliases = aliasSuggestions(q);
+    // Live USDA fills in behind. Bare-word alias fan-out only when the table had little to say.
+    const aliases = curated.length < 3 ? aliasSuggestions(q) : [];
     const [aliasHits, generic] = await Promise.all([
       Promise.all(aliases.map((a) => searchRanked(a, 15).then((r) => r.filter((i) => i.strict).slice(0, 2)).catch(() => [] as Item[]))),
       searchRanked(q, 40),
     ]);
-    const items: Item[] = [];
-    const seen = new Set<string>();
-    const push = (it: Item) => {
-      const k = normalize(it.name);
-      if (!seen.has(k) && items.length < 12) { seen.add(k); items.push(it); }
-    };
+    const isCurated = (it: Item) => CURATED_IDS.has(it.fdcId);
     // First pick per alias, then second picks, then generic — so "chicken" reads breast, thigh, wing… not breast×2.
-    for (const round of [0, 1]) for (const hits of aliasHits) if (hits[round]) push(hits[round]);
-    for (const it of generic) push(it);
+    for (const round of [0, 1]) for (const hits of aliasHits) if (hits[round] && !isCurated(hits[round])) push(hits[round]);
+    for (const it of generic) if (!isCurated(it)) push(it);
     return NextResponse.json({ items });
   } catch (e) {
     console.error("food-search failed", q, e instanceof Error ? e.message : e);
-    return NextResponse.json({ items: [] }, { status: 502 });
+    // The curated rows are still worth showing when USDA is down.
+    return NextResponse.json({ items }, { status: items.length ? 200 : 502 });
   }
 }
 
 /** The same food weighed the other way: "Chicken breast" + raw → USDA raw chicken breast. */
 async function counterpart(name: string, want: "raw" | "cooked") {
+  // Curated food? Its verified other half, no guessing.
+  const cf = FOODS.find((f) => normFood(f.name) === normFood(name));
+  if (cf) {
+    const h = want === "raw" ? cf.raw : cf.cooked;
+    return NextResponse.json({ item: h ? halfItem(cf, want, h) : null });
+  }
   const q = name.replace(/,/g, " ");
   try {
     const items = want === "raw"
