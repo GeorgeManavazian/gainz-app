@@ -100,6 +100,8 @@ Data access (thin, in the same file): `startWorkout(groups)` (client id, queued 
 
 **Scroll wheel — `components/Wheel.tsx`** — hand-rolled, no library: a vertical list with `scroll-snap-type: y mandatory`, fixed item height, ~5 items visible, the centre item highlighted, `onChange` fired when scrolling settles (`scrollend` with a `scroll`-debounce fallback). Programmatic `scrollTo` on mount/preset. Props: `values: number[]`, `value`, `onChange`, optional `format`.
 
+**Chosen design (2026-09-01): 12ui candidate C** — `docs/superpowers/design/2026-09-01-workout-12ui-C.png`. C shows a muscle-diagram thumbnail per exercise row; those illustrations are **deferred** (he wants them, not those ones). The implementation keeps the thumbnail slot (56 px rounded square, `surface-2`, muscle-group initial in muted text) so real diagrams can drop in later without a relayout. The other screens (muscle picker, summary) come from a 12ui branch of C.
+
 Visual design goes through a **12ui draft pass** (reference: the existing app's look — `docs/superpowers/design/2026-08-30-weight-page-12ui-A.png` and a dashboard screenshot) before the implementation plan is written; the chosen candidate's layout is what the plan implements. The screens to draft: muscle-group picker, exercise list, set sheet, summary.
 
 ## Offline
