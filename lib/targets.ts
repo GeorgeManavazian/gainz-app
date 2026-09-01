@@ -7,7 +7,7 @@ export function defaultProteinPerLb(phase: Phase): number {
 }
 
 export function defaultRate(phase: Phase): number {
-  if (phase === "cut") return 1.5;
+  if (phase === "cut") return 1.0;
   if (phase === "bulk") return 0.5;
   return 0;
 }

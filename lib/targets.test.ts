@@ -8,8 +8,8 @@ describe("phase defaults", () => {
     expect(defaultProteinPerLb("bulk")).toBe(1.0);
   });
 
-  it("rate: cut 1.5, maintain 0, bulk 0.5", () => {
-    expect(defaultRate("cut")).toBe(1.5);
+  it("rate: cut 1.0, maintain 0, bulk 0.5", () => {
+    expect(defaultRate("cut")).toBe(1.0);
     expect(defaultRate("maintain")).toBe(0);
     expect(defaultRate("bulk")).toBe(0.5);
   });
@@ -42,32 +42,33 @@ describe("estimateTdee (Mifflin-St Jeor × activity)", () => {
 
 describe("computeTargets", () => {
   const today = new Date(2026, 7, 30);
+  // Cut Protocol (Fall 2026) phase-1 inputs: 170 lb, ~1 lb/wk (500 kcal), k = 1.02, TDEE 3100.
   const george: Profile = {
     sex: "male", birth_date: "1990-01-01", height_in: 70, weight_lb: 170,
-    activity: "moderate", phase: "cut", rate_lb_per_wk: 1.5,
-    protein_g_per_lb: 1.1, tdee_override: 3100,
+    activity: "moderate", phase: "cut", rate_lb_per_wk: 1.0,
+    protein_g_per_lb: 1.02, tdee_override: 3100,
   };
 
-  it("reference: George cutting → 2350 / 223P / 214C / 67F", () => {
+  it("reference: Cut Protocol week 1 → 2600 / 206P / 293C / 67F", () => {
     const t = computeTargets(george, today);
-    expect(t).toMatchObject({ kcal: 2350, protein_g: 223, carbs_g: 214, fat_g: 67,
-      tdee: 3100, tdee_est: 3109 });
+    expect(t).toMatchObject({ kcal: 2600, protein_g: 206, carbs_g: 293, fat_g: 67, tdee: 3100 });
+    expect(Math.abs(4 * t.protein_g + 4 * t.carbs_g + 9 * t.fat_g - t.kcal)).toBeLessThanOrEqual(2); // carbs are the plug (gram rounding)
     expect(t.warning).toBeUndefined();
   });
 
   it("uses the estimate when override is null", () => {
     const t = computeTargets({ ...george, tdee_override: null }, today);
-    expect(t.tdee).toBe(3109);
-    expect(t.kcal).toBe(2359);
+    expect(t.tdee).toBe(t.tdee_est);
+    expect(t.kcal).toBe(t.tdee_est - 500);
   });
 
   it("uses the phase default protein when protein_g_per_lb is null", () => {
-    expect(computeTargets({ ...george, protein_g_per_lb: null }, today).protein_g).toBe(223); // 1.1 × 203
-    expect(computeTargets({ ...george, protein_g_per_lb: null, phase: "maintain" }, today).protein_g).toBe(203); // 1.0 × 203
+    expect(computeTargets({ ...george, protein_g_per_lb: null }, today).protein_g).toBe(222); // 1.1 × 201.8
+    expect(computeTargets({ ...george, protein_g_per_lb: null, phase: "maintain" }, today).protein_g).toBe(202); // 1.0 × 201.8
   });
 
   it("maintain ignores rate", () => {
-    const t = computeTargets({ ...george, phase: "maintain", rate_lb_per_wk: 1.5 }, today);
+    const t = computeTargets({ ...george, phase: "maintain", rate_lb_per_wk: 1.0 }, today);
     expect(t.kcal).toBe(3100);
   });
 
@@ -77,14 +78,14 @@ describe("computeTargets", () => {
   });
 
   it("floors carbs at 0 and warns when kcal cannot fit fat + protein", () => {
-    const t = computeTargets({ ...george, tdee_override: 1400 }, today); // 650 kcal
-    expect(t.kcal).toBe(650);
+    const t = computeTargets({ ...george, tdee_override: 1400 }, today); // 900 kcal
+    expect(t.kcal).toBe(900);
     expect(t.carbs_g).toBe(0);
     expect(t.warning).toBe("kcal too low for fat + protein floors");
   });
 
   it("defaults today to now (smoke)", () => {
     // override makes kcal age-independent, so this stays stable against the real clock
-    expect(computeTargets(george).kcal).toBe(2350);
+    expect(computeTargets(george).kcal).toBe(2600);
   });
 });
