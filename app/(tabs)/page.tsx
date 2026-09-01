@@ -30,13 +30,23 @@ export default function Hub() {
     setMeals((data as Meal[]) ?? []);
   }, []);
 
+  const loadWorkouts = useCallback(async () => {
+    getActiveWorkout().then(setActive).catch(() => setActive(null));
+    getTodayCompletedWorkout().then(async (w) => {
+      if (!w) return setDone(null);
+      const rows = await listLiftsForWorkout(w.id).catch(() => []);
+      setDone({ w, sets: totalSets(rows) });
+    }).catch(() => setDone(null));
+  }, []);
+
   useEffect(() => {
     load();
     const ch = supabase.channel("hub")
       .on("postgres_changes", { event: "*", schema: "public", table: "meals" }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "lifts" }, loadWorkouts)
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [load]);
+  }, [load, loadWorkouts]);
 
   const loadTargets = useCallback((soft = false) => {
     if (!soft) setProfile(undefined);
@@ -47,14 +57,7 @@ export default function Hub() {
   }, []);
   useEffect(() => { loadTargets(); }, [loadTargets]);
 
-  useEffect(() => {
-    getActiveWorkout().then(setActive).catch(() => setActive(null));
-    getTodayCompletedWorkout().then(async (w) => {
-      if (!w) return setDone(null);
-      const rows = await listLiftsForWorkout(w.id).catch(() => []);
-      setDone({ w, sets: totalSets(rows) });
-    }).catch(() => setDone(null));
-  }, []);
+  useEffect(() => { loadWorkouts(); }, [loadWorkouts]);
 
   const today = localDateKey();
   const trend = trendWeight(weighIns);
@@ -176,7 +179,7 @@ export default function Hub() {
                   <span className="block text-base font-semibold">
                     Next meal · ~{meal.kcal} kcal · {meal.protein_g} P · {meal.carbs_g} C · {meal.fat_g} F
                   </span>
-                  <span className="block text-[13px] text-muted">{meals.length} of 4 meals logged</span>
+                  <span className="block text-[13px] text-muted">{Math.min(meals.length, 4)} of 4 meals logged</span>
                 </>
               ) : (
                 <span className="block text-base text-muted">Target hit for today</span>
@@ -206,9 +209,18 @@ export default function Hub() {
                   <span className="text-muted">›</span>
                 </Link>
               </li>
-            ) : !active ? (
+            ) : active ? (
+              <li>
+                <Link href={`/workout/${active.id}`} className="flex items-center gap-3 px-4 py-3 active:bg-surface-2">
+                  <span className="flex-1 font-medium text-muted">
+                    Resume workout · {formatElapsed(Date.now() - new Date(active.started_at).getTime()).replace(/:\d\d$/, "")} min
+                  </span>
+                  <span className="text-muted">›</span>
+                </Link>
+              </li>
+            ) : (
               <li className="px-4 py-3 text-muted">No workout yet</li>
-            ) : null}
+            )}
           </ul>
         </section>
 
