@@ -40,7 +40,11 @@ export default function LineChart({ data, height = 150, unit = "lb" }: {
     const ticks = Array.from({ length: tickCount }, (_, i) => Math.round((i / Math.max(1, tickCount - 1)) * (data.length - 1)));
     return { x, y, line, area, lo, hi, ticks };
   }, [data, H]);
-  if (!geo) return <p className="py-8 text-center text-sm text-muted">No sessions yet</p>;
+  if (!geo || data.length < 2) return (
+    <p className="rounded-xl bg-surface-2/60 px-4 py-8 text-center text-sm text-muted">
+      Not enough data yet — a couple more workouts and your progress line shows up here.
+    </p>
+  );
 
   const last = data[data.length - 1];
   const pillW = 74, pillH = 30;

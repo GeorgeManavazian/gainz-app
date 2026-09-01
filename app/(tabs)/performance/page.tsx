@@ -5,7 +5,7 @@ import AuthGuard from "@/components/AuthGuard";
 import LineChart from "@/components/LineChart";
 import { INDICATORS, bestSet, indexAdvice, indicatorStatus, sessionsFor, strengthIndex } from "@/lib/progress";
 import { listCompletedWorkouts, listRecentLifts } from "@/lib/workouts-db";
-import { e1rm, formatElapsed, localDateOf, recentExercises, workoutTitle,
+import { formatElapsed, localDateOf, recentExercises, workoutTitle,
   type LiftRow, type WorkoutRow } from "@/lib/workouts";
 import { MUSCLE_GROUPS, normalizeName } from "@/lib/exercises";
 import { getProfile } from "@/lib/profile";
@@ -47,9 +47,10 @@ export default function Performance() {
   const recent12 = sessions.slice(-12);
   const allRows = sessions.flatMap((s) => s.rows);
   const best = bestSet(allRows);
-  const current = sessions.length ? sessions[sessions.length - 1].best : null;
   const prev = sessions.length > 1 ? sessions[sessions.length - 2] : null;
-  const delta = current !== null && prev !== null ? current - prev.best : null;
+  const latestTop = sessions.length ? bestSet(sessions[sessions.length - 1].rows) : null;
+  const prevTop = prev ? bestSet(prev.rows) : null;
+  const topDelta = latestTop && prevTop ? latestTop.weight - prevTop.weight : null;
 
   const index = useMemo(() => strengthIndex(rows), [rows]);
   const advice = useMemo(() => indexAdvice(index, phase), [index, phase]);
@@ -118,7 +119,6 @@ export default function Performance() {
                     <>
                       <p className="text-lg font-bold tabular-nums leading-tight">{Math.round(s.latest!)} <span className="text-sm font-normal text-muted">lb</span></p>
                       <p className="text-[11px]">
-                        <span className="text-muted">e1RM </span>
                         {s.pct !== null && (
                           <span className={s.level === "bad" ? "font-semibold text-danger" : s.level === "warn" ? "font-semibold text-accent" : "font-semibold text-success"}>
                             {s.pct >= 0 ? "↑" : "↓"} {Math.abs(s.pct).toFixed(1)}%
@@ -182,21 +182,23 @@ export default function Performance() {
           <section className="card-grad rounded-3xl border border-border p-5">
             <div className="mb-2 flex items-center gap-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent" aria-hidden>{LIFT_ICON}</span>
-              <h2 className="flex-1 text-[15px] font-semibold">{exercise} e1RM</h2>
-              <span className="rounded-full border border-border px-3 py-1 text-xs text-muted">e1RM</span>
+              <div className="flex-1">
+                <h2 className="text-[15px] font-semibold">{exercise}</h2>
+                <p className="text-[11px] text-muted">Top set over time</p>
+              </div>
             </div>
             <div className="mb-1">
-              <p className="text-[11px] font-medium text-muted">Current</p>
+              <p className="text-[11px] font-medium text-muted">Latest top set</p>
               <p className="text-3xl font-bold tabular-nums leading-tight">
-                {current !== null ? Math.round(current) : "—"} <span className="text-base font-normal text-muted">lb</span>
+                {latestTop ? <>{latestTop.weight} <span className="text-base font-normal text-muted">lb × {latestTop.reps}</span></> : "—"}
               </p>
-              {delta !== null && prev !== null && (
-                <p className={`text-[12px] font-semibold ${delta >= 0 ? "text-success" : "text-danger"}`}>
-                  {delta >= 0 ? "↑" : "↓"} {Math.abs(delta).toFixed(1)} lb <span className="font-normal text-muted">vs {fmtDay(prev.date)}</span>
+              {topDelta !== null && prev !== null && topDelta !== 0 && (
+                <p className={`text-[12px] font-semibold ${topDelta > 0 ? "text-success" : "text-danger"}`}>
+                  {topDelta > 0 ? "↑" : "↓"} {Math.abs(topDelta)} lb <span className="font-normal text-muted">vs {fmtDay(prev.date)}</span>
                 </p>
               )}
             </div>
-            <LineChart data={recent12.map((s) => ({ date: s.date, value: Math.round(s.best * 10) / 10 }))} />
+            <LineChart data={recent12.map((s) => ({ date: s.date, value: bestSet(s.rows)?.weight ?? 0 }))} />
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div className="rounded-2xl border border-border bg-surface-2/60 p-3">
                 <p className="text-[11px] font-medium text-muted">Best set</p>
@@ -204,19 +206,21 @@ export default function Performance() {
                   <>
                     <p className="text-[11px] text-muted">{fmtDay(localDateOf(best.logged_at))}</p>
                     <p className="mt-1 text-2xl font-bold tabular-nums text-accent">{best.weight} × {best.reps}</p>
-                    <p className="text-[11px] text-muted">e1RM {Math.round(e1rm(best.weight, best.reps))}</p>
                   </>
                 ) : <p className="text-sm text-muted">—</p>}
               </div>
               <div>
-                <p className="mb-1 text-[11px] font-medium text-muted">e1RM history</p>
+                <p className="mb-1 text-[11px] font-medium text-muted">Recent sessions</p>
                 <ul className="flex flex-col gap-1">
-                  {[...sessions].slice(-5).reverse().map((s) => (
-                    <li key={s.key} className="flex justify-between rounded-lg bg-surface-2/60 px-2.5 py-1.5 text-[12px]">
-                      <span className="text-muted">{fmtDay(s.date)}</span>
-                      <span className="font-semibold tabular-nums text-accent">{Math.round(s.best)} lb</span>
-                    </li>
-                  ))}
+                  {[...sessions].slice(-5).reverse().map((s) => {
+                    const b = bestSet(s.rows);
+                    return (
+                      <li key={s.key} className="flex justify-between rounded-lg bg-surface-2/60 px-2.5 py-1.5 text-[12px]">
+                        <span className="text-muted">{fmtDay(s.date)}</span>
+                        <span className="font-semibold tabular-nums text-accent">{b ? `${b.weight} × ${b.reps}` : "—"}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
@@ -236,19 +240,17 @@ export default function Performance() {
                 <p className="flex-1 text-[15px] font-semibold">{fmtDayLong(localDateOf(latest.started_at))} · {workoutTitle(latest.muscle_groups)}</p>
                 <Link href={`/workout/${latest.id}`} className="text-[13px] font-semibold text-accent">View ›</Link>
               </div>
-              <div className="grid grid-cols-[1fr_auto_auto] gap-x-4 gap-y-0 text-[13px]">
+              <div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-0 text-[13px]">
                 <span className="pb-1 text-[11px] font-medium text-muted">Exercise</span>
                 <span className="pb-1 text-right text-[11px] font-medium text-muted">Top set</span>
-                <span className="pb-1 text-right text-[11px] font-medium text-muted">e1RM</span>
                 {latestByExercise.map((g) => {
                   const b = bestSet(g)!;
                   const isSel = exercise !== null && normalizeName(g[0].exercise) === normalizeName(exercise);
                   return (
                     <button key={g[0].exercise} type="button" onClick={() => setSelected(g[0].exercise)}
-                      className="col-span-3 grid grid-cols-subgrid border-t border-border py-2 text-left active:bg-surface-2">
+                      className="col-span-2 grid grid-cols-subgrid border-t border-border py-2 text-left active:bg-surface-2">
                       <span className={`truncate font-medium ${isSel ? "text-accent" : ""}`}>{g[0].exercise}</span>
                       <span className="text-right tabular-nums">{b.weight} × {b.reps}{b.sets > 1 ? ` ×${b.sets}` : ""}</span>
-                      <span className="text-right tabular-nums text-muted">{b.weight > 0 ? Math.round(e1rm(b.weight, b.reps)) : "—"}</span>
                     </button>
                   );
                 })}
