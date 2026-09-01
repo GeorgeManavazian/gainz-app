@@ -10,8 +10,11 @@ const COOKED_RE = /\b(cooked|roasted|grilled|braised|boiled|baked|fried|broiled|
 const RAW_RE = /\braw\b/i;
 // Things nobody means when they type a plain food word.
 const ODD_RE = /meatless|imitation|substitute|powder|\broll\b|loaf|spread|baby food|soup|sandwich|casserole|frozen meal|\bdish\b|\bwith\b|\bin\b|stuffed|fast food|restaurant|school lunch|\bpuree|\bfeet\b|\bskin\b(?!\s*(not|eaten))|giblets|gizzard|liver|heart|\bneck\b|\bback\b|\btail\b|cornbread|curry|kiev|gravy|dumpling|pot pie|salad|cacciatore|parmigiana|marsala|tikka|teriyaki|a la king|fricassee|\band\b|\bor\b|orange chicken|general tso|kung pao|\bpaper\b|croquette|dressing|pilaf|milk\b(?!.*(cow|whole|2%|1%|skim|nonfat|lowfat))/i;
-// USDA qualifier noise we hide from the display name.
-const NOISE_RE = /^(NS as to|NFS|not further specified|as ingredient|from (fast food|restaurant)|Puerto Rican style)/i;
+// Segments that describe HOW it was cooked/served, not WHAT it is. Stripped from the row name so
+// "Chicken breast, grilled without sauce, skin not eaten" and "…, rotisserie, skin eaten" collapse to one row.
+const PREP_SEG_RE = /\b(cooked|raw|roasted|grilled|braised|boiled|baked|broiled|stewed|steamed|saut[ée]ed|rotisserie|poached|microwaved|toasted|skin|sauce|fat|NS as to|NFS|not further specified|as ingredient|from (fast food|restaurant|precooked|other sources|frozen|fresh)|Puerto Rican style|plain|regular|no added|made with|meat only|meat and skin|skinless|boneless|bone-in|with|without|prepared|enriched|unenriched|dry|dried|canned|frozen|home recipe|homemade|large|medium|small|extra large|jumbo|grade a|broiler|fryer|broilers or fryers)\b/i;
+// Foods whose weight changes when cooked — only these get the Raw / Cooked switch.
+const PAIRABLE_RE = /chicken|beef|pork|turkey|lamb|veal|steak|ground|salmon|tuna|cod|tilapia|shrimp|fish|halibut|egg|rice|pasta|spaghetti|penne|macaroni|noodle|oat|potato|quinoa|lentil|bean|broccoli|spinach|vegetable|asparagus|carrot|cauliflower|zucchini|mushroom|sausage|bacon/i;
 
 export type Item = {
   fdcId: number;
@@ -20,12 +23,13 @@ export type Item = {
   group: string;        // first segment, used for raw↔cooked pairing
   badge: "raw" | "cooked" | null;
   strict: boolean;      // every word of the query appears in the USDA name
+  pairable: boolean;    // meat/eggs/grains/veg: offer Raw / Cooked weighing switch
   per100g: { kcal: number; protein: number; carbs: number; fat: number };
 };
 
 function badgeFor(description: string): "raw" | "cooked" | null {
+  if (COOKED_RE.test(description)) return "cooked";   // "fried, coated, from raw" is cooked
   if (RAW_RE.test(description)) return "raw";
-  if (COOKED_RE.test(description)) return "cooked";
   return null;
 }
 
@@ -33,10 +37,10 @@ function normalize(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
 }
 
-/** "Chicken breast, grilled without sauce, NS as to skin eaten" → "Chicken breast, grilled without sauce". */
+/** "Chicken breast, grilled without sauce, NS as to skin eaten" → "Chicken breast". "Rice, white, cooked" → "Rice, white". */
 function prettyName(description: string): string {
   const parts = description.split(",").map((p) => p.trim()).filter(Boolean);
-  const kept = parts.filter((p, i) => i === 0 || !NOISE_RE.test(p)).slice(0, 3);
+  const kept = parts.filter((p, i) => i === 0 || !PREP_SEG_RE.test(p)).slice(0, 2);
   let s = kept.join(", ");
   if (s === s.toUpperCase()) s = s.toLowerCase();   // branded names arrive ALL CAPS
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -44,13 +48,20 @@ function prettyName(description: string): string {
 
 type Raw = { fdcId: number; description: string; dataType?: string; foodNutrients?: { nutrientId: number; value: number }[] };
 
-async function usdaSearch(q: string, pageSize: number, branded = false): Promise<Raw[]> {
+type Source = "plain" | "branded" | "raw";
+const SOURCES: Record<Source, string[]> = {
+  plain: ["Survey (FNDDS)", "Foundation", "SR Legacy"],
+  branded: ["Branded"],
+  raw: ["Foundation", "SR Legacy"],   // FNDDS is as-eaten; raw ingredients only exist here
+};
+
+async function usdaSearch(q: string, pageSize: number, source: Source = "plain"): Promise<Raw[]> {
   const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${encodeURIComponent(process.env.USDA_API_KEY!)}`;
   // POST: USDA's nginx edge rejects ~2/3 of GET searches with a bare 400 (verified 2026-09-01); POST is reliable.
   // Generic foods first; branded (ALL-CAPS package names) only as a fallback when the plain search is thin.
   const body = JSON.stringify({
     query: q, pageSize,
-    dataType: branded ? ["Branded"] : ["Survey (FNDDS)", "Foundation", "SR Legacy"],
+    dataType: SOURCES[source],
   });
   let res: Response | null = null;
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -65,17 +76,18 @@ async function usdaSearch(q: string, pageSize: number, branded = false): Promise
 
 /** Plain search, topped up with branded hits only when thin. */
 async function searchRanked(q: string, pageSize: number): Promise<Item[]> {
-  const plain = rank(await usdaSearch(q, pageSize), q);
+  const { items: plain, strictCount } = rank(await usdaSearch(q, pageSize), q);
   // "skippy peanut butter": no generic food carries "skippy" → only then look at branded.
-  if (plain.filter((i) => i.strict).length >= 3) return plain;
-  const branded = await usdaSearch(q, 15, true).then((f) => rank(f, q)).catch(() => [] as Item[]);
+  if (strictCount >= 3) return plain;
+  const branded = await usdaSearch(q, 15, "branded").then((f) => rank(f, q).items).catch(() => [] as Item[]);
   const seen = new Set(plain.map((i) => normalize(i.name)));
   return [...plain, ...branded.filter((i) => !seen.has(normalize(i.name)))]
     .sort((a, b) => Number(b.strict) - Number(a.strict));
 }
 
-/** Score + convert one search's hits. Lower score = better. */
-function rank(foods: Raw[], q: string): Item[] {
+/** Score + convert one search's hits. Lower score = better. strictCount is pre-collapse, so a food
+ *  with ten cooking variants still counts as a confident match after they fold into one row. */
+function rank(foods: Raw[], q: string): { items: Item[]; strictCount: number } {
   const nq = normalize(q);
   const scored = foods.map((f) => {
     const desc = f.description ?? "";
@@ -94,14 +106,17 @@ function rank(foods: Raw[], q: string): Item[] {
     if (badge === "cooked") score -= 2;             // people log what they ate, not what they bought
     if (badge === null) score -= 1;
     if (ODD_RE.test(desc)) score += 8;
+    if (/skin not eaten|skinless|meat only|without sauce|no added fat|\bplain\b/i.test(desc)) score -= 2;  // the lean default
+    if (/skin eaten|with sauce|breaded|battered|coated/i.test(desc)) score += 2;
     score += Math.min(desc.split(",").length, 6);   // shorter, plainer names first
     const get = (nid: number) => f.foodNutrients?.find((n) => n.nutrientId === nid)?.value ?? 0;
     const item: Item = {
-      fdcId: f.fdcId, name: prettyName(desc), description: desc, group, badge, strict,
+      fdcId: f.fdcId, name: prettyName(desc), description: desc, group, badge, strict, pairable: PAIRABLE_RE.test(desc),
       per100g: { kcal: get(NUTRIENTS.kcal), protein: get(NUTRIENTS.protein), carbs: get(NUTRIENTS.carbs), fat: get(NUTRIENTS.fat) },
     };
     return { item, score, nd };
   }).filter((x) => x.item.per100g.kcal > 0).sort((a, b) => a.score - b.score);
+  const strictCount = scored.filter((x) => x.item.strict).length;
   // One row per display name: FNDDS and SR Legacy both carry "Rice, white, cooked" — keep the better-ranked one.
   const seen = new Set<string>();
   const out: Item[] = [];
@@ -111,12 +126,16 @@ function rank(foods: Raw[], q: string): Item[] {
     seen.add(k);
     out.push(item);
   }
-  return out;
+  return { items: out, strictCount };
 }
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id")?.trim();
   if (id) return portions(id);
+
+  const pair = req.nextUrl.searchParams.get("pair")?.trim();
+  const want = req.nextUrl.searchParams.get("want");
+  if (pair && (want === "raw" || want === "cooked")) return counterpart(pair, want);
 
   const q = req.nextUrl.searchParams.get("q")?.trim();
   if (!q) return NextResponse.json({ items: [] });
@@ -142,6 +161,22 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     console.error("food-search failed", q, e instanceof Error ? e.message : e);
     return NextResponse.json({ items: [] }, { status: 502 });
+  }
+}
+
+/** The same food weighed the other way: "Chicken breast" + raw → USDA raw chicken breast. */
+async function counterpart(name: string, want: "raw" | "cooked") {
+  const q = name.replace(/,/g, " ");
+  try {
+    const items = want === "raw"
+      ? rank(await usdaSearch(`${q} raw`, 25, "raw"), `${q} raw`).items
+      : rank(await usdaSearch(q, 40), q).items;
+    const hit = items.find((i) => i.strict && i.badge === want)
+      ?? items.find((i) => i.badge === want && normalize(i.name) === normalize(name));
+    return NextResponse.json({ item: hit ?? null });
+  } catch (e) {
+    console.error("food-search pair failed", name, want, e instanceof Error ? e.message : e);
+    return NextResponse.json({ item: null }, { status: 502 });
   }
 }
 

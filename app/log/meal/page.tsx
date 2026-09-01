@@ -5,8 +5,11 @@ import { supabase } from "@/lib/supabase";
 import { logMeal } from "@/lib/log";
 
 type Per100 = { kcal: number; protein: number; carbs: number; fat: number };
-type Item = { fdcId: number; name: string; description: string; group: string; badge: "raw" | "cooked" | null; per100g: Per100 };
-type Picked = { name: string; description?: string; fdcId?: number; group?: string; badge?: "raw" | "cooked" | null; per100g: Per100; fromHistory?: boolean };
+type Item = { fdcId: number; name: string; description: string; group: string; badge: "raw" | "cooked" | null; pairable: boolean; per100g: Per100 };
+type Picked = { name: string; description?: string; fdcId?: number; badge?: "raw" | "cooked" | null; pairable?: boolean; per100g: Per100; fromHistory?: boolean };
+type Weighing = "raw" | "cooked";
+// undefined = still looking, null = USDA has no such version.
+type PairCache = Record<Weighing, Item | null | undefined>;
 type Unit = { label: string; grams: number };
 
 const BASE_UNITS: Unit[] = [
@@ -21,6 +24,7 @@ export default function LogMeal() {
   const [searching, setSearching] = useState(false);
   const [history, setHistory] = useState<Picked[]>([]);
   const [picked, setPicked] = useState<Picked | null>(null);
+  const [pairs, setPairs] = useState<PairCache>({ raw: undefined, cooked: undefined });
   const [units, setUnits] = useState<Unit[]>(BASE_UNITS);
   const [unit, setUnit] = useState<Unit>(BASE_UNITS[0]);
   const [amount, setAmount] = useState("");
@@ -74,13 +78,13 @@ export default function LogMeal() {
     return history.filter((h) => h.name.toLowerCase().includes(nq)).slice(0, 4);
   }, [history, q]);
 
-  async function pickItem(v: Item) {
-    setPicked({ name: v.name, description: v.description, fdcId: v.fdcId, group: v.group, badge: v.badge, per100g: v.per100g });
+  const weighingOf = (v: { badge?: "raw" | "cooked" | null }): Weighing => (v.badge === "raw" ? "raw" : "cooked");
+
+  async function loadPortions(fdcId: number) {
     setUnits(BASE_UNITS);
-    setUnit(BASE_UNITS[0]);
-    setAmount("");
+    setUnit((u) => (BASE_UNITS.some((b) => b.label === u.label) ? u : BASE_UNITS[0]));
     try {
-      const res = await fetch(`/api/food-search?id=${v.fdcId}`);
+      const res = await fetch(`/api/food-search?id=${fdcId}`);
       const data = await res.json();
       const extra: Unit[] = (data.portions ?? []).map((p: { label: string; grams: number }) =>
         ({ label: p.label, grams: p.grams }));
@@ -88,20 +92,46 @@ export default function LogMeal() {
     } catch { /* base units are fine */ }
   }
 
+  function toPicked(v: Item): Picked {
+    return { name: v.name, description: v.description, fdcId: v.fdcId, badge: v.badge, pairable: v.pairable, per100g: v.per100g };
+  }
+
+  async function pickItem(v: Item) {
+    setPicked(toPicked(v));
+    setAmount("");
+    const mine = weighingOf(v);
+    const other: Weighing = mine === "raw" ? "cooked" : "raw";
+    setPairs({ raw: undefined, cooked: undefined, [mine]: v });
+    loadPortions(v.fdcId);
+    if (!v.pairable) { setPairs((p) => ({ ...p, [other]: null })); return; }
+    // Same food weighed the other way, so the switch is ready by the time you've typed the grams.
+    try {
+      const res = await fetch(`/api/food-search?pair=${encodeURIComponent(v.name)}&want=${other}`);
+      const data = await res.json();
+      const hit: Item | null = data.item ?? null;
+      setPairs((p) => ({ ...p, [other]: hit && hit.fdcId !== v.fdcId ? hit : null }));
+    } catch { setPairs((p) => ({ ...p, [other]: null })); }
+  }
+
+  /** Raw ↔ Cooked: swap the USDA item, keep whatever amount is typed. */
+  function swapTo(w: Weighing) {
+    const t = pairs[w];
+    if (!t || !picked || weighingOf(picked) === w) return;
+    setPicked(toPicked(t));
+    loadPortions(t.fdcId);
+  }
+
   function pickHistory(h: Picked) {
     setPicked(h);
+    setPairs({ raw: null, cooked: null });
     setUnits(BASE_UNITS);
     setUnit(BASE_UNITS[0]);
     setAmount("");
   }
 
-  // Raw ↔ cooked toggle: same food (first USDA segment) with the opposite badge, if the search had one.
-  const counterpart = useMemo(() => {
-    if (!picked || picked.fromHistory || !picked.badge || !picked.group) return null;
-    const want = picked.badge === "raw" ? "cooked" : "raw";
-    const g = picked.group.toLowerCase();
-    return items.find((v) => v.badge === want && v.group.toLowerCase() === g) ?? null;
-  }, [items, picked]);
+  // Show the Raw / Cooked switch while the other version is loading or once it exists; hide if USDA has none.
+  const showSwitch = !!picked && !picked.fromHistory && !!picked.pairable &&
+    (pairs.raw !== null && pairs.cooked !== null);
 
   const n = parseFloat(amount) || 0;
   const grams = Math.round(n * unit.grams * 10) / 10;
@@ -158,28 +188,43 @@ export default function LogMeal() {
           /* ——— amount screen ——— */
           <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-3">
-              <p className="text-lg font-semibold leading-snug text-foreground">{picked.name}</p>
-              {!counterpart && <Badge badge={picked.badge} />}
-            </div>
-            <p className="rounded-xl bg-surface-2/60 px-3 py-2 text-[12px] leading-snug text-muted">
-              {picked.description && picked.description !== picked.name ? `USDA: ${picked.description}. ` : ""}
-              {picked.badge === "cooked" ? "Cooked weight: weigh it after cooking. " : ""}
-              {picked.badge === "raw" ? "Raw weight: weigh it before cooking. " : ""}
-              {picked.fromHistory ? "From your log: same values as last time you ate this. " : ""}
-              {Math.round(picked.per100g.kcal)} kcal and {Math.round(picked.per100g.protein)} g protein per 100 g.
-            </p>
-
-            {counterpart && (
-              <div className="flex self-start rounded-full border border-border bg-surface-2 p-0.5" role="group" aria-label="Raw or cooked">
-                {(["raw", "cooked"] as const).map((b) => (
-                  <button key={b} type="button" aria-pressed={picked.badge === b}
-                    onClick={() => { if (picked.badge !== b) pickItem(counterpart); }}
-                    className={`h-8 rounded-full px-4 text-[13px] font-semibold capitalize ${
-                      picked.badge === b ? "bg-accent/20 text-accent" : "text-muted"}`}>
-                    {b}
-                  </button>
-                ))}
+              <div className="min-w-0">
+                <p className="text-lg font-semibold leading-snug text-foreground">{picked.name}</p>
+                {picked.description && picked.description !== picked.name && (
+                  <p className="mt-0.5 text-[12px] leading-snug text-muted">{picked.description}</p>
+                )}
               </div>
+              {!showSwitch && <Badge badge={picked.badge} />}
+            </div>
+
+            {showSwitch && (
+              <div className="flex flex-col gap-1.5">
+                <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Weighing it</h2>
+                <div className="flex rounded-full border border-border bg-surface-2 p-0.5" role="group" aria-label="Raw or cooked">
+                  {(["raw", "cooked"] as const).map((b) => {
+                    const on = weighingOf(picked) === b;
+                    const loading = pairs[b] === undefined;
+                    return (
+                      <button key={b} type="button" aria-pressed={on} disabled={loading}
+                        onClick={() => swapTo(b)}
+                        className={`h-9 flex-1 rounded-full text-[13px] font-semibold capitalize ${
+                          on ? "bg-accent/20 text-accent" : "text-muted"} ${loading ? "opacity-50" : ""}`}>
+                        {b === "raw" ? "Raw" : "Cooked"}{loading ? " …" : ""}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="px-1 text-[12px] text-muted">
+                  {weighingOf(picked) === "cooked" ? "Weigh it after cooking." : "Weigh it before cooking."}
+                  {" "}{Math.round(picked.per100g.kcal)} kcal · {Math.round(picked.per100g.protein)} g protein per 100 g.
+                </p>
+              </div>
+            )}
+            {!showSwitch && (
+              <p className="rounded-xl bg-surface-2/60 px-3 py-2 text-[12px] leading-snug text-muted">
+                {picked.fromHistory ? "From your log: same values as last time you ate this. " : ""}
+                {Math.round(picked.per100g.kcal)} kcal and {Math.round(picked.per100g.protein)} g protein per 100 g.
+              </p>
             )}
 
             <div className="flex flex-wrap gap-2">
