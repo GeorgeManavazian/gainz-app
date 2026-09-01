@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import ExerciseRow from "@/components/ExerciseRow";
-import SetSheet, { type SheetState } from "@/components/SetSheet";
+import SetSheet, { REPS, SETS, WEIGHT, type SheetState } from "@/components/SetSheet";
 import WorkoutSummary from "@/components/WorkoutSummary";
 import { MUSCLE_GROUPS, exercisesFor, findExercise, normalizeName, searchExercises } from "@/lib/exercises";
-import { formatElapsed, lastSession, recentExercises, workoutTitle, type LiftRow, type WorkoutRow } from "@/lib/workouts";
+import { formatElapsed, groupByExercise, lastSession, recentExercises, workoutTitle, type LiftRow, type WorkoutRow } from "@/lib/workouts";
 import { deleteWorkout, endWorkout, getWorkout, listLiftsForWorkout, listRecentLifts, logSet } from "@/lib/workouts-db";
 
 const DEFAULT_STATE: SheetState = { sets: 1, reps: 8, weight: 0 };
+const snap = (v: number, values: number[]) => values.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
 
 export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
@@ -28,8 +29,8 @@ export default function WorkoutPage() {
 
   useEffect(() => {
     getWorkout(id).then(setWorkout).catch(() => setWorkout(null));
-    listRecentLifts().then(setHistory).catch(() => {});
-    listLiftsForWorkout(id).then(setLogged).catch(() => {});
+    listRecentLifts().then(setHistory).catch((e) => console.warn("gainz workouts: load failed", e));
+    listLiftsForWorkout(id).then(setLogged).catch((e) => console.warn("gainz workouts: load failed", e));
   }, [id]);
 
   useEffect(() => {
@@ -40,13 +41,22 @@ export default function WorkoutPage() {
   const groups = workout?.muscle_groups ?? [];
   const previousRows = useMemo(() => history.filter((r) => r.workout_id !== id), [history, id]);
   const recents = useMemo(() => recentExercises(previousRows, groups), [previousRows, groups]);
+  const listedNames = useMemo(() => new Set([
+    ...recents,
+    ...MUSCLE_GROUPS.filter((m) => groups.includes(m.id)).flatMap((m) => exercisesFor([m.id]).map((x) => x.name)),
+  ].map(normalizeName)), [recents, groups]);
+  const thisWorkoutExtra = useMemo(() =>
+    groupByExercise(logged).map((g) => g.exercise).filter((n) => !listedNames.has(normalizeName(n))),
+    [logged, listedNames]);
   const setCount = useCallback((name: string) =>
     logged.filter((r) => normalizeName(r.exercise) === normalizeName(name)).reduce((a, r) => a + r.sets, 0), [logged]);
 
   function openSheet(name: string) {
     if (!wheel[name]) {
       const prev = lastSession(name, previousRows);
-      const seed = prev[0] ? { sets: prev[0].sets, reps: prev[0].reps, weight: prev[0].weight } : DEFAULT_STATE;
+      const seed = prev[0]
+        ? { sets: snap(prev[0].sets, SETS), reps: snap(prev[0].reps, REPS), weight: snap(prev[0].weight, WEIGHT) }
+        : DEFAULT_STATE;
       setWheel((w) => ({ ...w, [name]: seed }));
     }
     setOpen(name);
@@ -119,6 +129,16 @@ export default function WorkoutPage() {
           </section>
         ) : (
           <>
+            {thisWorkoutExtra.length > 0 && (
+              <section className="flex flex-col gap-2">
+                <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">This workout</h2>
+                <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+                  {thisWorkoutExtra.map((name) => (
+                    <ExerciseRow key={name} name={name} muscle={findExercise(name)?.muscles[0]} setCount={setCount(name)} onClick={() => openSheet(name)} />
+                  ))}
+                </div>
+              </section>
+            )}
             {recents.length > 0 && (
               <section className="flex flex-col gap-2">
                 <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Recently used</h2>

@@ -7,9 +7,9 @@ import { formatSession, localDateOf, type LiftRow } from "@/lib/workouts";
 
 export type SheetState = { sets: number; reps: number; weight: number };
 
-const SETS = range(1, 10);
-const REPS = range(1, 30);
-const WEIGHT = range(0, 500, 2.5);
+export const SETS = range(1, 10);
+export const REPS = range(1, 30);
+export const WEIGHT = range(0, 500, 2.5);
 
 function shortDate(iso: string): string {
   const [y, m, d] = localDateOf(iso).split("-").map(Number);
