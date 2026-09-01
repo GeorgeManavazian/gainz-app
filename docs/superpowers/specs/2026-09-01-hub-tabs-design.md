@@ -74,7 +74,16 @@ No new tables. Reads: `meals` (today; last 7 days), `lifts` (all, newest-first, 
 
 ## Visual design
 
-12ui draft of the HUB (hero ring is the decision that matters) with the existing look as reference, then a branch of the chosen HUB into DIET and PERFORMANCE screens; the chosen layouts are what the plan implements. Diagram thumbnails remain deferred.
+**Chosen (2026-09-01): `docs/superpowers/design/2026-09-01-hub-final-lavender-A.png`** — mix of drafts (B base + C's open-gauge rings + A's header burn pill, bottom sections and sparkline + C's pill tab bar), recoloured to the soft navy/lavender palette he picked over lime-on-black. DIET and PERFORMANCE layouts come from a 12ui branch of this image.
+
+**Palette (app-wide re-skin via `app/globals.css` tokens — every existing screen inherits it):**
+- `--background: #1e1e2e` · `--surface: #2a2b3d` · `--surface-2: #34354a` · `--border: #3b3c52`
+- `--foreground: #cdd6f4` · `--muted: #8b8fa8`
+- `--accent: #b4a2f5` · `--accent-foreground: #1e1e2e`
+- `--success: #a6e3a1` (workout check, on-track) · `--danger: #f38ba8` (overage lap, losses)
+No other hex values anywhere; components keep using tokens.
+
+**Design notes from the chosen image:** hero ring is a 270° open gauge (gap at the bottom) with a soft glow and a flame icon above the number — the red overage lap draws along the same 270° track; macro gauges show `88` + `left` inside and `88 / 206g` beneath with thin vertical dividers; header has the GAINZ italic wordmark left and a burn pill (flame + kcal) + profile circle right — the burn pill renders only when a burn number exists (Oura, later; hidden until then), profile circle links to `/profile`; Today rows have small icon bubbles (meal-type glyphs deferred — use a generic bowl glyph) and the workout row a filled green check circle; weigh-in row carries a tiny sparkline of the last ~10 weigh-ins; tab bar is a rounded pill container with the active tab as a lavender-tinted pill. Diagram thumbnails remain deferred.
 
 ## Out of scope
 
