@@ -1,5 +1,5 @@
 import { normalizeName } from "./exercises";
-import { bestE1rm, localDateOf, type LiftRow } from "./workouts";
+import { bestE1rm, e1rm, localDateOf, type LiftRow } from "./workouts";
 
 export type Session = { key: string; date: string; rows: LiftRow[]; best: number };
 
@@ -23,7 +23,7 @@ export function sessionsFor(exercise: string, rows: LiftRow[]): Session[] {
 
 export function bestSet(rows: LiftRow[]): LiftRow | null {
   if (rows.length === 0) return null;
-  return rows.reduce((a, b) => (b.weight * (1 + b.reps / 30) > a.weight * (1 + a.reps / 30) ? b : a));
+  return rows.reduce((a, b) => (e1rm(b.weight, b.reps) > e1rm(a.weight, a.reps) ? b : a));
 }
 
 /** Cut Protocol — Fall 2026. Baselines set 2026-08-31; null = first logged session becomes the baseline. */
