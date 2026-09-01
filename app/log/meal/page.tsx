@@ -10,6 +10,8 @@ type Group = { name: string; items: Variant[] };
 type Picked = { name: string; fdcId?: number; badge?: "raw" | "cooked" | null; per100g: Per100; fromHistory?: boolean };
 type Unit = { label: string; grams: number };
 
+const normName = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+
 const BASE_UNITS: Unit[] = [
   { label: "g", grams: 1 },
   { label: "oz", grams: 28.35 },
@@ -22,6 +24,8 @@ export default function LogMeal() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [history, setHistory] = useState<Picked[]>([]);
   const [openGroup, setOpenGroup] = useState<Group | null>(null); // variant picker
+  const [loadingAlias, setLoadingAlias] = useState<string | null>(null); // alias row tapped, results pending
+  const pendingOpen = useRef<string | null>(null);
   const [picked, setPicked] = useState<Picked | null>(null);
   const [units, setUnits] = useState<Unit[]>(BASE_UNITS);
   const [unit, setUnit] = useState<Unit>(BASE_UNITS[0]);
@@ -62,9 +66,17 @@ export default function LogMeal() {
       try {
         const res = await fetch(`/api/food-search?q=${encodeURIComponent(q)}`);
         const data = await res.json();
-        setGroups(data.groups ?? []);
+        const gs: Group[] = data.groups ?? [];
+        setGroups(gs);
         setSuggestions(data.suggestions ?? []);
-      } catch { setGroups([]); setSuggestions([]); }
+        if (pendingOpen.current && normName(pendingOpen.current) === normName(q)) {
+          const want = normName(pendingOpen.current);
+          const g = gs.find((x) => normName(x.name) === want) ?? gs[0];
+          pendingOpen.current = null;
+          setLoadingAlias(null);
+          if (g) pickGroup(g);
+        }
+      } catch { setGroups([]); setSuggestions([]); pendingOpen.current = null; setLoadingAlias(null); }
     }, 300);
     return () => clearTimeout(timer.current);
   }, [q]);
@@ -94,6 +106,22 @@ export default function LogMeal() {
     if (g.items.length === 1) { pickVariant(g, g.items[0]); return; }
     setOpenGroup(g);
   }
+
+  /** Alias row ("Chicken breast" under "chicken"): re-search with the precise term and open that food's variants. */
+  function pickAlias(name: string) {
+    pendingOpen.current = name;
+    setLoadingAlias(name);
+    setQ(name);
+  }
+
+  // One flat list: alias shortlist first (human names), then USDA foods not already covered by an alias.
+  const rows = useMemo(() => {
+    const aliasKeys = new Set(suggestions.map(normName));
+    const out: ({ kind: "alias"; name: string } | { kind: "group"; group: Group })[] =
+      suggestions.map((name) => ({ kind: "alias" as const, name }));
+    for (const g of groups) if (!aliasKeys.has(normName(g.name))) out.push({ kind: "group", group: g });
+    return out;
+  }, [suggestions, groups]);
 
   function pickHistory(h: Picked) {
     setPicked(h);
@@ -234,8 +262,9 @@ export default function LogMeal() {
                   <button className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2"
                     onClick={() => pickVariant(openGroup, v)}>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[15px] capitalize text-foreground">{v.variant}</span>
-                      <span className="mt-0.5 block text-[12px] text-muted">
+                      <span className="block text-[15px] capitalize leading-snug text-foreground">{v.variant}</span>
+                      <span className="mt-0.5 block text-[12px] leading-snug text-muted">{v.description}</span>
+                      <span className="mt-0.5 block text-[12px] tabular-nums text-muted">
                         {Math.round(v.per100g.kcal)} kcal · {Math.round(v.per100g.protein)} P / 100g
                       </span>
                     </span>
@@ -277,36 +306,32 @@ export default function LogMeal() {
               </section>
             )}
 
-            {suggestions.length > 0 && (
-              <section className="flex flex-col gap-1.5">
-                <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Pick one</h2>
-                <div className="flex flex-wrap gap-2">
-                  {suggestions.map((sug) => (
-                    <button key={sug} type="button" onClick={() => setQ(sug)}
-                      className="h-8 rounded-full border border-accent/40 bg-accent/10 px-3 text-[13px] font-semibold text-accent active:opacity-80">
-                      {sug}
-                    </button>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {groups.length > 0 && (
+            {rows.length > 0 && (
               <section className="flex flex-col gap-1.5">
                 <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Foods</h2>
                 <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border">
-                  {groups.map((g) => (
-                    <li key={g.name}>
-                      <button className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2" onClick={() => pickGroup(g)}>
+                  {rows.map((r) => r.kind === "alias" ? (
+                    <li key={`a-${r.name}`}>
+                      <button className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2"
+                        onClick={() => pickAlias(r.name)} disabled={loadingAlias !== null}>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[15px] text-foreground">{g.name}</span>
+                          <span className="block truncate text-[15px] text-foreground">{r.name}</span>
+                        </span>
+                        <span className="text-muted">{loadingAlias === r.name ? "…" : "›"}</span>
+                      </button>
+                    </li>
+                  ) : (
+                    <li key={`g-${r.group.name}`}>
+                      <button className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2" onClick={() => pickGroup(r.group)}>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[15px] text-foreground">{r.group.name}</span>
                           <span className="mt-0.5 block text-[12px] text-muted">
-                            {g.items.length === 1
-                              ? `${Math.round(g.items[0].per100g.kcal)} kcal · ${Math.round(g.items[0].per100g.protein)} P / 100g`
-                              : `${g.items.length} options`}
+                            {r.group.items.length === 1
+                              ? `${Math.round(r.group.items[0].per100g.kcal)} kcal · ${Math.round(r.group.items[0].per100g.protein)} P / 100g`
+                              : `${r.group.items.length} options`}
                           </span>
                         </span>
-                        {g.items.length === 1 && <Badge badge={g.items[0].badge} />}
+                        {r.group.items.length === 1 && <Badge badge={r.group.items[0].badge} />}
                         <span className="text-muted">›</span>
                       </button>
                     </li>
