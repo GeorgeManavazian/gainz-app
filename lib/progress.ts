@@ -16,9 +16,13 @@ export function sessionsFor(exercise: string, rows: LiftRow[]): Session[] {
   return [...groups.entries()]
     .map(([k, g]) => {
       const sorted = [...g].sort((a, b) => (a.logged_at < b.logged_at ? -1 : 1));
-      return { key: k, date: localDateOf(sorted[0].logged_at), rows: sorted, best: bestE1rm(sorted) ?? 0 };
+      const startedAt = sorted[0].logged_at;
+      const session: Session = { key: k, date: localDateOf(startedAt), rows: sorted, best: bestE1rm(sorted) ?? 0 };
+      return { session, startedAt };
     })
-    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    .sort((a, b) => (a.session.date < b.session.date ? -1 : a.session.date > b.session.date ? 1
+      : a.startedAt < b.startedAt ? -1 : a.startedAt > b.startedAt ? 1 : 0))
+    .map((x) => x.session);
 }
 
 export function bestSet(rows: LiftRow[]): LiftRow | null {

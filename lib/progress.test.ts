@@ -21,6 +21,18 @@ describe("sessionsFor", () => {
     expect(s[0].date < s[1].date && s[1].date < s[2].date).toBe(true);
   });
   it("empty for unknown exercise", () => expect(sessionsFor("Nope", ROWS)).toEqual([]));
+
+  it("orders same-day sessions by their earliest row's logged_at", () => {
+    const sameDay: LiftRow[] = [
+      row({ logged_at: "2026-09-05T13:00:00.000Z", workout_id: "wa", reps: 5, weight: 90 }),  // e1RM 105
+      row({ logged_at: "2026-09-05T19:00:00.000Z", workout_id: "wb", reps: 8, weight: 100 }), // e1RM ≈126.7
+    ];
+    const s = sessionsFor("DB Chest Press", sameDay);
+    expect(s.map((x) => x.key)).toEqual(["wa", "wb"]);
+    expect(s[s.length - 1].key).toBe("wb");
+    expect(s[s.length - 1].best).toBeCloseTo(126.7, 1);
+    expect(indicatorStatus("DB Chest Press", sameDay).latest).toBeCloseTo(126.7, 1);
+  });
 });
 
 describe("bestSet", () => {
