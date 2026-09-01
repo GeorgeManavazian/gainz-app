@@ -190,12 +190,7 @@ export default function LogMeal() {
           /* ——— amount screen ——— */
           <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-lg font-semibold leading-snug text-foreground">{picked.name}</p>
-                {picked.description && picked.description !== picked.name && (
-                  <p className="mt-0.5 text-[12px] leading-snug text-muted">{picked.description}</p>
-                )}
-              </div>
+              <p className="min-w-0 text-lg font-semibold leading-snug text-foreground">{picked.name}</p>
               {!showSwitch && <Badge badge={picked.badge} />}
             </div>
 
