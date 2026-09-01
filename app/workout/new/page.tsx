@@ -17,7 +17,9 @@ export default function NewWorkout() {
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    getActiveWorkout().then((w) => { if (w) router.replace(`/workout/${w.id}`); }).catch(() => {}).finally(() => setChecked(true));
+    getActiveWorkout().then((w) => { if (w) router.replace(`/workout/${w.id}`); })
+      .catch((e) => console.warn("gainz workouts: getActiveWorkout failed", e))
+      .finally(() => setChecked(true));
   }, [router]);
 
   function toggle(id: MuscleGroup) {

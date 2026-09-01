@@ -18,7 +18,7 @@ export function normalizeQueued(raw: unknown): Queued {
   return r as Queued;
 }
 
-async function readQueue(): Promise<Queued[]> {
+export async function readQueue(): Promise<Queued[]> {
   return ((await get<unknown[]>(KEY)) ?? []).map(normalizeQueued);
 }
 
