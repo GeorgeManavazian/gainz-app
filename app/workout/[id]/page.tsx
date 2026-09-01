@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import ExerciseRow from "@/components/ExerciseRow";
 import SetSheet, { type SheetState } from "@/components/SetSheet";
+import WorkoutSummary from "@/components/WorkoutSummary";
 import { MUSCLE_GROUPS, PRESETS, exercisesFor, findExercise, muscleLabel, normalizeName, searchExercises,
   type MuscleGroup } from "@/lib/exercises";
 import { formatElapsed, lastSession, recentExercises, type LiftRow, type WorkoutRow } from "@/lib/workouts";
@@ -87,7 +88,7 @@ export default function WorkoutPage() {
     </AuthGuard>
   );
 
-  if (workout.ended_at) return <AuthGuard><main className="p-4 text-foreground">Summary coming</main></AuthGuard>;
+  if (workout.ended_at) return <AuthGuard><WorkoutSummary workout={workout} logged={logged} history={history} /></AuthGuard>;
 
   const q = query.trim();
   const searchHits = q ? searchExercises(q) : [];
