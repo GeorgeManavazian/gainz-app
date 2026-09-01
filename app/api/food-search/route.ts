@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { aliasSuggestions } from "@/lib/foodAliases";
 
 const NUTRIENTS = { kcal: 1008, protein: 1003, carbs: 1005, fat: 1004 } as const;
 
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
   if (id) return portions(id);
 
   const q = req.nextUrl.searchParams.get("q")?.trim();
-  if (!q) return NextResponse.json({ groups: [] });
+  if (!q) return NextResponse.json({ groups: [], suggestions: [] });
 
   const url = new URL("https://api.nal.usda.gov/fdc/v1/foods/search");
   url.searchParams.set("api_key", process.env.USDA_API_KEY!);
@@ -39,7 +40,8 @@ export async function GET(req: NextRequest) {
   url.searchParams.set("pageSize", "40");
 
   const res = await fetch(url, { next: { revalidate: 3600 } });
-  if (!res.ok) return NextResponse.json({ groups: [] }, { status: 502 });
+  const suggestions = aliasSuggestions(q);
+  if (!res.ok) return NextResponse.json({ groups: [], suggestions }, { status: 502 });
   const data = await res.json();
 
   const nq = normalize(q);
@@ -68,7 +70,7 @@ export async function GET(req: NextRequest) {
     const item: Item = {
       fdcId: f.fdcId,
       description: f.description,
-      variant: variant || "plain",
+      variant: variant || "regular",
       badge: badgeFor(f.description ?? ""),
       per100g: { kcal, protein: get(NUTRIENTS.protein), carbs: get(NUTRIENTS.carbs), fat: get(NUTRIENTS.fat) },
     };
@@ -81,7 +83,18 @@ export async function GET(req: NextRequest) {
     }
     if (bucket.length < 8) bucket.push(item);
   }
-  return NextResponse.json({ groups });
+  // Order variants: common preparations first, raw next, oddities last.
+  const PREP_ORDER = ["grilled", "baked", "broiled", "roasted", "rotisserie", "boiled", "steamed", "sauteed", "stir", "fried", "stewed", "braised"];
+  const variantRank = (v: { variant: string; badge: string | null }) => {
+    const t = v.variant.toLowerCase();
+    const i = PREP_ORDER.findIndex((k) => t.includes(k));
+    if (i !== -1) return i;
+    if (v.badge === "raw") return PREP_ORDER.length;
+    if (/meatless|imitation|substitute|canned|powder|roll|loaf|spread/.test(t)) return PREP_ORDER.length + 10;
+    return PREP_ORDER.length + 2;
+  };
+  for (const g of groups) g.items.sort((a, b) => variantRank(a) - variantRank(b));
+  return NextResponse.json({ groups, suggestions });
 }
 
 /** Per-food portions (e.g. "1 cup, chopped" → 140 g) from the FDC detail endpoint. */

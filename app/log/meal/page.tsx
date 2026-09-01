@@ -19,6 +19,7 @@ const BASE_UNITS: Unit[] = [
 export default function LogMeal() {
   const [q, setQ] = useState("");
   const [groups, setGroups] = useState<Group[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [history, setHistory] = useState<Picked[]>([]);
   const [openGroup, setOpenGroup] = useState<Group | null>(null); // variant picker
   const [picked, setPicked] = useState<Picked | null>(null);
@@ -55,14 +56,15 @@ export default function LogMeal() {
   }, []);
 
   useEffect(() => {
-    if (q.length < 2) { setGroups([]); return; }
+    if (q.length < 2) { setGroups([]); setSuggestions([]); return; }
     clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/food-search?q=${encodeURIComponent(q)}`);
         const data = await res.json();
         setGroups(data.groups ?? []);
-      } catch { setGroups([]); }
+        setSuggestions(data.suggestions ?? []);
+      } catch { setGroups([]); setSuggestions([]); }
     }, 300);
     return () => clearTimeout(timer.current);
   }, [q]);
@@ -156,6 +158,12 @@ export default function LogMeal() {
               <p className="text-lg font-semibold leading-snug text-foreground">{picked.name}</p>
               {!counterpart && <Badge badge={picked.badge} />}
             </div>
+            <p className="rounded-xl bg-surface-2/60 px-3 py-2 text-[12px] leading-snug text-muted">
+              {picked.badge === "cooked" ? "Cooked weight: weigh it after cooking. " : ""}
+              {picked.badge === "raw" ? "Raw weight: weigh it before cooking. " : ""}
+              {picked.fromHistory ? "From your log: same values as last time you ate this. " : ""}
+              {Math.round(picked.per100g.kcal)} kcal and {Math.round(picked.per100g.protein)} g protein per 100 g.
+            </p>
 
             {counterpart && (
               <div className="flex self-start rounded-full border border-border bg-surface-2 p-0.5" role="group" aria-label="Raw or cooked">
@@ -266,6 +274,20 @@ export default function LogMeal() {
                     </li>
                   ))}
                 </ul>
+              </section>
+            )}
+
+            {suggestions.length > 0 && (
+              <section className="flex flex-col gap-1.5">
+                <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Pick one</h2>
+                <div className="flex flex-wrap gap-2">
+                  {suggestions.map((sug) => (
+                    <button key={sug} type="button" onClick={() => setQ(sug)}
+                      className="h-8 rounded-full border border-accent/40 bg-accent/10 px-3 text-[13px] font-semibold text-accent active:opacity-80">
+                      {sug}
+                    </button>
+                  ))}
+                </div>
               </section>
             )}
 
