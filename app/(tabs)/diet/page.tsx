@@ -5,29 +5,60 @@ import AuthGuard from "@/components/AuthGuard";
 import WeightChart from "@/components/WeightChart";
 import WeighInCard from "@/components/WeighInCard";
 import ProgressCard from "@/components/ProgressCard";
+import { supabase } from "@/lib/supabase";
 import { getProfile, applyAdjustment, type ProfileRow } from "@/lib/profile";
 import { computeTargets } from "@/lib/targets";
 import { deleteWeighIn, listWeighIns, localDateKey, upsertWeighIn, type WeighInRow } from "@/lib/weighins";
 import { addDays, assessProgress, emaTrend, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight, type Assessment } from "@/lib/trend";
 
 type Range = 30 | 90 | "all";
+type MealRow = { id: string; food_name: string; grams: number; calories: number; protein_g: number };
+type DayMeals = { date: string; kcal: number; protein: number; meals: MealRow[] };
 
 function fmtDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-export default function WeightPage() {
+const fmtDay = (iso: string) => {
+  const [y, m, d] = iso.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  return dt.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+};
+
+export default function DietPage() {
   const [rows, setRows] = useState<WeighInRow[]>([]);
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [range, setRange] = useState<Range>(30);
   const [err, setErr] = useState("");
+  const [days, setDays] = useState<DayMeals[]>([]);
+  const [openDay, setOpenDay] = useState<string | null>(localDateKey());
 
   const load = useCallback(async () => {
-    const [w, p] = await Promise.allSettled([listWeighIns(), getProfile()]);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - 6);
+    const [w, p, m] = await Promise.allSettled([
+      listWeighIns(),
+      getProfile(),
+      supabase.from("meals").select("*").gte("logged_at", start.toISOString()).order("logged_at"),
+    ]);
     if (w.status === "fulfilled") { setRows(w.value); setErr(""); }
     else { setErr("Couldn't load weigh-ins."); }
     setProfile(p.status === "fulfilled" ? p.value : null);
+
+    if (m.status === "fulfilled" && !m.value.error) {
+      const rowsByDay = new Map<string, DayMeals>();
+      for (const raw of (m.value.data ?? []) as (MealRow & { logged_at: string })[]) {
+        const key = localDateKey(new Date(raw.logged_at));
+        const entry = rowsByDay.get(key) ?? { date: key, kcal: 0, protein: 0, meals: [] };
+        entry.kcal += Number(raw.calories);
+        entry.protein += Number(raw.protein_g);
+        entry.meals.push({ id: raw.id, food_name: raw.food_name, grams: raw.grams, calories: raw.calories, protein_g: raw.protein_g });
+        rowsByDay.set(key, entry);
+      }
+      setDays([...rowsByDay.values()].sort((a, b) => (a.date < b.date ? 1 : -1)));
+    }
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -72,11 +103,10 @@ export default function WeightPage() {
 
   return (
     <AuthGuard>
-      <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-10 pt-6 text-foreground">
-        <div className="grid grid-cols-3 items-center">
-          <Link href="/" className="text-sm font-medium text-accent active:opacity-80">‹ Back</Link>
-          <h1 className="text-center text-xl font-bold tracking-tight">Weight</h1>
-          <span />
+      <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-28 pt-6 text-foreground">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold tracking-tight">Diet</h1>
+          <Link href="/profile" className="rounded-full border border-border px-3 py-1.5 text-sm font-medium text-muted active:text-foreground">Targets ›</Link>
         </div>
         {err && <p className="text-sm text-danger">{err}</p>}
 
@@ -110,6 +140,33 @@ export default function WeightPage() {
               </li>
             ))}
             {rows.length === 0 && <li className="py-3 text-[13px] text-muted">Nothing yet — log this morning&apos;s weight above.</li>}
+          </ul>
+        </section>
+
+        <section className="flex flex-col gap-2">
+          <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Meals · last 7 days</h2>
+          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface text-sm">
+            {days.map((d) => (
+              <li key={d.date}>
+                <button type="button" onClick={() => setOpenDay(openDay === d.date ? null : d.date)}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2">
+                  <span className="flex-1 font-medium">{fmtDay(d.date)}</span>
+                  <span className="tabular-nums text-muted">{Math.round(d.kcal).toLocaleString()} kcal · {Math.round(d.protein)} P</span>
+                  <span className="text-muted">{openDay === d.date ? "▾" : "›"}</span>
+                </button>
+                <div className="mx-4 mb-2 h-1 overflow-hidden rounded-full bg-surface-2">
+                  <div className="h-full rounded-full bg-accent"
+                    style={{ width: `${targets ? Math.min(100, Math.round((d.kcal / targets.kcal) * 100)) : 0}%` }} />
+                </div>
+                {openDay === d.date && d.meals.map((m) => (
+                  <div key={m.id} className="flex justify-between border-t border-border py-2 pl-10 pr-4 text-[13px]">
+                    <span>{m.food_name} · {m.grams}g</span>
+                    <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
+                  </div>
+                ))}
+              </li>
+            ))}
+            {days.length === 0 && <li className="px-4 py-3 text-muted">No meals in the last 7 days</li>}
           </ul>
         </section>
       </main>

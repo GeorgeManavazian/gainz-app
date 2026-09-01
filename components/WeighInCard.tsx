@@ -90,7 +90,7 @@ export default function WeighInCard({ todayWeight, lastWeight, trend, slope, onS
 
   return (
     <section className="flex items-stretch justify-between gap-4 rounded-2xl border border-border bg-surface p-5">
-      {linkToDetail ? <Link href="/weight" className="active:opacity-80">{hero}</Link> : hero}
+      {linkToDetail ? <Link href="/diet" className="active:opacity-80">{hero}</Link> : hero}
       <div className="flex w-[45%] flex-col justify-center gap-2">
         {inputAndSave("relative", "h-10 rounded-xl bg-accent px-4 text-[15px] font-bold text-accent-foreground active:opacity-80 disabled:opacity-40")}
       </div>
