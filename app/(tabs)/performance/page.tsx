@@ -88,26 +88,28 @@ export default function Performance() {
 
         <section className="flex flex-col gap-2">
           <h2 className="text-[15px] font-semibold">Indicator lifts</h2>
-          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {INDICATORS.map((ind) => {
+          <div className="grid grid-cols-3 gap-2">
+            {[...INDICATORS].sort((a, b) =>
+              (indicatorStatus(b.name, rows).latest !== null ? 1 : 0) - (indicatorStatus(a.name, rows).latest !== null ? 1 : 0)
+            ).slice(0, 3).map((ind) => {
               const s = indicatorStatus(ind.name, rows);
               const active = exercise !== null && normalizeName(exercise) === normalizeName(ind.name);
               const has = s.latest !== null;
               return (
                 <button key={ind.name} type="button" disabled={!has}
                   onClick={() => has && setSelected(ind.name)} aria-pressed={active}
-                  className={`card-grad relative w-[148px] shrink-0 rounded-2xl border p-4 text-left ${
+                  className={`card-grad relative rounded-2xl border p-3 text-left ${
                     active ? "border-accent" : "border-border"} ${has ? "active:opacity-80" : "opacity-80"}`}>
                   {active && (
                     <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[11px] text-accent-foreground" aria-hidden>✓</span>
                   )}
-                  <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent" aria-hidden>
+                  <span className="mb-2 flex h-8 w-8 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent" aria-hidden>
                     {LIFT_ICON}
                   </span>
-                  <p className="min-h-9 text-[13px] font-semibold leading-tight">{ind.name}</p>
+                  <p className="min-h-8 text-[12px] font-semibold leading-tight">{ind.name}</p>
                   {has ? (
                     <>
-                      <p className="text-xl font-bold tabular-nums leading-tight">{Math.round(s.latest!)} <span className="text-sm font-normal text-muted">lb</span></p>
+                      <p className="text-lg font-bold tabular-nums leading-tight">{Math.round(s.latest!)} <span className="text-sm font-normal text-muted">lb</span></p>
                       <p className="text-[11px]">
                         <span className="text-muted">e1RM </span>
                         {s.pct !== null && (
@@ -119,8 +121,8 @@ export default function Performance() {
                     </>
                   ) : (
                     <>
-                      <p className="text-base font-semibold text-muted">No baseline</p>
-                      <p className="text-[11px] text-muted">Log it in a workout</p>
+                      <p className="text-sm font-semibold text-muted">No baseline</p>
+                      <p className="text-[10px] text-muted">Log it in a workout</p>
                     </>
                   )}
                 </button>
