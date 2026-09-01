@@ -9,12 +9,12 @@ Turn the single dashboard into a three-tab app. **HUB** is "today": the biggest 
 Decisions taken in brainstorming (2026-09-01):
 - Tabs: **HUB · DIET · PERFORMANCE**. Health/sleep (Oura) joins PERFORMANCE later; not in this build.
 - HUB body below the rings = today only (compact) **plus** a next-meal advice card.
-- Over target the big ring draws a **second lap in red** on top of the full lime ring; centre shows the overage.
+- Over target the big ring draws a **second lap in red** on top of the full accent ring; centre shows the overage.
 - PERFORMANCE ships with workout history **and** per-exercise progress (e1RM chart, best set, recent sessions) — roadmap #7 folded in.
 
 ## Navigation
 
-- Bottom tab bar (`components/TabBar.tsx`) rendered on `/`, `/diet`, `/performance`. Three items with icon + label; active item lime, others muted. Safe-area padding at the bottom (`pb-[env(safe-area-inset-bottom)]`). Page content gets `pb-24` so nothing hides behind the bar.
+- Bottom tab bar (`components/TabBar.tsx`) rendered on `/`, `/diet`, `/performance`. Three items with icon + label; active item accent (lavender pill per the chosen design), others muted. Safe-area padding at the bottom (`pb-[env(safe-area-inset-bottom)]`). Page content gets `pb-24` so nothing hides behind the bar.
 - Full-screen pushes without the bar, each with a `‹` back link: `/workout/new`, `/workout/[id]`, `/profile`.
 - `/weight` is **removed**; its content moves into DIET. `/log/meal` stays as a push (unchanged).
 - Implementation: a `app/(tabs)/layout.tsx` route group wraps the three tab pages with `<TabBar />`; the pushes live outside the group. Existing `AuthGuard` behaviour unchanged.
@@ -23,10 +23,10 @@ Decisions taken in brainstorming (2026-09-01):
 
 Top to bottom, in one scrolling column (`max-w-md`, `px-4`):
 
-1. **Header** — "Gainz" wordmark left, small date ("Mon Sep 1") right. No profile link here (it lives in DIET).
+1. **Header** — italic GAINZ wordmark left (accent); right: burn pill (flame + kcal — hidden until Oura data exists) and a profile circle → `/profile`.
 2. **Calorie ring** — hero, `components/Ring.tsx`, 200 px. Centre: remaining kcal as the biggest number on the screen (`text-5xl font-bold tabular-nums`), the word `left` beneath in muted; when over: `−180` in red and `over`. Below the ring, one muted line: `1,360 / 2,600 eaten`.
 3. **Macro rings** — three `Ring`s at 72 px in a row: **P**, **C**, **F**. Centre = grams left (or `−12` red when over), label + `/206g` under each. Same fill and overage rules as the big ring.
-4. **Actions** — `Log meal` (lime, → `/log/meal`) and `Start workout` / `Resume · 34 min` (→ `/workout/new` or the active workout), same components as today.
+4. **Actions** — `Log meal` (accent-filled, → `/log/meal`) and `Start workout` / `Resume · 34 min` (→ `/workout/new` or the active workout), same components as today.
 5. **Next meal** card — `Next meal · ~620 kcal · 52 P · 70 C · 17 F`. Muted subtitle `2 of 4 meals logged`. Tap → `/log/meal`. Rules in **Next-meal math** below. This is the roadmap #5 slot; the time-aware version replaces the math later without moving the card.
 6. **Today** — eyebrow `Today`. Meals as one-line rows `Greek yogurt, nonfat · 180 kcal` (newest last). Then the workout as one row: `Upper · 12 sets · 41:07 ›` (→ its summary) when a workout was completed today; `Resume workout · 34 min ›` when one is active; `No workout yet` muted otherwise. Empty meals → `Nothing logged yet`.
 7. **Weigh-in row** — small, last: `170 lb · trend 203.9 · −1.2 lb/wk`; not logged today → `Log weigh-in ›` with the inline number input on tap (reuse `WeighInCard` logic in a compact variant, `WeighInCard` gains a `compact` prop). No stall/too-fast card here — moved to DIET.
@@ -35,7 +35,7 @@ Targets come from `computeTargets({ ...profile, weight_lb: trendWeight ?? profil
 
 ## Ring — `components/Ring.tsx` (pure SVG, no library)
 
-Props: `{ size: number; stroke: number; value: number; target: number; children }`. Draws a muted full circle (`border` token), a lime arc for `min(value, target) / target`, and — when `value > target` — a red arc for `min(value − target, target) / target` drawn on top starting at 12 o'clock (a second lap that visually overlays the first). Arcs use `stroke-dasharray` / `stroke-dashoffset` on a circle rotated −90°, round line caps, and a 300 ms CSS transition on `stroke-dashoffset`. `children` render centred. `target <= 0` → empty muted ring, no arcs.
+Props: `{ size: number; stroke: number; value: number; target: number; children }`. Draws a muted full circle (`border` token), an accent arc for `min(value, target) / target`, and — when `value > target` — a red arc for `min(value − target, target) / target` drawn on top starting at 12 o'clock (a second lap that visually overlays the first). Arcs use `stroke-dasharray` / `stroke-dashoffset` on a circle rotated −90°, round line caps, and a 300 ms CSS transition on `stroke-dashoffset`. `children` render centred. `target <= 0` → empty muted ring, no arcs.
 
 `lib/hub.ts` (pure, tested):
 - `ringFractions(value, target): { fill: number; over: number }` — `fill = clamp(value / target, 0, 1)`, `over = clamp((value − target) / target, 0, 1)`, both `0` when `target <= 0`.
@@ -56,7 +56,7 @@ Props: `{ size: number; stroke: number; value: number; target: number; children 
 
 ## PERFORMANCE (`/performance`)
 
-1. **Indicator lifts** — pinned card, from Cut Protocol: `DB Chest Press` (baseline 111.0), `Seated Shoulder Press` (141.8), `Back Squat` / `Leg Press` and `Romanian Deadlift` (baseline = first logged session's best e1RM). Each row: name · latest e1RM · `+3.2 %` vs baseline (lime ≥ 0, red < 0, `−5 %` / `−8 %` thresholds from the protocol colour the badge amber/red). Baselines and thresholds are constants in `lib/progress.ts` (`INDICATORS`), editable in code — no UI for them.
+1. **Indicator lifts** — pinned card, from Cut Protocol: `DB Chest Press` (baseline 111.0), `Seated Shoulder Press` (141.8), `Back Squat` / `Leg Press` and `Romanian Deadlift` (baseline = first logged session's best e1RM). Each row: name · latest e1RM · `+3.2 %` vs baseline (accent/green ≥ 0, red < 0, `−5 %` / `−8 %` thresholds from the protocol colour the badge amber/red). Baselines and thresholds are constants in `lib/progress.ts` (`INDICATORS`), editable in code — no UI for them.
 2. **Workout history** — one row per workout with `ended_at`: `Mon Sep 1 · Upper · 12 sets · 41:07 ›` → `/workout/[id]` summary. Newest first, 30 most recent.
 3. **Exercise progress** — a chip row of exercises (recently used first, then the rest of the logged names). Selecting one shows: a small inline-SVG line chart of best e1RM per session (last 12 sessions), `Best: 95×6 · e1RM 114 · Aug 31`, and a table of the last 5 sessions (`Sep 1 · 95×6, 90×7`). Default selection = the most recently logged exercise.
 
