@@ -169,13 +169,14 @@ async function counterpart(name: string, want: "raw" | "cooked") {
   const q = name.replace(/,/g, " ");
   try {
     const items = want === "raw"
-      ? rank(await usdaSearch(`${q} raw`, 25, "raw"), `${q} raw`).items
+      ? rank(await usdaSearch(`${q} raw`, 40, "raw"), `${q} raw`).items
       : rank(await usdaSearch(q, 40), q).items;
     // Among same-badge candidates prefer the plain fresh cut: "thigh, meat only, raw" over
     // "skin (drumsticks and thighs), raw"; "egg, whole, raw, fresh" over "frozen, pasteurized".
     const pref = (i: Item) => {
       const d = i.description;
       let p = 0;
+      if (normalize(i.name) === normalize(name)) p -= 6;   // same food: "Egg, whole" not "Egg, turkey"
       if (/meat only|skinless|boneless|\bfresh\b|8[05]% lean|90% lean/i.test(d)) p -= 3;
       if (/\bskin\b(?! not eaten)|separable fat|giblets|gizzard|liver|heart|back\b|neck\b|frozen|pasteurized|dried|powder|liquid|grass-fed|organic|wagyu|bison|venison|duck|goose|quail|canned|salted|smoked|cured|70% lean|75% lean/i.test(d)) p += 5;
       return p;
