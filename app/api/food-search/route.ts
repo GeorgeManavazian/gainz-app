@@ -176,8 +176,8 @@ async function counterpart(name: string, want: "raw" | "cooked") {
     const pref = (i: Item) => {
       const d = i.description;
       let p = 0;
-      if (/meat only|skinless|boneless|\bfresh\b|\blean\b/i.test(d)) p -= 3;
-      if (/\bskin\b(?! not eaten)|separable fat|giblets|gizzard|liver|heart|back\b|neck\b|frozen|pasteurized|dried|powder|liquid|grass-fed|organic|wagyu|bison|canned|salted|smoked|cured/i.test(d)) p += 5;
+      if (/meat only|skinless|boneless|\bfresh\b|8[05]% lean|90% lean/i.test(d)) p -= 3;
+      if (/\bskin\b(?! not eaten)|separable fat|giblets|gizzard|liver|heart|back\b|neck\b|frozen|pasteurized|dried|powder|liquid|grass-fed|organic|wagyu|bison|venison|duck|goose|quail|canned|salted|smoked|cured|70% lean|75% lean/i.test(d)) p += 5;
       return p;
     };
     const cands = items
