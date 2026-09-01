@@ -3,11 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
 import LineChart from "@/components/LineChart";
-import { INDICATORS, bestSet, indicatorStatus, sessionsFor } from "@/lib/progress";
+import { INDICATORS, bestSet, indexAdvice, indicatorStatus, sessionsFor, strengthIndex } from "@/lib/progress";
 import { listCompletedWorkouts, listRecentLifts } from "@/lib/workouts-db";
 import { e1rm, formatElapsed, localDateOf, recentExercises, workoutTitle,
   type LiftRow, type WorkoutRow } from "@/lib/workouts";
 import { MUSCLE_GROUPS, normalizeName } from "@/lib/exercises";
+import { getProfile } from "@/lib/profile";
 
 function fmtDay(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
@@ -28,10 +29,12 @@ export default function Performance() {
   const [rows, setRows] = useState<LiftRow[]>([]);       // newest-first
   const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"cut" | "maintain" | "bulk">("cut");
 
   useEffect(() => {
     listRecentLifts(2000).then(setRows).catch((e) => console.warn("gainz perf: lifts load failed", e));
     listCompletedWorkouts().then(setWorkouts).catch((e) => console.warn("gainz perf: workouts load failed", e));
+    getProfile().then((p) => { if (p) setPhase(p.phase); }).catch(() => {});
   }, []);
 
   const recents = useMemo(
@@ -47,6 +50,10 @@ export default function Performance() {
   const current = sessions.length ? sessions[sessions.length - 1].best : null;
   const prev = sessions.length > 1 ? sessions[sessions.length - 2] : null;
   const delta = current !== null && prev !== null ? current - prev.best : null;
+
+  const index = useMemo(() => strengthIndex(rows), [rows]);
+  const advice = useMemo(() => indexAdvice(index, phase), [index, phase]);
+  const idxCurrent = index.length ? index[index.length - 1].value : null;
 
   const setsByWorkout = useMemo(() => {
     const m = new Map<string, number>();
@@ -142,6 +149,34 @@ export default function Performance() {
             </div>
           )}
         </section>
+
+        {index.length > 1 && (
+          <section className="card-grad rounded-3xl border border-border p-5">
+            <div className="mb-1 flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent" aria-hidden>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M4 17 L10 11 L14 14 L20 7 M20 11 V7 H16" />
+                </svg>
+              </span>
+              <div className="flex-1">
+                <h2 className="text-[15px] font-semibold">Strength Index</h2>
+                <p className="text-[11px] text-muted">All lifts · first session = 100</p>
+              </div>
+              {idxCurrent !== null && (
+                <p className={`text-2xl font-bold tabular-nums ${idxCurrent >= 100 ? "text-success" : "text-danger"}`}>{Math.round(idxCurrent)}</p>
+              )}
+            </div>
+            <LineChart data={index} unit="" />
+            {advice && (
+              <p className={`mt-2 rounded-xl px-3 py-2 text-[13px] font-medium ${
+                advice.level === "ok" ? "bg-success/10 text-success"
+                : advice.level === "watch" ? "bg-accent/10 text-accent"
+                : "bg-danger/10 text-danger"}`}>
+                {advice.level === "ok" ? "✓ " : advice.level === "watch" ? "· " : "! "}{advice.text}
+              </p>
+            )}
+          </section>
+        )}
 
         {exercise && (
           <section className="card-grad rounded-3xl border border-border p-5">

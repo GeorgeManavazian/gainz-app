@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { LiftRow } from "./workouts";
-import { INDICATORS, bestSet, indicatorStatus, sessionsFor } from "./progress";
+import { INDICATORS, bestSet, indexAdvice, indicatorStatus, sessionsFor, strengthIndex } from "./progress";
 
 const row = (o: Partial<LiftRow> & { logged_at: string }): LiftRow => ({
   id: o.logged_at, exercise: "DB Chest Press", sets: 1, reps: 6, weight: 95, workout_id: null, ...o });
@@ -75,3 +75,45 @@ describe("indicatorStatus", () => {
       expect(INDICATORS.find((i) => i.name === n)!.baseline).toBeNull();
   });
 });
+
+describe("strengthIndex", () => {
+  const r = (ex: string, iso: string, w: number, reps: number, wid: string): LiftRow =>
+    ({ id: iso + ex, exercise: ex, sets: 1, reps, weight: w, logged_at: iso, workout_id: wid });
+  it("starts at 100 and averages normalized e1RMs with carry-forward", () => {
+    const rows = [
+      r("A", "2026-09-01T10:00:00.000Z", 100, 6, "w1"), // A base e1RM 120
+      r("B", "2026-09-01T10:10:00.000Z", 50, 6, "w1"),  // B base 60
+      r("A", "2026-09-08T10:00:00.000Z", 110, 6, "w2"), // A → 110% ; B carries 100
+    ];
+    const idx = strengthIndex(rows);
+    expect(idx[0]).toEqual({ date: "2026-09-01", value: 100 });
+    expect(idx[1].value).toBeCloseTo(105, 1); // (110 + 100) / 2
+  });
+  it("exercise joining later starts at its own 100 without distorting", () => {
+    const rows = [
+      r("A", "2026-09-01T10:00:00.000Z", 100, 6, "w1"),
+      r("A", "2026-09-08T10:00:00.000Z", 120, 6, "w2"),
+      r("C", "2026-09-08T10:20:00.000Z", 80, 6, "w2"),
+    ];
+    const idx = strengthIndex(rows);
+    expect(idx[1].value).toBeCloseTo(110, 1); // (120% + 100%) / 2
+  });
+  it("empty → empty", () => expect(strengthIndex([])).toEqual([]));
+});
+
+describe("indexAdvice", () => {
+  const pt = (date: string, value: number) => ({ date, value });
+  it("null when under 2 points", () => expect(indexAdvice([pt("2026-09-01", 100)], "cut")).toBeNull());
+  it("warn at ≥5% drop from peak", () => {
+    const a = indexAdvice([pt("a", 100), pt("b", 106), pt("c", 100)], "cut")!;
+    expect(a.level).toBe("warn");
+    expect(a.text).toContain("carbs");
+  });
+  it("watch at 2.5–5% drop", () => {
+    expect(indexAdvice([pt("a", 100), pt("b", 104), pt("c", 100.5)], "cut")!.level).toBe("watch");
+  });
+  it("ok when holding on a cut", () => {
+    expect(indexAdvice([pt("a", 100), pt("b", 101)], "cut")!.level).toBe("ok");
+  });
+});
+
