@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
 import WeightChart from "@/components/WeightChart";
-import WeighInCard from "@/components/WeighInCard";
 import ProgressCard from "@/components/ProgressCard";
 import { supabase } from "@/lib/supabase";
 import { getProfile, applyAdjustment, type ProfileRow } from "@/lib/profile";
@@ -22,9 +21,74 @@ function fmtDate(iso: string): string {
 
 const fmtDay = (iso: string) => {
   const [y, m, d] = iso.split("-").map(Number);
-  const dt = new Date(y, m - 1, d);
-  return dt.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
+
+/** Once-a-day weigh-in entry: quiet row that locks after today's save; Edit reopens for typos. */
+function WeighInRowEntry({ todayWeight, lastWeight, onSave }: {
+  todayWeight: number | null; lastWeight: number | null; onSave: (w: number) => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState("");
+  const parsed = parseFloat(value);
+  const valid = Number.isFinite(parsed) && parsed >= 50 && parsed <= 600;
+
+  async function save() {
+    if (!valid) return;
+    setSaving(true); setErr("");
+    try { await onSave(parsed); setEditing(false); setValue(""); }
+    catch { setErr("Couldn't save."); }
+    finally { setSaving(false); }
+  }
+
+  return (
+    <div className="card-grad rounded-2xl border border-border">
+      {!editing ? (
+        todayWeight === null ? (
+          <button type="button" onClick={() => setEditing(true)}
+            className="flex w-full items-center gap-3 px-4 py-3.5 text-left active:bg-surface-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-accent/40 text-accent" aria-hidden>+</span>
+            <span className="flex-1 text-[15px] font-medium">Log today&apos;s weigh-in</span>
+            <span className="text-muted">›</span>
+          </button>
+        ) : (
+          <div className="flex w-full items-center gap-3 px-4 py-3.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-success/15 text-success" aria-hidden>✓</span>
+            <span className="flex-1 text-[15px]">
+              Logged today · <span className="font-bold tabular-nums">{todayWeight.toFixed(1)} lb</span>
+            </span>
+            <button type="button" onClick={() => { setEditing(true); setValue(String(todayWeight)); }}
+              className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted active:text-foreground">
+              Edit
+            </button>
+          </div>
+        )
+      ) : (
+        <div className="flex items-center gap-2 px-4 py-3">
+          <label className="relative flex-1">
+            <input autoFocus inputMode="decimal"
+              placeholder={lastWeight === null ? "200.0" : lastWeight.toFixed(1)}
+              value={value} onChange={(e) => setValue(e.target.value)}
+              aria-label="Today's weight in pounds"
+              className="h-11 w-full rounded-xl border border-border bg-surface-2 px-4 pr-9 text-base tabular-nums text-foreground placeholder:text-muted focus:border-accent focus:outline-none" />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">lb</span>
+          </label>
+          <button type="button" onClick={save} disabled={!valid || saving}
+            className="h-11 rounded-xl bg-accent px-4 text-[15px] font-bold text-accent-foreground active:opacity-80 disabled:opacity-40">
+            {saving ? "…" : "Save"}
+          </button>
+          <button type="button" onClick={() => { setEditing(false); setErr(""); }}
+            className="h-11 rounded-xl border border-border px-3 text-sm text-muted">
+            ✕
+          </button>
+          {err && <p className="text-xs text-danger">{err}</p>}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function DietPage() {
   const [rows, setRows] = useState<WeighInRow[]>([]);
@@ -94,35 +158,125 @@ export default function DietPage() {
     await load();
   }
 
-  const tab = (r: Range, label: string) => (
-    <button key={label} type="button" onClick={() => setRange(r)}
-      className={`h-7 rounded-md px-4 text-sm font-semibold ${range === r ? "bg-background text-accent" : "text-muted"}`}>
+  const chip = (r: Range, label: string) => (
+    <button key={label} type="button" onClick={() => setRange(r)} aria-pressed={range === r}
+      className={`h-7 rounded-full px-3 text-[13px] font-semibold ${range === r ? "bg-accent/20 text-accent" : "text-muted"}`}>
       {label}
     </button>
   );
+
+  const twoWk = slope === null ? null : slope * 2;
+  const trendCopy =
+    assessment === "on_track" ? "On track for your goal"
+    : assessment === "stalled" ? "Stalled — suggestion below"
+    : assessment === "too_fast" ? (phase === "cut" ? "Losing faster than planned" : "Gaining faster than planned")
+    : "Need a week of weigh-ins";
 
   return (
     <AuthGuard>
       <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-28 pt-6 text-foreground">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold tracking-tight">Diet</h1>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Diet</h1>
+            <p className="text-[13px] text-muted">Nutrition overview &amp; targets</p>
+          </div>
           <Link href="/profile" className="rounded-full border border-border px-3 py-1.5 text-sm font-medium text-muted active:text-foreground">Targets ›</Link>
         </div>
         {err && <p className="text-sm text-danger">{err}</p>}
 
-        <WeighInCard todayWeight={todayRow?.weight_lb ?? null} lastWeight={last?.weight_lb ?? null}
-          trend={trend} slope={slope} onSave={save} />
-
-        <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5">
-          <div className="inline-flex self-start rounded-lg border border-border bg-surface-2 p-0.5">
-            {tab(30, "30")}{tab(90, "90")}{tab("all", "All")}
+        {/* ——— Meals first ——— */}
+        <section className="flex flex-col gap-2">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-[15px] font-semibold">Last 7 days intake</h2>
+            <span className="text-[11px] text-muted">kcal</span>
           </div>
-          <WeightChart points={visible} />
-          <ProgressCard assessment={assessment} slope={slope} rate={rate} phase={phase} delta={delta}
-            newKcal={newKcal} suppressed={suppressed} onApply={apply} />
+          <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border text-sm">
+            {days.map((d) => (
+              <li key={d.date}>
+                <button type="button" onClick={() => setOpenDay(openDay === d.date ? null : d.date)}
+                  aria-expanded={openDay === d.date}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2">
+                  <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
+                    targets && d.kcal <= targets.kcal ? "bg-success/15 text-success" : "bg-surface-2 text-muted"}`} aria-hidden>
+                    {openDay === d.date ? "▾" : "✓"}
+                  </span>
+                  <span className="flex-1">
+                    <span className="font-semibold">{fmtDay(d.date)}</span>
+                    {d.date === today && <span className="ml-2 text-[11px] text-muted">Today</span>}
+                  </span>
+                  <span className="text-[15px] font-bold tabular-nums text-accent">{Math.round(d.kcal).toLocaleString()}</span>
+                  <span className="text-muted">›</span>
+                </button>
+                <div className="mx-4 mb-2 h-1 overflow-hidden rounded-full bg-surface-2">
+                  <div className="h-full rounded-full bg-accent"
+                    style={{ width: `${targets ? Math.min(100, Math.round((d.kcal / targets.kcal) * 100)) : 0}%` }} />
+                </div>
+                {openDay === d.date && d.meals.map((m) => (
+                  <div key={m.id} className="flex items-center gap-3 border-t border-border py-2.5 pl-6 pr-4 text-[13px]">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-accent" aria-hidden>
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <path d="M4 12 A8 5 0 0 0 20 12 Z" /><path d="M9 8 C9 6 11 6 11 8 M14 8 C14 5 17 5 17 8" />
+                      </svg>
+                    </span>
+                    <span className="flex-1">{m.food_name} <span className="text-muted">· {m.grams}g</span></span>
+                    <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
+                  </div>
+                ))}
+              </li>
+            ))}
+            {days.length === 0 && <li className="px-4 py-3 text-muted">No meals in the last 7 days</li>}
+          </ul>
         </section>
 
-        <section className="rounded-2xl border border-border bg-surface p-5">
+        {/* ——— Weight lives at the bottom ——— */}
+        <h2 className="mt-2 text-[15px] font-semibold">Weight</h2>
+
+        <section className="card-grad rounded-2xl border border-border p-4">
+          <div className="mb-1 flex items-start justify-between">
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted">Weight</p>
+              <p className="leading-tight">
+                <span className="text-3xl font-bold tabular-nums">{(todayRow?.weight_lb ?? last?.weight_lb)?.toFixed(1) ?? "—"}</span>
+                <span className="ml-1 text-sm text-muted">lb</span>
+              </p>
+              <p className="text-[11px] text-muted">{todayRow ? "Today" : last ? fmtDay(last.date) : ""}</p>
+            </div>
+            <div className="flex rounded-full border border-border bg-surface-2 p-0.5">
+              {chip(30, "1M")}{chip(90, "3M")}{chip("all", "All")}
+            </div>
+          </div>
+          <WeightChart points={visible} />
+        </section>
+
+        <section className="card-grad grid grid-cols-2 divide-x divide-border rounded-2xl border border-border">
+          <div className="flex items-center gap-3 p-4">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-accent text-accent" aria-hidden>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {twoWk !== null && twoWk > 0 ? <path d="M4 17 L11 10 L14 13 L20 7 M20 12 V7 H15" /> : <path d="M4 7 L11 14 L14 11 L20 17 M20 12 V17 H15" />}
+              </svg>
+            </span>
+            <div>
+              <p className="text-[11px] font-medium text-muted">14-Day Trend</p>
+              <p className="text-[15px] font-bold">
+                {twoWk === null ? "—" : `${twoWk > 0 ? "Up" : "Down"} ${Math.abs(twoWk).toFixed(1)} lb`}
+                {twoWk !== null && <span className="ml-1 text-[11px] font-normal text-muted">vs 2 wk ago</span>}
+              </p>
+              <p className="text-[11px] text-muted">{trendCopy}</p>
+            </div>
+          </div>
+          <div className="flex flex-col justify-center p-4 text-right">
+            <p className="text-[11px] font-medium text-muted">Weekly goal</p>
+            <p className="text-[15px] font-bold tabular-nums text-accent">{phase === "cut" ? "−" : "+"}{rate.toFixed(1)} lb</p>
+            <p className="text-[11px] text-muted">Per week</p>
+          </div>
+        </section>
+
+        <ProgressCard assessment={assessment} slope={slope} rate={rate} phase={phase} delta={delta}
+          newKcal={newKcal} suppressed={suppressed} onApply={apply} />
+
+        <WeighInRowEntry todayWeight={todayRow?.weight_lb ?? null} lastWeight={last?.weight_lb ?? null} onSave={save} />
+
+        <section className="card-grad rounded-2xl border border-border p-5">
           <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-muted">Recent weigh-ins</p>
           <ul className="divide-y divide-border">
             {[...rows].reverse().slice(0, 30).map((r) => (
@@ -140,33 +294,6 @@ export default function DietPage() {
               </li>
             ))}
             {rows.length === 0 && <li className="py-3 text-[13px] text-muted">Nothing yet — log this morning&apos;s weight above.</li>}
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-2">
-          <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Meals · last 7 days</h2>
-          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface text-sm">
-            {days.map((d) => (
-              <li key={d.date}>
-                <button type="button" onClick={() => setOpenDay(openDay === d.date ? null : d.date)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2">
-                  <span className="flex-1 font-medium">{fmtDay(d.date)}</span>
-                  <span className="tabular-nums text-muted">{Math.round(d.kcal).toLocaleString()} kcal · {Math.round(d.protein)} P</span>
-                  <span className="text-muted">{openDay === d.date ? "▾" : "›"}</span>
-                </button>
-                <div className="mx-4 mb-2 h-1 overflow-hidden rounded-full bg-surface-2">
-                  <div className="h-full rounded-full bg-accent"
-                    style={{ width: `${targets ? Math.min(100, Math.round((d.kcal / targets.kcal) * 100)) : 0}%` }} />
-                </div>
-                {openDay === d.date && d.meals.map((m) => (
-                  <div key={m.id} className="flex justify-between border-t border-border py-2 pl-10 pr-4 text-[13px]">
-                    <span>{m.food_name} · {m.grams}g</span>
-                    <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
-                  </div>
-                ))}
-              </li>
-            ))}
-            {days.length === 0 && <li className="px-4 py-3 text-muted">No meals in the last 7 days</li>}
           </ul>
         </section>
       </main>

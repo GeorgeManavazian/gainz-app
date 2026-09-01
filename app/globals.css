@@ -11,6 +11,8 @@
   --accent-foreground: #1e1e2e;
   --danger: #f38ba8;
   --success: #a6e3a1;
+  --surface-hi: #31324a;
+  --surface-lo: #232438;
 }
 
 @theme inline {
@@ -40,6 +42,10 @@ body {
 
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+.card-grad {
+  background: linear-gradient(135deg, var(--surface-hi), var(--surface-lo));
 }
 
 ::selection {
