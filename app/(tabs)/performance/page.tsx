@@ -5,7 +5,7 @@ import AuthGuard from "@/components/AuthGuard";
 import LineChart from "@/components/LineChart";
 import { INDICATORS, bestSet, indicatorStatus, sessionsFor } from "@/lib/progress";
 import { listCompletedWorkouts, listRecentLifts } from "@/lib/workouts-db";
-import { formatElapsed, formatSession, localDateOf, recentExercises, workoutTitle,
+import { e1rm, formatElapsed, formatSession, localDateOf, recentExercises, workoutTitle,
   type LiftRow, type WorkoutRow } from "@/lib/workouts";
 import { MUSCLE_GROUPS } from "@/lib/exercises";
 
@@ -89,7 +89,7 @@ export default function Performance() {
               {best && (
                 <p className="mt-2 text-sm text-muted">
                   Best: <span className="font-semibold text-foreground tabular-nums">{best.weight}×{best.reps}</span>
-                  {" "}· e1RM <span className="font-semibold text-accent tabular-nums">{(best.weight * (1 + best.reps / 30)).toFixed(0)}</span>
+                  {" "}· e1RM <span className="font-semibold text-accent tabular-nums">{e1rm(best.weight, best.reps).toFixed(0)}</span>
                   {" "}· {fmtDay(localDateOf(best.logged_at))}
                 </p>
               )}
