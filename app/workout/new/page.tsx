@@ -14,9 +14,10 @@ export default function NewWorkout() {
   const [selected, setSelected] = useState<MuscleGroup[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    getActiveWorkout().then((w) => { if (w) router.replace(`/workout/${w.id}`); }).catch(() => {});
+    getActiveWorkout().then((w) => { if (w) router.replace(`/workout/${w.id}`); }).catch(() => {}).finally(() => setChecked(true));
   }, [router]);
 
   function toggle(id: MuscleGroup) {
@@ -25,6 +26,7 @@ export default function NewWorkout() {
 
   async function start() {
     if (selected.length === 0 || busy) return;
+    setErr("");
     setBusy(true);
     try {
       const ordered = MUSCLE_GROUPS.map((m) => m.id).filter((id) => selected.includes(id));
@@ -38,6 +40,8 @@ export default function NewWorkout() {
 
   const presetActive = (p: "upper" | "lower") => sameSet(selected, PRESETS[p]);
 
+  if (!checked) return <AuthGuard><main className="min-h-dvh bg-background" /></AuthGuard>;
+
   return (
     <AuthGuard>
       <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-28 pt-6 text-foreground">
@@ -50,7 +54,7 @@ export default function NewWorkout() {
           <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Quick presets</h2>
           <div className="grid grid-cols-2 gap-3">
             {(["upper", "lower"] as const).map((p) => (
-              <button key={p} type="button" onClick={() => setSelected(PRESETS[p])}
+              <button key={p} type="button" onClick={() => setSelected(PRESETS[p])} aria-pressed={presetActive(p)}
                 className={`rounded-2xl border bg-surface p-4 text-left active:bg-surface-2 ${
                   presetActive(p) ? "border-accent" : "border-border"}`}>
                 <p className="text-lg font-bold">{p === "upper" ? "Upper" : "Lower"}</p>
@@ -66,7 +70,7 @@ export default function NewWorkout() {
           {MUSCLE_GROUPS.map((m) => {
             const on = selected.includes(m.id);
             return (
-              <button key={m.id} type="button" onClick={() => toggle(m.id)}
+              <button key={m.id} type="button" onClick={() => toggle(m.id)} aria-pressed={on}
                 className={`flex items-center gap-3 rounded-2xl border bg-surface px-4 py-3.5 text-left active:bg-surface-2 ${
                   on ? "border-accent/60" : "border-border"}`}>
                 <span className={`flex h-5 w-5 items-center justify-center rounded-md border text-xs ${
