@@ -72,7 +72,7 @@ export const EXERCISES: Exercise[]; // ~120–150 entries
 
 `LiftRow = { id, exercise, sets, reps, weight, logged_at, workout_id: string | null }`.
 
-Data access (thin, in the same file): `startWorkout(groups)` (client id, queued insert), `endWorkout(id)` (queued update `ended_at = now`), `deleteWorkout(id)` (direct, only for the empty-workout case), `getActiveWorkout()`, `getWorkout(id)`, `listLiftsForWorkout(id)`, `listRecentLifts(limit = 400)` (newest-first, used for recents + last-time), `logSet({ workout_id, exercise, sets, reps, weight })` → `enqueueOrSend`.
+Data access (thin, in `lib/workouts-db.ts`): `startWorkout(groups)` (client id, queued insert), `endWorkout(id)` (queued update `ended_at = now`), `deleteWorkout(id)` (direct, only for the empty-workout case), `getActiveWorkout()`, `getWorkout(id)`, `listLiftsForWorkout(id)`, `listRecentLifts(limit = 400)` (newest-first, used for recents + last-time), `logSet({ workout_id, exercise, sets, reps, weight })` → `enqueueOrSend`.
 
 ## Flow & screens
 
@@ -113,6 +113,7 @@ All workout writes go through the existing queue (`lib/queue.ts`), generalised f
 - **Flush stops at the first transient failure** (`break`, not `continue`) so FIFO order is preserved: a set can never reach Supabase before the workout row it references. Permanent rejections still dead-letter and continue, as today.
 - Because the workout id is generated on the phone, the active-workout page works entirely from local state while offline: it does not need `getWorkout` to succeed to render — it carries `started_at` and `muscle_groups` in navigation state / `sessionStorage` and falls back to fetching when that is missing (e.g. Resume from the dashboard).
 - The dashboard's Resume card relies on `getActiveWorkout()` (a read), so it appears once the workout row has landed; that is acceptable.
+- If anything is already queued, `enqueueOrSend` queues the new write too (never overtakes) and kicks a flush.
 
 ## Out of scope
 
