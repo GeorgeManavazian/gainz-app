@@ -58,7 +58,7 @@ export async function enqueueOrSend(table: QueueTable, entry: Record<string, unk
   // Never overtake: if anything is waiting, this goes behind it.
   if ((await readQueue()).length > 0) {
     await update<unknown[]>(KEY, (q) => [...(q ?? []), item]);
-    void flushQueue();
+    flushQueue().catch((e) => console.warn("gainz queue: background flush failed", e));
     return "queued";
   }
 
