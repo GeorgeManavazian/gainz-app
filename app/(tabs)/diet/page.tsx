@@ -184,53 +184,6 @@ export default function DietPage() {
         </div>
         {err && <p className="text-sm text-danger">{err}</p>}
 
-        {/* ——— Meals first ——— */}
-        <section className="flex flex-col gap-2">
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-[15px] font-semibold">Last 7 days intake</h2>
-            <span className="text-[11px] text-muted">kcal</span>
-          </div>
-          <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border text-sm">
-            {days.map((d) => (
-              <li key={d.date}>
-                <button type="button" onClick={() => setOpenDay(openDay === d.date ? null : d.date)}
-                  aria-expanded={openDay === d.date}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2">
-                  <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
-                    targets && d.kcal <= targets.kcal ? "bg-success/15 text-success" : "bg-surface-2 text-muted"}`} aria-hidden>
-                    {openDay === d.date ? "▾" : "✓"}
-                  </span>
-                  <span className="flex-1">
-                    <span className="font-semibold">{fmtDay(d.date)}</span>
-                    {d.date === today && <span className="ml-2 text-[11px] text-muted">Today</span>}
-                  </span>
-                  <span className="text-[15px] font-bold tabular-nums text-accent">{Math.round(d.kcal).toLocaleString()}</span>
-                  <span className="text-muted">›</span>
-                </button>
-                <div className="mx-4 mb-2 h-1 overflow-hidden rounded-full bg-surface-2">
-                  <div className="h-full rounded-full bg-accent"
-                    style={{ width: `${targets ? Math.min(100, Math.round((d.kcal / targets.kcal) * 100)) : 0}%` }} />
-                </div>
-                {openDay === d.date && d.meals.map((m) => (
-                  <div key={m.id} className="flex items-center gap-3 border-t border-border py-2.5 pl-6 pr-4 text-[13px]">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-accent" aria-hidden>
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                        <path d="M4 12 A8 5 0 0 0 20 12 Z" /><path d="M9 8 C9 6 11 6 11 8 M14 8 C14 5 17 5 17 8" />
-                      </svg>
-                    </span>
-                    <span className="flex-1">{m.food_name} <span className="text-muted">· {m.grams}g</span></span>
-                    <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
-                  </div>
-                ))}
-              </li>
-            ))}
-            {days.length === 0 && <li className="px-4 py-3 text-muted">No meals in the last 7 days</li>}
-          </ul>
-        </section>
-
-        {/* ——— Weight lives at the bottom ——— */}
-        <h2 className="mt-2 text-[15px] font-semibold">Weight</h2>
-
         <section className="card-grad rounded-2xl border border-border p-4">
           <div className="mb-1 flex items-start justify-between">
             <div>
@@ -275,6 +228,50 @@ export default function DietPage() {
           newKcal={newKcal} suppressed={suppressed} onApply={apply} />
 
         <WeighInRowEntry todayWeight={todayRow?.weight_lb ?? null} lastWeight={last?.weight_lb ?? null} onSave={save} />
+
+        {/* Last 7 days — bottom, matching the approved render */}
+        <section className="flex flex-col gap-2">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-[15px] font-semibold">Last 7 days intake</h2>
+            <span className="text-[11px] text-muted">kcal</span>
+          </div>
+          <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border text-sm">
+            {days.map((d) => (
+              <li key={d.date}>
+                <button type="button" onClick={() => setOpenDay(openDay === d.date ? null : d.date)}
+                  aria-expanded={openDay === d.date}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2">
+                  <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
+                    targets && d.kcal <= targets.kcal ? "bg-success/15 text-success" : "bg-surface-2 text-muted"}`} aria-hidden>
+                    {openDay === d.date ? "▾" : "✓"}
+                  </span>
+                  <span className="flex-1">
+                    <span className="font-semibold">{fmtDay(d.date)}</span>
+                    {d.date === today && <span className="ml-2 text-[11px] text-muted">Today</span>}
+                  </span>
+                  <span className="text-[15px] font-bold tabular-nums text-accent">{Math.round(d.kcal).toLocaleString()}</span>
+                  <span className="text-muted">›</span>
+                </button>
+                <div className="mx-4 mb-2 h-1 overflow-hidden rounded-full bg-surface-2">
+                  <div className="h-full rounded-full bg-accent"
+                    style={{ width: `${targets ? Math.min(100, Math.round((d.kcal / targets.kcal) * 100)) : 0}%` }} />
+                </div>
+                {openDay === d.date && d.meals.map((m) => (
+                  <div key={m.id} className="flex items-center gap-3 border-t border-border py-2.5 pl-6 pr-4 text-[13px]">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-accent" aria-hidden>
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <path d="M4 12 A8 5 0 0 0 20 12 Z" /><path d="M9 8 C9 6 11 6 11 8 M14 8 C14 5 17 5 17 8" />
+                      </svg>
+                    </span>
+                    <span className="flex-1">{m.food_name} <span className="text-muted">· {m.grams}g</span></span>
+                    <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
+                  </div>
+                ))}
+              </li>
+            ))}
+            {days.length === 0 && <li className="px-4 py-3 text-muted">No meals in the last 7 days</li>}
+          </ul>
+        </section>
 
         <section className="card-grad rounded-2xl border border-border p-5">
           <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-muted">Recent weigh-ins</p>
