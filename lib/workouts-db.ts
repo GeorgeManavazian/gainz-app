@@ -79,6 +79,15 @@ export async function getActiveWorkout(): Promise<WorkoutRow | null> {
   }
 }
 
+export async function getTodayCompletedWorkout(): Promise<WorkoutRow | null> {
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const { data, error } = await supabase.from("workouts").select("*")
+    .not("ended_at", "is", null).gte("started_at", start.toISOString())
+    .order("started_at", { ascending: false }).limit(1).maybeSingle();
+  if (error) throw error;
+  return data ? toWorkout(data) : null;
+}
+
 export async function getWorkout(id: string): Promise<WorkoutRow | null> {
   const cached = readCache(id);
   if (cached) return cached;
