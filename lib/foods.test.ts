@@ -46,6 +46,8 @@ describe("curated food table integrity", () => {
         expect(r.kcal, `${f.name} dry should be denser`).toBeGreaterThan(c.kcal * 1.5);
       } else {
         // Meat/fish lose water when cooked: raw is less dense. Boiled veg can gain a little water, so allow 15%.
+        // Very fatty cuts (pork belly, bacon) render fat out, so raw can be denser — skip those.
+        if (r.fat > 30) continue;
         expect(r.kcal, `${f.name} raw denser than cooked?`).toBeLessThanOrEqual(c.kcal * 1.15);
       }
     }

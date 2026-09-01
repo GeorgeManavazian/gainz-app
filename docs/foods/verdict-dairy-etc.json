@@ -1,0 +1,576 @@
+{
+ "verdicts": [
+  {
+   "name": "Milk, whole",
+   "verdict": "PASS",
+   "notes": "FNDDS 61 kcal, matches expectation"
+  },
+  {
+   "name": "Milk, 2%",
+   "verdict": "PASS",
+   "notes": "50 kcal, matches"
+  },
+  {
+   "name": "Milk, 1%",
+   "verdict": "PASS",
+   "notes": "43 kcal, matches"
+  },
+  {
+   "name": "Milk, skim",
+   "verdict": "PASS",
+   "notes": "34 kcal, matches"
+  },
+  {
+   "name": "Almond milk, unsweetened",
+   "verdict": "PASS",
+   "notes": "15 kcal; label range 13-17"
+  },
+  {
+   "name": "Oat milk",
+   "verdict": "PASS",
+   "notes": "45 kcal; Oatly original label ~46/100 mL"
+  },
+  {
+   "name": "Fairlife 2% milk",
+   "verdict": "PASS",
+   "notes": "id 2757397 re-fetched OK; 41.7/5.42/2.5/1.04 matches 240 mL label (100 kcal / 13 P / 6 C / 2.5 F)"
+  },
+  {
+   "name": "Fairlife fat free milk",
+   "verdict": "PASS",
+   "notes": "id 2756934 re-fetched OK; matches label (80 kcal / 13 P / 6 C / 0 F)"
+  },
+  {
+   "name": "Fairlife whole milk",
+   "verdict": "PASS",
+   "notes": "id 2757704 re-fetched OK; matches label (150 kcal / 13 P / 6 C / 8 F)"
+  },
+  {
+   "name": "Greek yogurt, nonfat",
+   "verdict": "FIX",
+   "issues": [
+    "59 kcal / 10.3 P is correct and the item is plain nonfat.",
+    "alias 'oikos triple zero' routes a sweetened, flavored product (~10 P but ~9-10 g carbs/100 g, stevia-sweetened) onto a plain 3.6 g-carb item; drop it. 'chobani nonfat' is fine (Chobani plain 0% exists)."
+   ],
+   "fix": {
+    "aliases": [
+     "0% greek yogurt",
+     "chobani nonfat",
+     "fage 0%",
+     "fat free greek yogurt",
+     "greek yogurt",
+     "greek yogurt nonfat",
+     "nonfat greek yogurt",
+     "plain greek yogurt",
+     "greek yogurt 0%",
+     "greek"
+    ]
+   }
+  },
+  {
+   "name": "Greek yogurt, 2%",
+   "verdict": "PASS",
+   "notes": "FNDDS 67/10.2/3.6/1.36 vs SR 170903 73/9.95/3.94/1.92 and Fage 2% label ~71/10/2.9/2.1. 8% under on kcal, fat a little low, but plain and within tolerance"
+  },
+  {
+   "name": "Greek yogurt, whole milk",
+   "verdict": "PASS",
+   "notes": "94/8.78/4.75/4.39 vs expected ~97; plain, fine"
+  },
+  {
+   "name": "Greek yogurt, vanilla",
+   "verdict": "PASS",
+   "notes": "SR lowfat vanilla 95 kcal; correctly separated from plain rows. Placeholder for flavored \u2014 brand variance is large (Chobani vanilla ~ 90, Oikos vanilla ~ 90-105)"
+  },
+  {
+   "name": "Yogurt, plain",
+   "verdict": "PASS",
+   "notes": "FNDDS whole-milk plain 78 kcal. SR legacy says 61 but Foundation/FNDDS 2021+ and labels (Stonyfield whole plain 76, Dannon whole plain 73) support ~75-78; keep"
+  },
+  {
+   "name": "Yogurt, plain, low fat",
+   "verdict": "PASS",
+   "notes": "63 kcal, matches SR"
+  },
+  {
+   "name": "Cottage cheese, 2%",
+   "verdict": "FIX",
+   "issues": [
+    "fdcId 328841 returns 404 from USDA (retried) \u2014 the Foundation record has been retired, so the row is unverifiable and will break any live re-fetch.",
+    "Replacement: FNDDS 2705747 'Cheese, cottage, NFS' \u2014 FNDDS NFS cottage cheese is the 2% lowfat default and carries the same macros (82/11/4.31/2.3 vs old 84/11/4.31/2.3). Within the 72-80 kcal / 11-12 P expectation."
+   ],
+   "fix": {
+    "cooked": {
+     "fdcId": 2705747,
+     "description": "Cheese, cottage, NFS",
+     "kcal": 82,
+     "protein": 11,
+     "carbs": 4.31,
+     "fat": 2.3,
+     "usda_verified": true,
+     "dataType": "Survey (FNDDS)"
+    },
+    "notes": "FNDDS 'NFS' cottage cheese = 2% lowfat default; Foundation 2% record 328841 was retired from USDA."
+   }
+  },
+  {
+   "name": "Cottage cheese, 1%",
+   "verdict": "PASS",
+   "notes": "SR 72/12.4, matches expectation"
+  },
+  {
+   "name": "Cheddar cheese",
+   "verdict": "PASS",
+   "notes": "409/23.3/2.44/34 ~ SR 403; alias 'cheese' defaulting to cheddar is reasonable"
+  },
+  {
+   "name": "Mozzarella, part skim",
+   "verdict": "PASS",
+   "notes": "296/23.7 ~ SR low-moisture part-skim 302/26; name says part skim, matches"
+  },
+  {
+   "name": "American cheese",
+   "verdict": "PASS",
+   "notes": "FNDDS 340/16.8; between SR process American (375) and Kraft Singles label (286). Acceptable generic"
+  },
+  {
+   "name": "Parmesan cheese",
+   "verdict": "FIX",
+   "issues": [
+    "FNDDS 2705730 gives 412 kcal / 29.9 P / 8.36 C / 28.75 F \u2014 it inherits the Foundation 'grated' composite where carbs are by-difference and inflated. Real Parmesan is ~0-4 g carbs and 32-36 g protein (SR hard 392/35.75/3.22/25; branded Parmigiano Reggiano 393/32.1/0/28.6).",
+    "Protein 16% low and carbs ~2.6x high vs the SR hard record; name/aliases ('parmigiano reggiano') describe the hard cheese. Swap to SR Legacy 170848."
+   ],
+   "fix": {
+    "cooked": {
+     "fdcId": 170848,
+     "description": "Cheese, parmesan, hard",
+     "kcal": 392,
+     "protein": 35.75,
+     "carbs": 3.22,
+     "fat": 25,
+     "usda_verified": true,
+     "dataType": "SR Legacy"
+    }
+   }
+  },
+  {
+   "name": "Feta cheese",
+   "verdict": "FIX",
+   "issues": [
+    "FNDDS 2705714 protein 19.71 g/100 g is ~39% above SR 173420 (14.21) and above every retail label (Athenos/President 28 g = 4 g P -> ~14 g/100 g). Fat 19.08 vs 21.49 also low. kcal is close (273 vs 265) but P/F split is wrong.",
+    "Swap to SR Legacy 173420 'Cheese, feta' 265/14.21/3.88/21.49."
+   ],
+   "fix": {
+    "cooked": {
+     "fdcId": 173420,
+     "description": "Cheese, feta",
+     "kcal": 265,
+     "protein": 14.21,
+     "carbs": 3.88,
+     "fat": 21.49,
+     "usda_verified": true,
+     "dataType": "SR Legacy"
+    }
+   }
+  },
+  {
+   "name": "Cream cheese",
+   "verdict": "PASS",
+   "notes": "343 ~ SR 342; regular plain"
+  },
+  {
+   "name": "String cheese",
+   "verdict": "PASS",
+   "notes": "Branded 286/25/3.57/17.9 \u2014 consistent with a 28 g part-skim stick (80 kcal / 7 P). Fallback noted in row"
+  },
+  {
+   "name": "Butter",
+   "verdict": "PASS",
+   "notes": "SR salted 717, correct"
+  },
+  {
+   "name": "Whey protein powder",
+   "verdict": "PASS",
+   "notes": "PLACEHOLDER \u2014 SR 173180 352 kcal / 78 P / 6.25 C / 1.56 F is a reasonable generic whey concentrate/blend (ON Gold Standard 31 g scoop = 120 kcal / 24 P -> 387/77 per 100 g). Acceptable. Alias 'whey isolate' lands here too; isolates run ~90 P / 370 kcal, so it under-counts protein by ~13% \u2014 tolerable but note it"
+  },
+  {
+   "name": "Casein protein powder",
+   "verdict": "PASS",
+   "notes": "Branded unflavored micellar casein 367/80/0/0; typical casein labels 110-120 kcal / 24 P per 32 g scoop (~365/75). Fine"
+  },
+  {
+   "name": "Protein bar",
+   "verdict": "PASS",
+   "notes": "PLACEHOLDER \u2014 FNDDS 'High Protein Bar' 412/30.3/38.4/15.2 per 100 g. Real bars range 300-450 kcal, 25-35 P; Quest 60 g = 190 kcal / 21 P (317/35), Barebells 55 g = 200 / 20 (364/36). Keep but treat as rough; override with label"
+  },
+  {
+   "name": "Peanut butter",
+   "verdict": "PASS",
+   "notes": "FNDDS 598/22.2/22.3/51.4 vs SR ~588/22; labels 32 g = 190 kcal (594). Correct"
+  },
+  {
+   "name": "Skippy peanut butter",
+   "verdict": "PASS",
+   "notes": "Branded id 1759570 re-fetched OK (usda_verified true); 594/21.9/18.8/50 = 32 g label 190/7/6/16"
+  },
+  {
+   "name": "Almond butter",
+   "verdict": "PASS",
+   "notes": "641 vs SR 614 (4%); fine"
+  },
+  {
+   "name": "Almonds",
+   "verdict": "FIX",
+   "issues": [
+    "626 kcal (FNDDS unroasted) vs SR 579 / Foundation 620 \u2014 fine.",
+    "alias 'nuts' is a generic that should route to 'Mixed nuts', not almonds; move it."
+   ],
+   "fix": {
+    "aliases": [
+     "almond",
+     "almonds",
+     "raw almonds",
+     "whole almonds",
+     "roasted almonds"
+    ]
+   }
+  },
+  {
+   "name": "Walnuts",
+   "verdict": "PASS",
+   "notes": "SR 654, correct"
+  },
+  {
+   "name": "Cashews",
+   "verdict": "PASS",
+   "notes": "578 ~ SR roasted 574"
+  },
+  {
+   "name": "Peanuts",
+   "verdict": "PASS",
+   "notes": "599 ~ SR roasted salted 587"
+  },
+  {
+   "name": "Pistachios",
+   "verdict": "PASS",
+   "notes": "576 ~ SR roasted 569; kernel weight noted"
+  },
+  {
+   "name": "Mixed nuts",
+   "verdict": "FIX",
+   "issues": [
+    "612 kcal fine.",
+    "Add generic alias 'nuts' (moved from Almonds) so a bare 'nuts' search lands on the mixed item."
+   ],
+   "fix": {
+    "aliases": [
+     "mixed nut",
+     "mixed nuts",
+     "nut mix",
+     "nuts",
+     "planters mixed nuts"
+    ]
+   }
+  },
+  {
+   "name": "Olive oil",
+   "verdict": "PASS",
+   "notes": "FNDDS 900 (SR 884, 2% diff \u2014 FNDDS rounds fat energy at 9 kcal/g)"
+  },
+  {
+   "name": "Avocado oil",
+   "verdict": "PASS",
+   "notes": "SR 884, correct"
+  },
+  {
+   "name": "Coconut oil",
+   "verdict": "PASS",
+   "notes": "895, correct"
+  },
+  {
+   "name": "Mayonnaise",
+   "verdict": "PASS",
+   "notes": "680 = SR regular mayo"
+  },
+  {
+   "name": "Mayonnaise, light",
+   "verdict": "PASS",
+   "notes": "238 ~ SR light 231"
+  },
+  {
+   "name": "Ketchup",
+   "verdict": "PASS",
+   "notes": "109 ~ SR 101"
+  },
+  {
+   "name": "Mustard",
+   "verdict": "PASS",
+   "notes": "69 vs SR yellow 60 (15%); FNDDS blends dijon in. Acceptable for a low-kcal condiment"
+  },
+  {
+   "name": "BBQ sauce",
+   "verdict": "PASS",
+   "notes": "172 ~ SR 172"
+  },
+  {
+   "name": "Honey",
+   "verdict": "PASS",
+   "notes": "304, correct"
+  },
+  {
+   "name": "Maple syrup",
+   "verdict": "PASS",
+   "notes": "SR 260, correct"
+  },
+  {
+   "name": "Jam",
+   "verdict": "PASS",
+   "notes": "278 ~ SR 278"
+  },
+  {
+   "name": "Sugar",
+   "verdict": "PASS",
+   "notes": "401 vs Atwater 387 (3.6%); FNDDS value, fine"
+  },
+  {
+   "name": "Sour cream",
+   "verdict": "PASS",
+   "notes": "196 ~ SR 198"
+  },
+  {
+   "name": "Ranch dressing",
+   "verdict": "PASS",
+   "notes": "430 ~ SR ranch 430"
+  },
+  {
+   "name": "Soy sauce",
+   "verdict": "PASS",
+   "notes": "53 ~ SR 53"
+  },
+  {
+   "name": "Hot sauce",
+   "verdict": "PASS",
+   "notes": "12 kcal vinegar-based; correct"
+  },
+  {
+   "name": "Sriracha",
+   "verdict": "PASS",
+   "notes": "SR 93; correctly separated from hot sauce"
+  },
+  {
+   "name": "Salsa",
+   "verdict": "PASS",
+   "notes": "34 kcal NFS; 'pico de gallo' alias fine (~25-35 kcal)"
+  },
+  {
+   "name": "Dark chocolate",
+   "verdict": "PASS",
+   "notes": "SR 45-59% 546; note about 70%+ bars already in row. 'chocolate' alias -> dark is fine (milk chocolate 535)"
+  },
+  {
+   "name": "Ice cream, vanilla",
+   "verdict": "PASS",
+   "notes": "207 ~ SR 207"
+  },
+  {
+   "name": "Heavy cream",
+   "verdict": "PASS",
+   "notes": "343 ~ SR 340"
+  },
+  {
+   "name": "Half and half",
+   "verdict": "PASS",
+   "notes": "131 ~ SR 131; 'creamer' alias tolerable (Coffee-mate liquid ~ 130-160 kcal)"
+  }
+ ],
+ "add": [
+  {
+   "name": "Cottage cheese, 4%",
+   "aliases": [
+    "4% cottage cheese",
+    "cottage cheese 4%",
+    "cottage cheese whole milk",
+    "full fat cottage cheese",
+    "whole milk cottage cheese",
+    "good culture whole milk",
+    "daisy cottage cheese"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2705748,
+    "description": "Cheese, cottage, creamed, large or small curd",
+    "kcal": 103,
+    "protein": 11.6,
+    "carbs": 4.6,
+    "fat": 4.22,
+    "usda_verified": true,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null,
+   "notes": "Generic 4% (creamed) cottage cheese. Good Culture 4% label = 107/12.7/3.33/4.67 (branded 2757361) if a brand row is ever wanted."
+  },
+  {
+   "name": "Swiss cheese",
+   "aliases": [
+    "swiss",
+    "swiss cheese",
+    "baby swiss",
+    "emmental",
+    "emmentaler",
+    "sliced swiss"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2705735,
+    "description": "Cheese, Swiss",
+    "kcal": 393,
+    "protein": 27,
+    "carbs": 1.44,
+    "fat": 31,
+    "usda_verified": true,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null
+  },
+  {
+   "name": "Provolone cheese",
+   "aliases": [
+    "provolone",
+    "provolone cheese",
+    "sliced provolone"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2705733,
+    "description": "Cheese, Provolone",
+    "kcal": 357,
+    "protein": 23.4,
+    "carbs": 2.45,
+    "fat": 28.1,
+    "usda_verified": true,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null
+  },
+  {
+   "name": "Chia seeds",
+   "aliases": [
+    "chia",
+    "chia seed",
+    "chia seeds",
+    "seeds"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2707590,
+    "description": "Chia seeds",
+    "kcal": 486,
+    "protein": 16.5,
+    "carbs": 42.1,
+    "fat": 30.7,
+    "usda_verified": true,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null,
+   "notes": "Dry seed weight; ~34 g of the 42 g carbs is fiber."
+  },
+  {
+   "name": "Pecans",
+   "aliases": [
+    "pecan",
+    "pecan halves",
+    "pecans",
+    "raw pecans"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 170182,
+    "description": "Nuts, pecans",
+    "kcal": 691,
+    "protein": 9.17,
+    "carbs": 13.86,
+    "fat": 71.97,
+    "usda_verified": true,
+    "dataType": "SR Legacy"
+   },
+   "raw": null,
+   "notes": "SR raw pecans (691) chosen over FNDDS (750) because retail labels are 1 oz = 190-200 kcal (~690-710/100 g)."
+  },
+  {
+   "name": "Canola oil",
+   "aliases": [
+    "canola",
+    "canola oil",
+    "cooking oil",
+    "vegetable oil",
+    "veg oil"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2710188,
+    "description": "Canola oil",
+    "kcal": 900,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 100,
+    "usda_verified": true,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null,
+   "notes": "All liquid cooking oils are ~884-900 kcal / 100 g fat; this row also catches 'vegetable oil'."
+  },
+  {
+   "name": "Soy milk, unsweetened",
+   "aliases": [
+    "soy milk",
+    "soy milk unsweetened",
+    "soymilk",
+    "unsweetened soy milk",
+    "silk soy milk"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2705405,
+    "description": "Soy milk, unsweetened",
+    "kcal": 38,
+    "protein": 3.55,
+    "carbs": 1.29,
+    "fat": 2.12,
+    "usda_verified": true,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null,
+   "notes": "Unsweetened, to match the almond-milk row. Sweetened/original soy milk is FNDDS 2705404 (53/3.41/5.22/2.05)."
+  },
+  {
+   "name": "Nutella",
+   "aliases": [
+    "chocolate hazelnut spread",
+    "hazelnut spread",
+    "nutella"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2710289,
+    "description": "Chocolate hazelnut spread",
+    "kcal": 539,
+    "protein": 5.41,
+    "carbs": 62.4,
+    "fat": 29.7,
+    "usda_verified": true,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null,
+   "notes": "FNDDS generic; Nutella label 37 g = 200 kcal / 2 P / 23 C / 12 F -> 541/5.4/62/32, essentially identical."
+  }
+ ],
+ "summary": "Checked all 60 dairy/protein-supplement/nut/fat/condiment/sweetener rows on A, C, D (no raw/cooked pairs). Milks (61/50/43/34), Greek yogurts (59/67/94, all plain), honey 304, peanut butter 598, whey 352/78, Fairlife x3 and Skippy ids all resolve and match labels. Wrong: Cottage cheese 2% id 328841 is a 404 (retired Foundation record) -> FNDDS 2705747 'Cheese, cottage, NFS' 82/11/4.31/2.3; Feta FNDDS protein 19.7 is ~39% above SR/labels (14.2) -> SR 173420; Parmesan FNDDS carries inflated by-difference carbs (8.4) and low protein (29.9) -> SR 170848 hard (392/35.75/3.22/25). Alias fixes: drop 'oikos triple zero' from plain nonfat Greek (it is flavored/sweetened); move 'nuts' from Almonds to Mixed nuts. Placeholders kept and flagged: Whey protein powder (SR generic; 'whey isolate' alias under-counts protein ~13%), Protein bar (FNDDS high-protein bar, real bars vary 300-450 kcal). Unsure: Greek 2% FNDDS 67 kcal vs SR 73 (both defensible, kept); whole-milk plain yogurt 78 vs SR-legacy 61 (kept FNDDS, matches labels). Added 8 verified rows: Cottage cheese 4%, Swiss, Provolone, Chia seeds, Pecans, Canola oil, Soy milk unsweetened, Nutella. 48 USDA requests used."
+}

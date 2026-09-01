@@ -161,6 +161,9 @@ export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id")?.trim();
   if (id) return portions(id);
 
+  const fdc = req.nextUrl.searchParams.get("fdc")?.trim();
+  if (fdc) return detail(fdc);
+
   const pair = req.nextUrl.searchParams.get("pair")?.trim();
   const want = req.nextUrl.searchParams.get("want");
   if (pair && (want === "raw" || want === "cooked")) return counterpart(pair, want);
@@ -230,6 +233,27 @@ async function counterpart(name: string, want: "raw" | "cooked") {
     console.error("food-search pair failed", name, want, e instanceof Error ? e.message : e);
     return NextResponse.json({ item: null }, { status: 502 });
   }
+}
+
+/** Raw USDA record for one id: description, data type, per-100 g macros. Used to verify the curated table. */
+async function detail(id: string) {
+  const url = new URL(`https://api.nal.usda.gov/fdc/v1/food/${encodeURIComponent(id)}`);
+  url.searchParams.set("api_key", process.env.USDA_API_KEY!);
+  const res = await fetch(url, { next: { revalidate: 86400 } });
+  if (!res.ok) return NextResponse.json({ error: res.status }, { status: 502 });
+  const data = await res.json();
+  type N = { nutrient?: { id?: number; number?: string }; amount?: number; nutrientId?: number; value?: number };
+  const get = (nid: number) => {
+    const n = ((data.foodNutrients ?? []) as N[]).find((x) => x.nutrient?.id === nid || x.nutrientId === nid);
+    return n?.amount ?? n?.value ?? 0;
+  };
+  // Some Foundation/SR records report energy under 1062 (kJ) or 2047/2048; 1008 is kcal.
+  let kcal = get(1008);
+  if (!kcal) kcal = get(2047) || get(2048);
+  return NextResponse.json({
+    fdcId: data.fdcId, description: data.description, dataType: data.dataType,
+    per100g: { kcal, protein: get(1003), carbs: get(1005), fat: get(1004) },
+  });
 }
 
 /** Per-food portions (e.g. "1 cup, chopped" → 140 g) from the FDC detail endpoint. */

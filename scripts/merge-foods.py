@@ -36,3 +36,46 @@ for cat in ORDER:
         out.append(r)
 print(len(out),"entries")
 json.dump(out,open(os.path.expanduser("~/code/gainz-app/lib/foods.data.json"),"w"),indent=1,ensure_ascii=False)
+
+# ---- Apply independent-verifier verdicts (verdict-<cat>.json) on top of the merged table ----
+import glob as _glob
+verdict_files=sorted(_glob.glob(f"{D}/verdict-*.json"))
+if verdict_files:
+    byname={r["name"].lower():r for r in out}
+    removed=fixed=added=0
+    for vf in verdict_files:
+        v=json.load(open(vf))
+        for row in v.get("verdicts",[]):
+            r=byname.get(row["name"].lower())
+            if not r: print("VERDICT FOR UNKNOWN",row["name"],os.path.basename(vf)); continue
+            if row["verdict"]=="REMOVE":
+                out.remove(r); byname.pop(row["name"].lower()); removed+=1
+            elif row["verdict"]=="FIX":
+                fx=row.get("fix",{})
+                for k,val in fx.items():
+                    if k in ("cooked","raw") and val is not None:
+                        val={kk:val[kk] for kk in ("fdcId","description","kcal","protein","carbs","fat")}
+                    if k=="aliases": val=sorted(set(a.lower().strip() for a in val))
+                    if k=="name":
+                        byname.pop(r["name"].lower()); byname[val.lower()]=r
+                    r[k]=val
+                if not r.get("raw") or not r.get("cooked"):
+                    r.pop("rawLabel",None)
+                    if r.get("default")=="raw" and not r.get("raw"): r.pop("default",None)
+                fixed+=1
+        for r in v.get("add",[]):
+            r={k:v_ for k,v_ in r.items() if k in ("name","aliases","default","rawLabel","cooked","raw","notes")}
+            if r["name"].lower() in byname: print("ADD DUP",r["name"]); continue
+            r["aliases"]=sorted(set(a.lower().strip() for a in r["aliases"]))
+            for h in ("cooked","raw"):
+                if r.get(h): r[h]={k:r[h][k] for k in ("fdcId","description","kcal","protein","carbs","fat")}
+            out.append(r); byname[r["name"].lower()]=r; added+=1
+    # Post-verdict curation
+    for r in out:
+        k=r["name"].lower()
+        if k=="rotisserie chicken breast" and r.get("raw") and r["raw"]["fdcId"]==171077:
+            r["raw"]=None; r.pop("rawLabel",None); r.pop("default",None)   # bought cooked; raw id belongs to Chicken breast
+        if k=="ground beef, 90/10":
+            r["aliases"]=sorted(set(r["aliases"])|{"ground beef","hamburger","hamburger meat","lean ground beef"})  # generic "ground beef" lands on the lean default
+    print(f"verdicts applied: {removed} removed, {fixed} fixed, {added} added → {len(out)} entries")
+    json.dump(out,open(os.path.expanduser("~/code/gainz-app/lib/foods.data.json"),"w"),indent=1,ensure_ascii=False)

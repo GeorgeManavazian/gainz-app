@@ -1,0 +1,314 @@
+{
+ "verdicts": [
+  {
+   "name": "Chicken breast",
+   "verdict": "FIX",
+   "issues": [
+    "Cooked half is acceptable (FNDDS baked/broiled/roasted 161/30.2/3.52) but not the tightest match: SR 171534 'Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, grilled' (151 kcal/30.54 P/3.17 F) is the direct cooked counterpart of the existing raw half 171077 (same SR item family, same skinless boneless breast), is plain (no added fat) and is grilled, which matches how the user actually cooks it. Swap for exact pair sameness.",
+    "Do NOT use FNDDS 'Chicken breast, grilled without sauce, skin not eaten' (2705968, 176/29.6/5.45): its numbers are identical to FNDDS 'Chicken breast, baked, coated, skin / coating not eaten' (2705981), i.e. the FNDDS grilled recipe carries added fat; it is not plain skinless breast.",
+    "Missing obvious aliases: 'skinless chicken breast', 'boneless skinless chicken breast', 'chicken breast grilled'."
+   ],
+   "fix": {
+    "cooked": {
+     "fdcId": 171534,
+     "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, grilled",
+     "kcal": 151,
+     "protein": 30.54,
+     "carbs": 0,
+     "fat": 3.17,
+     "dataType": "SR Legacy"
+    },
+    "aliases": [
+     "baked chicken",
+     "boneless skinless chicken breast",
+     "chicken",
+     "chicken breast",
+     "chicken breast grilled",
+     "chicken breasts",
+     "chicken tenderloin",
+     "chicken tenderloins",
+     "chicken tenders plain",
+     "grilled chicken",
+     "grilled chicken breast",
+     "grilled chicken tenders",
+     "roasted chicken breast",
+     "skinless chicken breast",
+     "tenderloins"
+    ]
+   }
+  },
+  {
+   "name": "Chicken thigh, skinless",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Chicken drumstick",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Chicken wing",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Chicken leg (drumstick + thigh)",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Rotisserie chicken, meat only",
+   "verdict": "PASS",
+   "issues": [
+    "Pairing is the best USDA offers: FNDDS rotisserie NS-as-to-part skin not eaten (164/26.8/6.36) vs SR whole broiler meat only raw (119/21.4/3.08). Same food class (whole bird, meat only). Rotisserie birds are brined so a true raw would be a few percent lower in kcal, but no USDA raw exists for that; nobody weighs rotisserie chicken raw anyway. Home 'roast chicken' skin not eaten (FNDDS 2705934, 165/27.3/5.32) is numerically the same, so the 'roast chicken'/'whole chicken' aliases are safe."
+   ]
+  },
+  {
+   "name": "Ground chicken",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Chicken tenders, breaded",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Chicken nuggets",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Chicken sausage",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Chicken liver",
+   "verdict": "FIX",
+   "issues": [
+    "Alias 'liver' hijacks any liver search (beef liver etc.). Keep the entry, drop the bare alias."
+   ],
+   "fix": {
+    "aliases": [
+     "chicken liver",
+     "chicken livers"
+    ]
+   }
+  },
+  {
+   "name": "Turkey breast, roasted",
+   "verdict": "PASS",
+   "issues": [
+    "Confirmed plain: SR 'Turkey, retail parts, breast, meat only, cooked, roasted' (136/29.51/1.97), not deli. Raw is the matching SR retail-parts breast. Cooked fat (1.97) is marginally below raw fat (2.33) which is an SR sampling artefact, well within tolerance."
+   ]
+  },
+  {
+   "name": "Ground turkey, 93/7",
+   "verdict": "FIX",
+   "issues": [
+    "Cooked fdcId 746785 returns 404 (usda_verified false). The correct SR record is 172851 'Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles' 213 kcal/27.1 P/0 C/11.6 F (the stored 220 kcal was wrong). Raw 172850 is the same 93% lean SR item, so lean % matches after the fix."
+   ],
+   "fix": {
+    "cooked": {
+     "fdcId": 172851,
+     "description": "Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles",
+     "kcal": 213,
+     "protein": 27.1,
+     "carbs": 0,
+     "fat": 11.6,
+     "dataType": "SR Legacy"
+    }
+   }
+  },
+  {
+   "name": "Ground turkey, 85/15",
+   "verdict": "PASS",
+   "issues": [
+    "Both halves are SR 85% lean / 15% fat (174494 crumbles, 174493 raw). Same lean %."
+   ]
+  },
+  {
+   "name": "Deli turkey breast",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Turkey bacon",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Turkey sausage",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Duck breast, skin-on",
+   "verdict": "PASS",
+   "issues": [
+    "Raw half still not found: searched 'duck breast raw', 'duck white pekin breast', 'duckling breast meat and skin raw' and probed 4 neighbouring SR ids; the White Pekin breast meat-and-skin raw record does not surface through this endpoint. Leave raw null. Cooked SR roasted White Pekin breast meat and skin (202/24.5/10.8) is the right item; 'duck' alias landing on skin-on breast is what most people mean."
+   ]
+  },
+  {
+   "name": "Duck, skinless",
+   "verdict": "PASS",
+   "issues": [
+    "Cooked FNDDS 'Duck, roasted, skin not eaten' (200/23.4/11.15) matches SR 172411 'Duck, domesticated, meat only, cooked, roasted' (201/23.5/11.2) exactly, and the raw half is the SR partner of that. Fat roughly doubling raw to cooked is real for duck (skin fat renders into the meat)."
+   ]
+  }
+ ],
+ "add": [
+  {
+   "name": "Chicken thigh, skin-on",
+   "aliases": [
+    "bone in chicken thigh",
+    "bone-in chicken thigh",
+    "chicken thigh skin on",
+    "chicken thigh with skin",
+    "skin on chicken thigh",
+    "skin-on chicken thigh",
+    "skin-on thigh"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2706029,
+    "description": "Chicken thigh, baked, broiled, or roasted, skin eaten, from raw",
+    "kcal": 231,
+    "protein": 23.1,
+    "carbs": 0,
+    "fat": 14.6,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": {
+    "fdcId": 172385,
+    "description": "Chicken, broilers or fryers, thigh, meat and skin, raw",
+    "kcal": 221,
+    "protein": 16.52,
+    "carbs": 0.25,
+    "fat": 16.61,
+    "dataType": "SR Legacy"
+   },
+   "notes": "Both halves meat AND skin. Cooked kcal only slightly above raw because skin fat renders off during roasting."
+  },
+  {
+   "name": "Chicken breast, skin-on",
+   "aliases": [
+    "chicken breast skin on",
+    "chicken breast with skin",
+    "skin on chicken breast",
+    "skin-on chicken breast",
+    "skin-on breast",
+    "split chicken breast"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2705955,
+    "description": "Chicken breast, baked, broiled, or roasted, skin eaten, from raw",
+    "kcal": 192,
+    "protein": 26.2,
+    "carbs": 0,
+    "fat": 8.8,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": {
+    "fdcId": 171474,
+    "description": "Chicken, broilers or fryers, breast, meat and skin, raw",
+    "kcal": 172,
+    "protein": 20.85,
+    "carbs": 0,
+    "fat": 9.25,
+    "dataType": "SR Legacy"
+   },
+   "notes": "Both halves meat AND skin."
+  },
+  {
+   "name": "Ground turkey, 99/1 (extra lean)",
+   "aliases": [
+    "99% ground turkey",
+    "99/1 turkey",
+    "extra lean ground turkey",
+    "fat free ground turkey",
+    "ground turkey 99",
+    "ground turkey 99/1",
+    "ground turkey breast",
+    "lean ground turkey breast"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 172848,
+    "description": "Turkey, ground, fat free, pan-broiled crumbles",
+    "kcal": 151,
+    "protein": 31.69,
+    "carbs": 0,
+    "fat": 2.71,
+    "dataType": "SR Legacy"
+   },
+   "raw": {
+    "fdcId": 172847,
+    "description": "Turkey, ground, fat free, raw",
+    "kcal": 112,
+    "protein": 23.57,
+    "carbs": 0,
+    "fat": 1.95,
+    "dataType": "SR Legacy"
+   },
+   "notes": "USDA labels 99% lean retail ground turkey breast as 'fat free'. Both halves the same SR item. Very common cut-diet protein."
+  },
+  {
+   "name": "Turkey thigh",
+   "aliases": [
+    "dark meat turkey",
+    "turkey dark meat",
+    "turkey thigh",
+    "turkey thigh skinless",
+    "turkey thighs"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2706126,
+    "description": "Turkey, thigh, cooked, skin not eaten",
+    "kcal": 161,
+    "protein": 26.9,
+    "carbs": 0,
+    "fat": 5.98,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": {
+    "fdcId": 174518,
+    "description": "Turkey, retail parts, thigh, meat only, raw",
+    "kcal": 116,
+    "protein": 20.6,
+    "carbs": 0,
+    "fat": 3.69,
+    "dataType": "SR Legacy"
+   },
+   "notes": "Skin not eaten both halves."
+  },
+  {
+   "name": "Rotisserie chicken breast",
+   "aliases": [
+    "costco chicken breast",
+    "rotisserie breast",
+    "rotisserie chicken breast",
+    "rotisserie chicken breast meat"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2705964,
+    "description": "Chicken breast, rotisserie, skin not eaten",
+    "kcal": 144,
+    "protein": 28,
+    "carbs": 0,
+    "fat": 3.57,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": {
+    "fdcId": 171077,
+    "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+    "kcal": 120,
+    "protein": 22.5,
+    "carbs": 0,
+    "fat": 2.62,
+    "dataType": "SR Legacy"
+   },
+   "notes": "Breast pulled off a rotisserie bird, skin not eaten. Lower kcal than 'Rotisserie chicken, meat only' (whole-bird average) because it is white meat only. Raw is the same skinless breast raw record used by 'Chicken breast'."
+  }
+ ],
+ "summary": "Checked all 19 POULTRY entries on name->item, pair sameness, numbers, aliases and default; 46 USDA requests used. Wrong: Ground turkey 93/7 cooked id 746785 is a 404 -> replace with SR 172851 (213 kcal, not 220). Chicken liver alias 'liver' hijacks -> drop it. Chicken breast: keep away from FNDDS 'grilled without sauce' (its numbers equal the 'baked, coated' recipe, so it carries added fat); the current baked/broiled/roasted item is fine, but SR 171534 skinless boneless breast cooked grilled (151/30.5/3.2) is the exact cooked partner of the existing raw 171077 and matches grilling, so I recommend swapping plus adding 'skinless chicken breast' aliases. Rotisserie pairing (brined FNDDS vs SR whole broiler meat only raw) is the best USDA offers and passes; ground turkey 85/15 halves are both 85% lean; turkey breast cooked is plain SR roasted retail-parts breast, not deli. Duck breast skin-on raw still not findable through this endpoint after 3 searches and id probing; leave null. Added 5 missing foods, all ids confirmed via ?fdc=: chicken thigh skin-on, chicken breast skin-on, ground turkey 99/1 (USDA 'fat free'), turkey thigh, rotisserie chicken breast."
+}

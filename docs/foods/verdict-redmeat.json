@@ -1,0 +1,318 @@
+{
+  "verdicts": [
+    { "name": "Ground beef, 80/20", "verdict": "PASS" },
+    {
+      "name": "Ground beef, 85/15",
+      "verdict": "FIX",
+      "issues": [
+        "raw null: SR Legacy 171796 'Beef, ground, 85% lean meat / 15% fat, raw (Includes foods for USDA's Food Distribution Program)' exists (215 kcal / 18.59 P / 0 C / 15 F) - the '(Includes foods for...)' suffix is just USDA's FDP tag, it is the generic 85/15 raw item",
+        "rawLabel missing (every other paired entry carries rawLabel: 'Raw')"
+      ],
+      "fix": {
+        "rawLabel": "Raw",
+        "raw": {
+          "fdcId": 171796,
+          "description": "Beef, ground, 85% lean meat / 15% fat, raw (Includes foods for USDA's Food Distribution Program)",
+          "kcal": 215,
+          "protein": 18.59,
+          "carbs": 0,
+          "fat": 15,
+          "usda_verified": true,
+          "dataType": "SR Legacy"
+        }
+      }
+    },
+    { "name": "Ground beef, 90/10", "verdict": "PASS" },
+    { "name": "Ground beef, 93/7", "verdict": "PASS" },
+    {
+      "name": "Sirloin steak",
+      "verdict": "FIX",
+      "issues": [
+        "alias 'beef' should not land on lean-only top sirloin: someone typing 'beef' most likely means ground beef or a generic beef; routing it to a 188 kcal trimmed steak is arbitrary and hijacks the generic term. Keep 'beef' generic (no curated alias). 'steak', 'steaks' and 'beef steak' -> sirloin are sensible: sirloin is the most generic plain steak.",
+        "pair check: both halves top sirloin steak, separable lean only, choice; trim differs (cooked 0\", raw 1/8\") - acceptable per brief. Neither a 0\" raw nor a 1/8\" broiled top sirloin steak surfaced in 2 further searches (only 'top sirloin petite roast/filet' 0\" raw 173408 and 'top sirloin filet' 0\" grilled 174694, which are a different sub-cut)."
+      ],
+      "fix": {
+        "aliases": [
+          "beef steak",
+          "grilled steak",
+          "sirloin",
+          "sirloin steak",
+          "steak",
+          "steaks",
+          "top sirloin",
+          "top sirloin steak"
+        ]
+      }
+    },
+    { "name": "Ribeye steak", "verdict": "PASS" },
+    { "name": "NY strip steak", "verdict": "PASS" },
+    {
+      "name": "Filet mignon",
+      "verdict": "FIX",
+      "issues": [
+        "alias 'fillet' is a fish word for most people (salmon fillet, cod fillet); routing it to beef tenderloin is a wrong-food risk. Drop it. 'tenderloin' alone is ambiguous with pork tenderloin but beef is the more common unqualified meaning - kept.",
+        "pair itself is exact: tenderloin steak, lean only, 1/8\" trim, choice, both halves."
+      ],
+      "fix": {
+        "aliases": [
+          "beef tenderloin",
+          "filet",
+          "filet mignon",
+          "tenderloin",
+          "tenderloin steak"
+        ]
+      }
+    },
+    { "name": "Flank steak", "verdict": "PASS" },
+    { "name": "Skirt steak", "verdict": "PASS" },
+    { "name": "Chuck roast", "verdict": "PASS" },
+    {
+      "name": "Brisket",
+      "verdict": "FIX",
+      "issues": [
+        "grade mismatch is avoidable: SR Legacy 168657 'Beef, brisket, flat half, boneless, separable lean only, trimmed to 0\" fat, choice, raw' exists (137 kcal / 21.28 P / 0 C / 5.75 F) and matches the choice cooked half exactly (same cut, lean only, 0\" trim, same grade). Current select raw (124 kcal) understates fat for a choice brisket."
+      ],
+      "fix": {
+        "raw": {
+          "fdcId": 168657,
+          "description": "Beef, brisket, flat half, boneless, separable lean only, trimmed to 0\" fat, choice, raw",
+          "kcal": 137,
+          "protein": 21.28,
+          "carbs": 0,
+          "fat": 5.75,
+          "usda_verified": true,
+          "dataType": "SR Legacy"
+        }
+      }
+    },
+    { "name": "Beef jerky", "verdict": "PASS" },
+    { "name": "Roast beef, deli", "verdict": "PASS" },
+    { "name": "Pork chop", "verdict": "PASS" },
+    { "name": "Pork tenderloin", "verdict": "PASS" },
+    { "name": "Pork loin", "verdict": "PASS" },
+    { "name": "Ground pork", "verdict": "PASS" },
+    { "name": "Pork ribs", "verdict": "PASS" },
+    { "name": "Bacon", "verdict": "PASS" },
+    {
+      "name": "Ham, deli",
+      "verdict": "FIX",
+      "issues": [
+        "cooked fdcId 332397 returns 404 from USDA (Foundation entry withdrawn) - numbers cannot be verified. Replace with FNDDS 2705878 'Ham' (117 kcal / 19.04 P / 1.58 C / 3.87 F), the generic as-eaten ham; its macros are within a few percent of the dead entry. SR 173864 'Ham, sliced, regular (approximately 11% fat)' (164 kcal) is the fattier alternative and does not represent modern deli ham."
+      ],
+      "fix": {
+        "cooked": {
+          "fdcId": 2705878,
+          "description": "Ham",
+          "kcal": 117,
+          "protein": 19.04,
+          "carbs": 1.58,
+          "fat": 3.87,
+          "usda_verified": true,
+          "dataType": "Survey (FNDDS)"
+        }
+      }
+    },
+    { "name": "Breakfast sausage", "verdict": "PASS" },
+    {
+      "name": "Italian sausage",
+      "verdict": "FIX",
+      "issues": [
+        "cooked fdcId 746780 returns 404 from USDA - unverifiable. FNDDS 2706189 'Italian sausage' (317 kcal / 18.2 P / 2.15 C / 26.2 F) carries the same P/C/F to the decimal (it is FNDDS's copy of the same cooked mild pork Italian sausage); use it. Raw half 171631 is fine."
+      ],
+      "fix": {
+        "cooked": {
+          "fdcId": 2706189,
+          "description": "Italian sausage",
+          "kcal": 317,
+          "protein": 18.2,
+          "carbs": 2.15,
+          "fat": 26.2,
+          "usda_verified": true,
+          "dataType": "Survey (FNDDS)"
+        }
+      }
+    },
+    { "name": "Hot dog", "verdict": "PASS" },
+    { "name": "Pepperoni", "verdict": "PASS" },
+    { "name": "Salami", "verdict": "PASS" },
+    { "name": "Lamb chop", "verdict": "PASS" },
+    { "name": "Ground lamb", "verdict": "PASS" },
+    { "name": "Ground bison", "verdict": "PASS" }
+  ],
+  "add": [
+    {
+      "name": "Top round steak",
+      "aliases": ["top round", "top round steak", "london broil", "round steak", "beef round"],
+      "default": "cooked",
+      "rawLabel": "Raw",
+      "cooked": {
+        "fdcId": 169471,
+        "description": "Beef, round, top round steak, boneless, separable lean only, trimmed to 0\" fat, choice, cooked, grilled",
+        "kcal": 166,
+        "protein": 30.24,
+        "carbs": 0,
+        "fat": 4.11,
+        "usda_verified": true,
+        "dataType": "SR Legacy"
+      },
+      "raw": {
+        "fdcId": 171758,
+        "description": "Beef, round, top round steak, boneless, separable lean only, trimmed to 0\" fat, choice, raw",
+        "kcal": 124,
+        "protein": 23.59,
+        "carbs": 0,
+        "fat": 3.26,
+        "usda_verified": true,
+        "dataType": "SR Legacy"
+      },
+      "notes": "Exact pair: top round steak, boneless, lean only, 0\" trim, choice. The lean cutter's steak; nothing in the table currently covers round."
+    },
+    {
+      "name": "Eye of round roast",
+      "aliases": ["eye of round", "eye round", "eye of round roast", "eye round roast"],
+      "default": "cooked",
+      "rawLabel": "Raw",
+      "cooked": {
+        "fdcId": 170635,
+        "description": "Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, select, cooked, roasted",
+        "kcal": 157,
+        "protein": 29.52,
+        "carbs": 0,
+        "fat": 3.43,
+        "usda_verified": true,
+        "dataType": "SR Legacy"
+      },
+      "raw": null,
+      "notes": "Cooked-only. The matching raw (746760 'Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw', 122 kcal / 23.4 P / 2.48 F) appears in search results but ?fdc=746760 returned 404 twice, so it could not be confirmed byte-for-byte and is left out."
+    },
+    {
+      "name": "Pork shoulder",
+      "aliases": ["pork shoulder", "boston butt", "pork butt", "pulled pork", "carnitas", "pork shoulder roast"],
+      "default": "cooked",
+      "rawLabel": "Raw",
+      "cooked": {
+        "fdcId": 168261,
+        "description": "Pork, fresh, shoulder, (Boston butt), blade (steaks), separable lean only, cooked, braised",
+        "kcal": 233,
+        "protein": 26.57,
+        "carbs": 0,
+        "fat": 13.2,
+        "usda_verified": true,
+        "dataType": "SR Legacy"
+      },
+      "raw": {
+        "fdcId": 168260,
+        "description": "Pork, fresh, shoulder, (Boston butt), blade (steaks), separable lean only, raw",
+        "kcal": 132,
+        "protein": 18.73,
+        "carbs": 0,
+        "fat": 5.71,
+        "usda_verified": true,
+        "dataType": "SR Legacy"
+      },
+      "notes": "Boston butt, lean only, exact raw/braised pair - braised is the right cooking method for pulled pork. The 'boston (roasts), lean only, roasted' cooked entry (167852, 232 kcal) exists but its raw twin never surfaced, so the steaks pair was used."
+    },
+    {
+      "name": "Canadian bacon",
+      "aliases": ["canadian bacon", "back bacon", "canadian style bacon"],
+      "default": "cooked",
+      "rawLabel": "Raw",
+      "cooked": {
+        "fdcId": 168383,
+        "description": "Canadian bacon, cooked, pan-fried",
+        "kcal": 146,
+        "protein": 28.31,
+        "carbs": 1.8,
+        "fat": 2.78,
+        "usda_verified": true,
+        "dataType": "SR Legacy"
+      },
+      "raw": {
+        "fdcId": 167869,
+        "description": "Canadian bacon, unprepared",
+        "kcal": 110,
+        "protein": 20.31,
+        "carbs": 1.34,
+        "fat": 2.62,
+        "usda_verified": true,
+        "dataType": "SR Legacy"
+      },
+      "notes": "Exact SR pair. FNDDS 2705884 'Canadian bacon, cooked' carries identical numbers."
+    },
+    {
+      "name": "Pork belly",
+      "aliases": ["pork belly", "belly pork", "fresh pork belly"],
+      "default": "cooked",
+      "rawLabel": "Raw",
+      "cooked": {
+        "fdcId": 2705901,
+        "description": "Pork, belly",
+        "kcal": 404,
+        "protein": 26.6,
+        "carbs": 0,
+        "fat": 32.2,
+        "usda_verified": true,
+        "dataType": "Survey (FNDDS)"
+      },
+      "raw": {
+        "fdcId": 167812,
+        "description": "Pork, fresh, belly, raw",
+        "kcal": 518,
+        "protein": 9.34,
+        "carbs": 0,
+        "fat": 53.01,
+        "usda_verified": true,
+        "dataType": "SR Legacy"
+      },
+      "notes": "Cooked kcal is lower than raw because roughly half the fat renders out - expected for belly, same pattern as bacon."
+    },
+    {
+      "name": "Prosciutto",
+      "aliases": ["prosciutto", "parma ham", "prosciutto di parma"],
+      "cooked": {
+        "fdcId": 2705879,
+        "description": "Ham, prosciutto",
+        "kcal": 195,
+        "protein": 27.8,
+        "carbs": 0.3,
+        "fat": 8.32,
+        "usda_verified": true,
+        "dataType": "Survey (FNDDS)"
+      },
+      "raw": null
+    },
+    {
+      "name": "Chorizo",
+      "aliases": ["chorizo", "pork chorizo", "mexican chorizo"],
+      "cooked": {
+        "fdcId": 746781,
+        "description": "Sausage, pork, chorizo, link or ground, cooked, pan-fried",
+        "kcal": 346,
+        "protein": 19.3,
+        "carbs": 2.63,
+        "fat": 28.1,
+        "usda_verified": true,
+        "dataType": "Foundation"
+      },
+      "raw": null,
+      "notes": "Foundation analyzed cooked chorizo. The raw Foundation twin (746782) returned 404, and no SR raw pork chorizo surfaced, so cooked-only."
+    },
+    {
+      "name": "Bratwurst",
+      "aliases": ["bratwurst", "brat", "brats", "bratwurst sausage"],
+      "cooked": {
+        "fdcId": 171620,
+        "description": "Bratwurst, pork, cooked",
+        "kcal": 333,
+        "protein": 13.72,
+        "carbs": 2.85,
+        "fat": 29.18,
+        "usda_verified": true,
+        "dataType": "SR Legacy"
+      },
+      "raw": null,
+      "notes": "FNDDS 2706174 'Bratwurst' carries identical numbers."
+    }
+  ],
+  "summary": "Checked all 29 red-meat/pork/lamb/processed entries on name, pair sameness, numbers, aliases and default; 55 USDA requests used. Every steak/roast pair is same cut and same 'separable lean only' on both halves (ribeye, NY strip, filet, flank, skirt, chuck, pork chop boneless top loin, pork ribs spareribs lean+fat, bacon cured raw vs cooked all check out); numbers are all plausible, including ground lamb and bison where raw is about equal to cooked because fat renders. Six FIXes: (1) Ground beef 85/15 raw exists - SR 171796 (the FDP-tagged generic), plus missing rawLabel; (2) Brisket raw can be the choice-grade 168657 to match the choice cooked half exactly; (3) Ham deli cooked 332397 and (4) Italian sausage cooked 746780 both 404 at USDA - replaced with FNDDS 2705878 'Ham' and 2706189 'Italian sausage' (identical P/C/F for the sausage); (5) Sirloin: drop alias 'beef' - a bare 'beef' should stay generic rather than land on trimmed sirloin, while 'steak'/'beef steak' -> sirloin is sensible; (6) Filet mignon: drop 'fillet' (a fish word). Sirloin trim mismatch (0\" cooked / 1/8\" raw) is acceptable and I could not find an exact-trim alternative either. Lamb chop's Australian pair is fine; a US domestic loin pair (172491 raw / 172492 broiled, 1/4\" choice) does exist if a domestic entry is preferred. Eight adds: top round steak, eye of round roast (cooked-only - raw 746760 404s on direct fetch despite appearing in search), pork shoulder, Canadian bacon, pork belly, prosciutto, chorizo (cooked-only), bratwurst. Further candidates not added under the 8 cap: corned beef 170200, kielbasa 173877. Unsure: no plain 'ground beef'/'hamburger' alias exists on any entry, so the generic term relies on substring matching - worth deciding which lean % it should land on."
+}

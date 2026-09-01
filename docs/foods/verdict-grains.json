@@ -1,0 +1,392 @@
+{
+ "verdicts": [
+  {
+   "name": "Rice, white",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Rice, brown",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Rice, wild",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Quinoa",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Oats, rolled",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Oatmeal, instant",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Cream of rice",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Pasta",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Pasta, whole wheat",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Macaroni and cheese",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Rice noodles",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Couscous",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Potato, russet",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Potato, red",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Mashed potatoes",
+   "verdict": "PASS"
+  },
+  {
+   "name": "French fries",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Sweet potato",
+   "verdict": "FIX",
+   "issues": [
+    "cooked FNDDS 2709699 'Sweet potato, baked, no added fat' is 82 kcal, BELOW raw 86 kcal; baking loses water so cooked must be >= raw. FNDDS value blends peel-eaten/not-eaten. SR 168483 'Sweet potato, cooked, baked in skin, flesh, without salt' (90 kcal) is the same SR family as the raw half 168482 and makes the pair consistent (raw 86 -> baked 90)."
+   ],
+   "fix": {
+    "cooked": {
+     "fdcId": 168483,
+     "description": "Sweet potato, cooked, baked in skin, flesh, without salt",
+     "kcal": 90,
+     "protein": 2.01,
+     "carbs": 20.71,
+     "fat": 0.15,
+     "dataType": "SR Legacy"
+    }
+   }
+  },
+  {
+   "name": "Bread, white",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Bread, whole wheat",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Bread, sourdough",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Bagel, plain",
+   "verdict": "PASS"
+  },
+  {
+   "name": "English muffin",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Tortilla, flour",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Tortilla, corn",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Pita",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Rice cakes",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Crackers, saltine",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Granola",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Cheerios",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Black beans",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Pinto beans",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Kidney beans",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Chickpeas",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Lentils",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Edamame",
+   "verdict": "FIX",
+   "issues": [
+    "cooked FNDDS 2707436 'Edamame, cooked' = 140 kcal / 7.58 g fat vs raw frozen-unprepared 109 kcal / 4.73 g fat. Boiling does not add 60% fat; the FNDDS recipe evidently carries added fat. SR 168411 'Edamame, frozen, prepared' (121 kcal, 11.91 P, 8.91 C, 5.2 F) is the plain boiled counterpart of the raw half 168410 (same SR family) and makes the pair sane."
+   ],
+   "fix": {
+    "cooked": {
+     "fdcId": 168411,
+     "description": "Edamame, frozen, prepared",
+     "kcal": 121,
+     "protein": 11.91,
+     "carbs": 8.91,
+     "fat": 5.2,
+     "dataType": "SR Legacy"
+    }
+   }
+  },
+  {
+   "name": "Hummus",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Popcorn",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Pretzels",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Rice Krispies Treat",
+   "verdict": "PASS"
+  }
+ ],
+ "add": [
+  {
+   "name": "Hamburger bun",
+   "aliases": [
+    "bun",
+    "buns",
+    "burger bun",
+    "hamburger bun",
+    "hamburger buns",
+    "hot dog bun",
+    "white roll"
+   ],
+   "cooked": {
+    "fdcId": 2707657,
+    "description": "Roll, white, hamburger bun",
+    "kcal": 267,
+    "protein": 9.43,
+    "carbs": 49.2,
+    "fat": 3.59,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null,
+   "notes": "FNDDS maps hamburger bun to the same profile as white bread (267 kcal). Cooked-only."
+  },
+  {
+   "name": "Naan",
+   "aliases": [
+    "naan",
+    "naan bread",
+    "garlic naan"
+   ],
+   "cooked": {
+    "fdcId": 2707613,
+    "description": "Bread, naan",
+    "kcal": 311,
+    "protein": 11.1,
+    "carbs": 50.2,
+    "fat": 7.28,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null
+  },
+  {
+   "name": "Ramen, instant",
+   "aliases": [
+    "cup noodles",
+    "instant noodles",
+    "instant ramen",
+    "maruchan",
+    "ramen",
+    "ramen noodles",
+    "top ramen"
+   ],
+   "default": "raw",
+   "rawLabel": "Dry",
+   "raw": {
+    "fdcId": 171177,
+    "description": "Soup, ramen noodle, any flavor, dry",
+    "kcal": 440,
+    "protein": 10.17,
+    "carbs": 60.26,
+    "fat": 17.59,
+    "dataType": "SR Legacy"
+   },
+   "cooked": {
+    "fdcId": 2709152,
+    "description": "Soup, ramen noodles, water added",
+    "kcal": 66,
+    "protein": 1.53,
+    "carbs": 9.04,
+    "fat": 2.64,
+    "dataType": "Survey (FNDDS)"
+   },
+   "notes": "Default = Dry because people log the block/packet weight. Cooked half is the prepared soup including broth water (66 kcal/100 g) - only useful if he weighs the finished bowl."
+  },
+  {
+   "name": "Cream of wheat",
+   "aliases": [
+    "cream of wheat",
+    "farina",
+    "wheat cereal hot"
+   ],
+   "default": "cooked",
+   "rawLabel": "Dry",
+   "cooked": {
+    "fdcId": 2708436,
+    "description": "Cream of wheat, instant, made with water, no added fat",
+    "kcal": 67,
+    "protein": 1.52,
+    "carbs": 14.4,
+    "fat": 0.21,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": {
+    "fdcId": 171660,
+    "description": "Cereals, CREAM OF WHEAT, instant, dry",
+    "kcal": 366,
+    "protein": 10.6,
+    "carbs": 75.5,
+    "fat": 1.4,
+    "dataType": "SR Legacy"
+   },
+   "notes": "Both halves instant. Generic quick farina dry is 171658 (360 kcal) if a non-instant dry half is preferred; within noise."
+  },
+  {
+   "name": "Grits",
+   "aliases": [
+    "corn grits",
+    "grits",
+    "hominy grits"
+   ],
+   "default": "cooked",
+   "rawLabel": "Dry",
+   "cooked": {
+    "fdcId": 171671,
+    "description": "Cereals, corn grits, white, regular and quick, enriched, cooked with water, with salt",
+    "kcal": 71,
+    "protein": 1.71,
+    "carbs": 14.76,
+    "fat": 0.46,
+    "dataType": "SR Legacy"
+   },
+   "raw": {
+    "fdcId": 171654,
+    "description": "Cereals, corn grits, white, regular and quick, enriched, dry",
+    "kcal": 370,
+    "protein": 7.65,
+    "carbs": 79.09,
+    "fat": 1.75,
+    "dataType": "SR Legacy"
+   },
+   "notes": "Same SR family both halves (regular/quick, cooked with water, no fat). Instant alternative: FNDDS 2708370 (65 kcal) / Quaker instant dry 171656 (343 kcal)."
+  },
+  {
+   "name": "Pancakes",
+   "aliases": [
+    "pancake",
+    "pancakes",
+    "flapjacks",
+    "hotcakes"
+   ],
+   "cooked": {
+    "fdcId": 2708304,
+    "description": "Pancakes, plain",
+    "kcal": 282,
+    "protein": 7.41,
+    "carbs": 35.3,
+    "fat": 12.1,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null,
+   "notes": "Plain, no syrup/butter. Cooked-only."
+  },
+  {
+   "name": "Waffles",
+   "aliases": [
+    "waffle",
+    "waffles",
+    "eggo",
+    "frozen waffle"
+   ],
+   "cooked": {
+    "fdcId": 2708325,
+    "description": "Waffle, plain",
+    "kcal": 373,
+    "protein": 8.7,
+    "carbs": 41.5,
+    "fat": 18.8,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null,
+   "notes": "Plain, no toppings. Cooked-only."
+  },
+  {
+   "name": "Barley, pearled",
+   "aliases": [
+    "barley",
+    "barley, pearled",
+    "pearl barley",
+    "pearled barley"
+   ],
+   "default": "cooked",
+   "rawLabel": "Dry",
+   "cooked": {
+    "fdcId": 170285,
+    "description": "Barley, pearled, cooked",
+    "kcal": 123,
+    "protein": 2.26,
+    "carbs": 28.22,
+    "fat": 0.44,
+    "dataType": "SR Legacy"
+   },
+   "raw": {
+    "fdcId": 170284,
+    "description": "Barley, pearled, raw",
+    "kcal": 352,
+    "protein": 9.91,
+    "carbs": 77.72,
+    "fat": 1.16,
+    "dataType": "SR Legacy"
+   }
+  }
+ ],
+ "summary": "Checked all 39 grains/starches/breads/legumes entries on name->item, pair sameness, numbers, aliases, default half. All ids were usda_verified; re-fetched Cheerios 173884 and Rice Krispies Treats 169687 and both resolve with matching macros. Dry/cooked pairs are same-type (white long-grain vs white cooked; brown vs brown; whole-wheat pasta both halves; russet flesh+skin both halves; beans canned-drained no-added-fat vs mature-seeds-raw; oatmeal made with water, no added fat vs Oats raw; popcorn is air-popped no butter). Bread per-100g plausible (white 267, whole wheat 254, sourdough/french 272, bagel 275).\nTwo FIXes: (1) Sweet potato cooked 82 kcal < raw 86 is a FNDDS peel-blend artefact, not a different food - replaced with SR 168483 baked-in-skin flesh (90 kcal), same SR family as raw 168482. (2) Edamame cooked FNDDS 2707436 shows 140 kcal / 7.6 g fat vs 109 / 4.7 raw - fat cannot rise 60% from boiling, so the FNDDS recipe carries added fat; replaced with SR 168411 'Edamame, frozen, prepared' (121 kcal), the plain boiled sibling of the raw half.\nMinor, left as PASS: 'toast' alias on Bread, white under-counts toast slightly per gram (water loss); 'noodles' alias on Pasta will catch egg-noodle/ramen typers (FNDDS Noodles, cooked is 137 vs 157) - acceptable. Kidney beans alias 'red beans' is a slight stretch (small red beans differ) but fine.\nAdded 8 verified entries: Hamburger bun, Naan, Ramen instant (Dry default, cooked = soup with water), Cream of wheat (instant pair), Grits (SR regular/quick pair), Pancakes, Waffles, Barley pearled (SR pair). Every id in fixes/adds confirmed via ?fdc=.\nUnsure: Ramen cooked half is 'soup with water' (66 kcal) which only matters if he weighs the finished bowl - could be dropped to cooked-only if the Dry/Cooked toggle confuses. Requests used: 33."
+}

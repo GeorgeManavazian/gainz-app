@@ -1,0 +1,516 @@
+{
+ "verdicts": [
+  {
+   "name": "Banana",
+   "verdict": "PASS",
+   "notes": "FNDDS 97 kcal (SR Legacy 173944 is 89); both acceptable, FNDDS is the current dataset"
+  },
+  {
+   "name": "Apple",
+   "verdict": "PASS",
+   "notes": "FNDDS 61 kcal vs SR 52 — 17% higher, within tolerance; FNDDS inherits newer Foundation apple data"
+  },
+  {
+   "name": "Orange",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Strawberries",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Blueberries",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Raspberries",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Blackberries",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Grapes",
+   "verdict": "PASS",
+   "notes": "FNDDS 83 kcal vs SR 69 — FNDDS follows newer Foundation red-seedless data; ~20% gap, borderline but USDA-current"
+  },
+  {
+   "name": "Watermelon",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Honeydew",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Cantaloupe",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Pineapple",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Mango",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Peach",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Pear",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Cherries",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Kiwi",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Avocado",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Dates",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Raisins",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Clementine",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Grapefruit",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Plum",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Cranberries, dried",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Broccoli",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Spinach",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Kale",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Carrots",
+   "verdict": "FIX",
+   "issues": [
+    "alias 'baby carrots' routes to regular carrots (44 kcal) but SR has a distinct 'Carrots, baby, raw' at 35 kcal — 20% off; moved to its own entry (see add)"
+   ],
+   "fix": {
+    "aliases": [
+     "carrot",
+     "carrots",
+     "raw carrots",
+     "carrot sticks"
+    ]
+   }
+  },
+  {
+   "name": "Bell pepper",
+   "verdict": "FIX",
+   "issues": [
+    "pair is fine (SR red boiled 28 vs FNDDS red raw 31; 'Red pepper, cooked, as ingredient' 2710799 = 33 kcal is an equivalent FNDDS option)",
+    "aliases miss 'green pepper'/'green bell pepper'/'yellow pepper' — a user typing those finds nothing. Green bell pepper is ~20 kcal vs red 31, i.e. ≤11 kcal/100 g absolute, so routing to this row is acceptable"
+   ],
+   "fix": {
+    "aliases": [
+     "bell pepper",
+     "bell peppers",
+     "capsicum",
+     "peppers",
+     "red bell pepper",
+     "red pepper",
+     "sweet pepper",
+     "green pepper",
+     "green bell pepper",
+     "yellow pepper",
+     "yellow bell pepper",
+     "orange pepper"
+    ]
+   }
+  },
+  {
+   "name": "Onion",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Zucchini",
+   "verdict": "FIX",
+   "issues": [
+    "cooked half 2709991 is 'Summer squash, yellow or green' (mixed species) while raw is green only — pair not the same food",
+    "SR Legacy has a zucchini-only pair: 169291 raw (17 kcal, identical to FNDDS raw) and 169292 boiled drained without salt (15 kcal); use both for a same-source pair"
+   ],
+   "fix": {
+    "cooked": {
+     "fdcId": 169292,
+     "description": "Squash, summer, zucchini, includes skin, cooked, boiled, drained, without salt",
+     "kcal": 15,
+     "protein": 1.14,
+     "carbs": 2.69,
+     "fat": 0.36
+    },
+    "raw": {
+     "fdcId": 169291,
+     "description": "Squash, summer, zucchini, includes skin, raw",
+     "kcal": 17,
+     "protein": 1.21,
+     "carbs": 3.11,
+     "fat": 0.32
+    }
+   }
+  },
+  {
+   "name": "Asparagus",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Green beans",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Cauliflower",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Brussels sprouts",
+   "verdict": "FIX",
+   "issues": [
+    "alias 'sprouts' hijacks 'bean sprouts' / 'alfalfa sprouts' searches"
+   ],
+   "fix": {
+    "aliases": [
+     "brussel sprouts",
+     "brussels sprout",
+     "brussels sprouts",
+     "brussel sprout"
+    ]
+   }
+  },
+  {
+   "name": "Mushrooms",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Corn",
+   "verdict": "PASS",
+   "notes": "raw and cooked identical (86 kcal) in FNDDS — fine. Canned corn (67 kcal) added as a separate entry"
+  },
+  {
+   "name": "Peas",
+   "verdict": "FIX",
+   "issues": [
+    "missing the way most people buy them: 'frozen peas' (FNDDS frozen cooked ≈ 78 kcal, within 10% of fresh cooked 84)"
+   ],
+   "fix": {
+    "aliases": [
+     "garden peas",
+     "green peas",
+     "pea",
+     "peas",
+     "frozen peas",
+     "sweet peas"
+    ]
+   }
+  },
+  {
+   "name": "Cabbage",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Eggplant",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Lettuce, romaine",
+   "verdict": "FIX",
+   "issues": [
+    "alias 'salad' is too broad — hijacks any 'salad' search (chicken salad, salad dressing)",
+    "'salad greens' now belongs to the new Spring mix entry"
+   ],
+   "fix": {
+    "aliases": [
+     "lettuce",
+     "romaine",
+     "romaine lettuce",
+     "romaine hearts",
+     "lettuce romaine"
+    ]
+   }
+  },
+  {
+   "name": "Cucumber",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Tomato",
+   "verdict": "FIX",
+   "issues": [
+    "absorbs the removed Cherry tomatoes entry: USDA has no SR/FNDDS cherry or grape tomato and the Foundation id 321360 is dead. Plain tomato 20 kcal vs grape 27 — ≤7 kcal/100 g, acceptable"
+   ],
+   "fix": {
+    "aliases": [
+     "roma tomato",
+     "sliced tomato",
+     "tomato",
+     "tomatoes",
+     "cherry tomato",
+     "cherry tomatoes",
+     "grape tomato",
+     "grape tomatoes",
+     "baby tomatoes"
+    ]
+   }
+  },
+  {
+   "name": "Celery",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Garlic",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Cherry tomatoes",
+   "verdict": "REMOVE",
+   "issues": [
+    "fdc 321360 returns 404 (Foundation record withdrawn)",
+    "no SR Legacy or FNDDS cherry/grape tomato exists — search only returns branded items and the dead id; 1999634 is 'Tomato, roma'",
+    "aliases folded into Tomato (2709719, 20 kcal vs 27 — within 7 kcal/100 g)"
+   ]
+  },
+  {
+   "name": "Pickles",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Olives",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Sauerkraut",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Kimchi",
+   "verdict": "PASS"
+  },
+  {
+   "name": "Mixed vegetables, frozen",
+   "verdict": "PASS"
+  }
+ ],
+ "add": [
+  {
+   "name": "Mixed berries, frozen",
+   "aliases": [
+    "frozen berries",
+    "frozen mixed berries",
+    "mixed berries",
+    "berry mix",
+    "frozen fruit"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2709272,
+    "description": "Berries, frozen",
+    "kcal": 52,
+    "protein": 0.76,
+    "carbs": 12.5,
+    "fat": 0.34,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null
+  },
+  {
+   "name": "Corn, canned",
+   "aliases": [
+    "canned corn",
+    "corn canned",
+    "tinned corn",
+    "sweetcorn canned"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2709912,
+    "description": "Corn, canned, cooked, no added fat",
+    "kcal": 67,
+    "protein": 2.29,
+    "carbs": 14.3,
+    "fat": 1.22,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null
+  },
+  {
+   "name": "Baby carrots",
+   "aliases": [
+    "baby carrots",
+    "baby carrot",
+    "carrot snack"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 168568,
+    "description": "Carrots, baby, raw",
+    "kcal": 35,
+    "protein": 0.64,
+    "carbs": 8.24,
+    "fat": 0.13,
+    "dataType": "SR Legacy"
+   },
+   "raw": null
+  },
+  {
+   "name": "Applesauce, unsweetened",
+   "aliases": [
+    "applesauce",
+    "apple sauce",
+    "unsweetened applesauce"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2709217,
+    "description": "Applesauce, unsweetened",
+    "kcal": 52,
+    "protein": 0.27,
+    "carbs": 12.3,
+    "fat": 0.16,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null,
+   "notes": "Sweetened 'Applesauce, regular' is 2709216 (75 kcal) if wanted"
+  },
+  {
+   "name": "Spring mix",
+   "aliases": [
+    "spring mix",
+    "mixed greens",
+    "mixed salad greens",
+    "salad greens",
+    "salad mix",
+    "baby greens",
+    "arugula mix"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2709792,
+    "description": "Mixed salad greens, raw",
+    "kcal": 21,
+    "protein": 1.31,
+    "carbs": 3.43,
+    "fat": 0.21,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": null
+  },
+  {
+   "name": "Butternut squash",
+   "aliases": [
+    "butternut squash",
+    "butternut",
+    "winter squash",
+    "squash"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 169296,
+    "description": "Squash, winter, butternut, cooked, baked, without salt",
+    "kcal": 40,
+    "protein": 0.9,
+    "carbs": 10.49,
+    "fat": 0.09,
+    "dataType": "SR Legacy"
+   },
+   "raw": {
+    "fdcId": 169295,
+    "description": "Squash, winter, butternut, raw",
+    "kcal": 45,
+    "protein": 1.0,
+    "carbs": 11.69,
+    "fat": 0.1,
+    "dataType": "SR Legacy"
+   },
+   "notes": "Baked loses little water so cooked ≈ raw. FNDDS generic 'Winter squash, cooked, no added fat' 2709694 = 37 kcal is the alternative"
+  },
+  {
+   "name": "Beets",
+   "aliases": [
+    "beet",
+    "beets",
+    "beetroot",
+    "roasted beets",
+    "cooked beets"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 2709872,
+    "description": "Beets, fresh, cooked, no added fat",
+    "kcal": 45,
+    "protein": 1.67,
+    "carbs": 9.93,
+    "fat": 0.18,
+    "dataType": "Survey (FNDDS)"
+   },
+   "raw": {
+    "fdcId": 2709770,
+    "description": "Beets, raw",
+    "kcal": 43,
+    "protein": 1.61,
+    "carbs": 9.56,
+    "fat": 0.17,
+    "dataType": "Survey (FNDDS)"
+   }
+  },
+  {
+   "name": "Sugar snap peas",
+   "aliases": [
+    "snap peas",
+    "sugar snap peas",
+    "sugar snaps",
+    "snow peas",
+    "edible pod peas"
+   ],
+   "default": "cooked",
+   "rawLabel": "Raw",
+   "cooked": {
+    "fdcId": 170010,
+    "description": "Peas, edible-podded, raw",
+    "kcal": 42,
+    "protein": 2.8,
+    "carbs": 7.55,
+    "fat": 0.2,
+    "dataType": "SR Legacy"
+   },
+   "raw": null
+  }
+ ],
+ "summary": "Checked all 51 produce entries on the five points; 50 ids were already byte-verified and I re-fetched only the suspect/candidate ones. Fruit rows are all plain raw FNDDS items with sane numbers (banana 97, apple 61, avocado 160; grapes 83 is FNDDS/Foundation-current vs SR 69 — flagged as borderline, not wrong). Wrong: Cherry tomatoes (321360 is a withdrawn Foundation id; USDA has no SR/FNDDS cherry or grape tomato — search returns only branded rows, and 1999634 is roma) -> REMOVE and fold aliases into Tomato (20 vs 27 kcal). Zucchini cooked half was 'yellow or green' summer squash -> replaced with the SR zucchini-only pair 169291/169292. Bell pepper SR-red-boiled cooked half is fine. Alias fixes: 'sprouts' (Brussels) and 'salad' (romaine) hijack searches; 'baby carrots' routed to 44-kcal carrots when SR has a 35-kcal baby-carrot item (now its own entry); added green/yellow pepper and frozen peas aliases. Defaults (raw for spinach/carrot/pepper/onion, cooked for broccoli/asparagus/brussels etc.) are sensible; kale-cooked is a coin flip (43 vs 46 kcal). Single-half fruit/veg rows live in the 'cooked' slot with raw=null and no default — structural, not a data error. Added 8 verified entries: frozen mixed berries, canned corn, baby carrots, unsweetened applesauce, spring mix, butternut squash (SR raw/baked pair), beets (FNDDS pair), sugar snap peas. Also verified but left out for the 8-cap: Pomegranate 2709267 (83 kcal) and jalapeno SR 168576 (29 kcal). Not resolved: no clean 'frozen broccoli' distinction (frozen cooked ~28 vs fresh 41 kcal) — left as a note. Requests used: 35."
+}

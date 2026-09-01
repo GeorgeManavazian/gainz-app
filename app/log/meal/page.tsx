@@ -219,6 +219,8 @@ export default function LogMeal() {
                 <p className="px-1 text-[12px] text-muted">
                   {weighingOf(picked) === "cooked" ? "Weigh it after cooking." : picked.rawLabel === "Dry" ? "Weigh it dry, before cooking." : "Weigh it raw, before cooking."}
                   {" "}{Math.round(picked.per100g.kcal)} kcal · {Math.round(picked.per100g.protein)} g protein per 100 g.
+                  {pairs.raw && pairs.cooked && picked.rawLabel !== "Dry" && pairs.raw.per100g.kcal >= pairs.cooked.per100g.kcal * 0.95
+                    ? " Fatty cut: cooking loses fat as well as water, so raw and cooked are about the same per gram." : ""}
                 </p>
               </div>
             )}
