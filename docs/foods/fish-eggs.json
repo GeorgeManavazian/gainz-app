@@ -1,0 +1,178 @@
+[
+  {
+    "name": "Salmon, Atlantic (farmed)",
+    "aliases": ["salmon", "atlantic salmon", "farmed salmon", "salmon fillet", "salmon filet", "baked salmon", "grilled salmon"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 175168, "description": "Fish, salmon, Atlantic, farmed, cooked, dry heat", "kcal": 206, "protein": 22.1, "carbs": 0, "fat": 12.4 },
+    "raw":    { "fdcId": 175167, "description": "Fish, salmon, Atlantic, farmed, raw", "kcal": 208, "protein": 20.4, "carbs": 0, "fat": 13.4 }
+  },
+  {
+    "name": "Salmon, sockeye (wild)",
+    "aliases": ["sockeye salmon", "sockeye", "wild salmon", "red salmon", "wild sockeye"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 173692, "description": "Fish, salmon, sockeye, cooked, dry heat", "kcal": 156, "protein": 26.5, "carbs": 0, "fat": 5.57 },
+    "raw":    { "fdcId": 173691, "description": "Fish, salmon, sockeye, raw", "kcal": 131, "protein": 22.2, "carbs": 0, "fat": 4.69 }
+  },
+  {
+    "name": "Tuna, canned in water",
+    "aliases": ["canned tuna", "tuna in water", "tuna can", "chunk light tuna", "tuna packet", "tuna pouch", "tuna"],
+    "cooked": { "fdcId": 334194, "description": "Fish, tuna, light, canned in water, drained solids", "kcal": 90, "protein": 19, "carbs": 0.08, "fat": 0.94 },
+    "raw": null,
+    "notes": "Drained solids. Light (skipjack) tuna; albacore in water was not searched to save quota."
+  },
+  {
+    "name": "Tuna, canned in oil",
+    "aliases": ["tuna in oil", "canned tuna in oil", "tuna in olive oil", "oil packed tuna"],
+    "cooked": { "fdcId": 173708, "description": "Fish, tuna, light, canned in oil, drained solids", "kcal": 198, "protein": 29.1, "carbs": 0, "fat": 8.21 },
+    "raw": null,
+    "notes": "Drained solids."
+  },
+  {
+    "name": "Tuna steak (yellowfin)",
+    "aliases": ["tuna steak", "ahi tuna", "ahi", "yellowfin tuna", "fresh tuna", "seared tuna", "tuna steaks"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 172006, "description": "Fish, tuna, yellowfin, fresh, cooked, dry heat", "kcal": 130, "protein": 29.2, "carbs": 0, "fat": 0.59 },
+    "raw":    { "fdcId": 175159, "description": "Fish, tuna, fresh, yellowfin, raw", "kcal": 109, "protein": 24.4, "carbs": 0, "fat": 0.49 }
+  },
+  {
+    "name": "Tilapia",
+    "aliases": ["tilapia", "tilapia fillet", "tilapia filet", "baked tilapia"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 175177, "description": "Fish, tilapia, cooked, dry heat", "kcal": 128, "protein": 26.2, "carbs": 0, "fat": 2.65 },
+    "raw":    { "fdcId": 175176, "description": "Fish, tilapia, raw", "kcal": 96, "protein": 20.1, "carbs": 0, "fat": 1.7 }
+  },
+  {
+    "name": "Cod",
+    "aliases": ["cod", "cod fillet", "cod filet", "atlantic cod", "baked cod", "white fish"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 171956, "description": "Fish, cod, Atlantic, cooked, dry heat", "kcal": 105, "protein": 22.8, "carbs": 0, "fat": 0.86 },
+    "raw":    { "fdcId": 171955, "description": "Fish, cod, Atlantic, raw", "kcal": 82, "protein": 17.8, "carbs": 0, "fat": 0.67 }
+  },
+  {
+    "name": "Halibut",
+    "aliases": ["halibut", "halibut fillet", "halibut steak"],
+    "default": "raw",
+    "rawLabel": "Raw",
+    "cooked": null,
+    "raw":    { "fdcId": 174200, "description": "Fish, halibut, Atlantic and Pacific, raw", "kcal": 91, "protein": 18.6, "carbs": 0, "fat": 1.33 },
+    "notes": "Cooked half missing: 'Fish, halibut, Atlantic and Pacific, cooked, dry heat' never surfaced in 4 queries. Only FNDDS 'Fish, halibut' (2706260) came back, and its 7.79 g carbs show it is a breaded/fried average, so it was rejected. Cooked plain halibut is roughly raw x1.28 (about 117 kcal / 23.8 P / 1.7 F per 100 g) if a manual fill is ever wanted."
+  },
+  {
+    "name": "Mahi mahi",
+    "aliases": ["mahi mahi", "mahi", "mahimahi", "mahi-mahi", "dorado", "dolphinfish"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 171992, "description": "Fish, mahimahi, cooked, dry heat", "kcal": 109, "protein": 23.7, "carbs": 0, "fat": 0.9 },
+    "raw":    { "fdcId": 171959, "description": "Fish, mahimahi, raw", "kcal": 85, "protein": 18.5, "carbs": 0, "fat": 0.7 }
+  },
+  {
+    "name": "Shrimp",
+    "aliases": ["shrimp", "shrimps", "prawns", "prawn", "grilled shrimp", "boiled shrimp", "steamed shrimp"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 175180, "description": "Crustaceans, shrimp, cooked", "kcal": 99, "protein": 24, "carbs": 0.2, "fat": 0.28 },
+    "raw":    { "fdcId": 174210, "description": "Crustaceans, shrimp, mixed species, raw (may contain additives to retain moisture)", "kcal": 71, "protein": 13.6, "carbs": 0.91, "fat": 1.01 },
+    "notes": "Cooked is the Foundation 'Crustaceans, shrimp, cooked' item; raw is SR Legacy mixed-species shrimp that may include moisture-retaining additives (phosphates), which is why raw protein looks low relative to cooked. Both are plain shrimp, no breading."
+  },
+  {
+    "name": "Scallops",
+    "aliases": ["scallops", "scallop", "sea scallops", "bay scallops", "seared scallops"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 167742, "description": "Mollusks, scallop, (bay and sea), cooked, steamed", "kcal": 111, "protein": 20.5, "carbs": 5.41, "fat": 0.84 },
+    "raw":    { "fdcId": 174220, "description": "Mollusks, scallop, mixed species, raw", "kcal": 69, "protein": 12.1, "carbs": 3.18, "fat": 0.49 },
+    "notes": "Cooked is '(bay and sea), steamed' and raw is 'mixed species'; both are generic plain scallop (no breading), just different USDA wording. Only other cooked options were breaded/fried."
+  },
+  {
+    "name": "Crab",
+    "aliases": ["crab", "crab meat", "crabmeat", "blue crab", "steamed crab", "crab legs"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 174205, "description": "Crustaceans, crab, blue, cooked, moist heat", "kcal": 83, "protein": 17.9, "carbs": 0, "fat": 0.74 },
+    "raw":    { "fdcId": 174204, "description": "Crustaceans, crab, blue, raw", "kcal": 87, "protein": 18.1, "carbs": 0.04, "fat": 1.08 },
+    "notes": "Blue crab used as the generic crab; king/Dungeness/snow crab are separate USDA items and were not searched."
+  },
+  {
+    "name": "Lobster",
+    "aliases": ["lobster", "lobster meat", "lobster tail", "steamed lobster", "boiled lobster"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 174209, "description": "Crustaceans, lobster, northern, cooked, moist heat", "kcal": 89, "protein": 19, "carbs": 0, "fat": 0.86 },
+    "raw":    { "fdcId": 174208, "description": "Crustaceans, lobster, northern, raw", "kcal": 77, "protein": 16.5, "carbs": 0, "fat": 0.75 }
+  },
+  {
+    "name": "Sardines, canned",
+    "aliases": ["sardines", "sardine", "canned sardines", "sardines in oil", "tinned sardines"],
+    "cooked": { "fdcId": 175139, "description": "Fish, sardine, Atlantic, canned in oil, drained solids with bone", "kcal": 208, "protein": 24.6, "carbs": 0, "fat": 11.4 },
+    "raw": null,
+    "notes": "Oil-packed, drained, with bone (the standard tin). Water-packed sardines were not searched."
+  },
+  {
+    "name": "Smoked salmon",
+    "aliases": ["smoked salmon", "lox", "nova lox", "cold smoked salmon", "gravlax"],
+    "cooked": { "fdcId": 2706292, "description": "Fish, salmon, smoked", "kcal": 117, "protein": 18.28, "carbs": 0, "fat": 4.32 },
+    "raw": null,
+    "notes": "FNDDS generic smoked salmon; the SR Legacy 'Fish, salmon, chinook, smoked' item never surfaced. Only branded lox items otherwise."
+  },
+  {
+    "name": "Fish sticks",
+    "aliases": ["fish sticks", "fish stick", "fish fingers", "breaded fish sticks", "frozen fish sticks"],
+    "cooked": { "fdcId": 174195, "description": "Fish, fish sticks, frozen, prepared", "kcal": 277, "protein": 11, "carbs": 21.7, "fat": 16.2 },
+    "raw": null
+  },
+  {
+    "name": "Egg, whole",
+    "aliases": ["egg", "eggs", "whole egg", "whole eggs", "hard boiled egg", "hard boiled eggs", "boiled egg", "boiled eggs", "hardboiled egg", "chicken egg"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 173424, "description": "Egg, whole, cooked, hard-boiled", "kcal": 155, "protein": 12.6, "carbs": 1.12, "fat": 10.6 },
+    "raw":    { "fdcId": 171287, "description": "Egg, whole, raw, fresh", "kcal": 143, "protein": 12.6, "carbs": 0.72, "fat": 9.51 },
+    "notes": "Chicken egg only. Duck/goose/turkey/quail items were returned by the same queries and deliberately skipped."
+  },
+  {
+    "name": "Egg white",
+    "aliases": ["egg white", "egg whites", "whites", "cooked egg whites", "boiled egg white"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 2707170, "description": "Egg, white, cooked, no added fat", "kcal": 52, "protein": 10.67, "carbs": 2.35, "fat": 0 },
+    "raw":    { "fdcId": 172183, "description": "Egg, white, raw, fresh", "kcal": 52, "protein": 10.9, "carbs": 0.73, "fat": 0.17 },
+    "notes": "Cooked is FNDDS, raw is SR Legacy; same food (chicken egg white). No SR cooked-only egg white exists."
+  },
+  {
+    "name": "Egg yolk",
+    "aliases": ["egg yolk", "egg yolks", "yolk", "yolks"],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": { "fdcId": 2707174, "description": "Egg, yolk only, cooked, no added fat", "kcal": 327, "protein": 16.15, "carbs": 1.02, "fat": 28.71 },
+    "raw":    { "fdcId": 172184, "description": "Egg, yolk, raw, fresh", "kcal": 322, "protein": 15.9, "carbs": 3.59, "fat": 26.5 },
+    "notes": "Cooked is FNDDS, raw is SR Legacy; same food (chicken egg yolk)."
+  },
+  {
+    "name": "Scrambled eggs",
+    "aliases": ["scrambled eggs", "scrambled egg", "scramble", "egg scramble", "omelet", "omelette", "plain omelet"],
+    "cooked": { "fdcId": 2707205, "description": "Egg omelet or scrambled egg, no added fat", "kcal": 143, "protein": 12.36, "carbs": 0.96, "fat": 9.93 },
+    "raw": null,
+    "notes": "No-added-fat version chosen per brief. SR 'Egg, whole, cooked, scrambled' (172187, 149 kcal) assumes milk and butter and was skipped."
+  },
+  {
+    "name": "Liquid egg whites (carton)",
+    "aliases": ["liquid egg whites", "liquid egg white", "carton egg whites", "egg whites carton", "egg beaters whites", "pasteurized egg whites"],
+    "default": "raw",
+    "rawLabel": "Raw",
+    "cooked": null,
+    "raw":    { "fdcId": 2408230, "description": "LIQUID EGG WHITES", "kcal": 54, "protein": 10.9, "carbs": 0, "fat": 0 },
+    "notes": "Raw only by design: cartons are logged by pour weight before cooking. This is a generically named branded item whose label values match every major carton (25 kcal / 5 g protein per 46 g). For a cooked weight, use the 'Egg white' row instead."
+  },
+  {
+    "name": "Fried egg",
+    "aliases": ["fried egg", "fried eggs", "sunny side up", "over easy", "over medium", "over hard"],
+    "cooked": { "fdcId": 2707156, "description": "Egg, whole, fried no added fat", "kcal": 143, "protein": 12.36, "carbs": 0.96, "fat": 9.93 },
+    "raw": null,
+    "notes": "No-added-fat version; if cooked in butter or oil, log the fat separately."
+  }
+]

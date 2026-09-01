@@ -1,0 +1,778 @@
+[
+  {
+    "name": "Ground beef, 80/20",
+    "aliases": [
+      "ground beef 80/20",
+      "80/20 ground beef",
+      "80/20",
+      "ground beef 80% lean",
+      "hamburger 80/20"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 171797,
+      "description": "Beef, ground, 80% lean meat / 20% fat, patty, cooked, broiled",
+      "kcal": 270,
+      "protein": 25.8,
+      "carbs": 0,
+      "fat": 17.8
+    },
+    "raw": {
+      "fdcId": 174036,
+      "description": "Beef, ground, 80% lean meat / 20% fat, raw",
+      "kcal": 254,
+      "protein": 17.2,
+      "carbs": 0,
+      "fat": 20
+    }
+  },
+  {
+    "name": "Ground beef, 85/15",
+    "aliases": [
+      "ground beef 85/15",
+      "85/15 ground beef",
+      "85/15",
+      "ground beef 85% lean",
+      "hamburger 85/15"
+    ],
+    "default": "cooked",
+    "cooked": {
+      "fdcId": 174032,
+      "description": "Beef, ground, 85% lean meat / 15% fat, patty, cooked, broiled",
+      "kcal": 250,
+      "protein": 25.9,
+      "carbs": 0,
+      "fat": 15.4
+    },
+    "raw": null,
+    "notes": "Generic 'Beef, ground, 85% lean meat / 15% fat, raw' never surfaced in 4 queries (only the Australian grass-fed 85/15 raw did, which is a different food). Left raw null rather than pair a different lean %."
+  },
+  {
+    "name": "Ground beef, 90/10",
+    "aliases": [
+      "ground beef 90/10",
+      "90/10 ground beef",
+      "90/10",
+      "ground beef 90% lean",
+      "lean ground beef",
+      "hamburger 90/10"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 174031,
+      "description": "Beef, ground, 90% lean meat / 10% fat, patty, cooked, broiled",
+      "kcal": 217,
+      "protein": 26.1,
+      "carbs": 0,
+      "fat": 11.8
+    },
+    "raw": {
+      "fdcId": 174030,
+      "description": "Beef, ground, 90% lean meat / 10% fat, raw",
+      "kcal": 176,
+      "protein": 20,
+      "carbs": 0,
+      "fat": 10
+    }
+  },
+  {
+    "name": "Ground beef, 93/7",
+    "aliases": [
+      "ground beef 93/7",
+      "93/7 ground beef",
+      "93/7",
+      "ground beef 93% lean",
+      "extra lean ground beef",
+      "hamburger 93/7"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 174752,
+      "description": "Beef, ground, 93% lean meat / 7% fat, patty, cooked, broiled",
+      "kcal": 193,
+      "protein": 26.2,
+      "carbs": 0,
+      "fat": 8.94
+    },
+    "raw": {
+      "fdcId": 173110,
+      "description": "Beef, ground, 93% lean meat / 7% fat, raw",
+      "kcal": 152,
+      "protein": 20.8,
+      "carbs": 0,
+      "fat": 7
+    }
+  },
+  {
+    "name": "Beef steak",
+    "aliases": [
+      "steak",
+      "beef steak",
+      "steaks",
+      "grilled steak",
+      "beef"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 168635,
+      "description": "Beef, top sirloin, steak, separable lean only, trimmed to 0\" fat, choice, cooked, broiled",
+      "kcal": 188,
+      "protein": 30.3,
+      "carbs": 0,
+      "fat": 6.55
+    },
+    "raw": {
+      "fdcId": 174763,
+      "description": "Beef, top sirloin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw",
+      "kcal": 135,
+      "protein": 21.9,
+      "carbs": 0,
+      "fat": 4.62
+    },
+    "notes": "Generic 'steak' row: points at top sirloin (lean only, broiled) as the representative plain steak, with its raw top sirloin match. Same cut, both separable lean only, but USDA raw is the 1/8\" trim entry and cooked is the 0\" trim entry (a 0\" raw / 1/8\" broiled match did not surface in 4 queries). Lean-only values differ only marginally between trims."
+  },
+  {
+    "name": "Sirloin steak",
+    "aliases": [
+      "sirloin steak",
+      "sirloin",
+      "top sirloin",
+      "top sirloin steak"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 168635,
+      "description": "Beef, top sirloin, steak, separable lean only, trimmed to 0\" fat, choice, cooked, broiled",
+      "kcal": 188,
+      "protein": 30.3,
+      "carbs": 0,
+      "fat": 6.55
+    },
+    "raw": {
+      "fdcId": 174763,
+      "description": "Beef, top sirloin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw",
+      "kcal": 135,
+      "protein": 21.9,
+      "carbs": 0,
+      "fat": 4.62
+    },
+    "notes": "Same cut, both separable lean only, but USDA raw is the 1/8\" trim entry and cooked is the 0\" trim entry (a 0\" raw / 1/8\" broiled match did not surface in 4 queries). Lean-only values differ only marginally between trims."
+  },
+  {
+    "name": "Ribeye steak",
+    "aliases": [
+      "ribeye steak",
+      "ribeye",
+      "rib eye",
+      "rib eye steak",
+      "ribeye steaks"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 172144,
+      "description": "Beef, rib eye steak, boneless, lip off, separable lean only, trimmed to 0\" fat, choice, cooked, grilled",
+      "kcal": 215,
+      "protein": 27.4,
+      "carbs": 0,
+      "fat": 11.8
+    },
+    "raw": {
+      "fdcId": 173380,
+      "description": "Beef, rib eye steak, boneless, lip off, separable lean only, trimmed to 0\" fat, choice, raw",
+      "kcal": 162,
+      "protein": 21.4,
+      "carbs": 0,
+      "fat": 8.5
+    },
+    "notes": "Lean-only (trimmed) ribeye; a ribeye eaten with the fat cap will run higher."
+  },
+  {
+    "name": "NY strip steak",
+    "aliases": [
+      "ny strip",
+      "new york strip",
+      "strip steak",
+      "ny strip steak",
+      "new york strip steak",
+      "top loin steak",
+      "kansas city strip"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 173119,
+      "description": "Beef, short loin, top loin, steak, separable lean only, trimmed to 1/8\" fat, choice, cooked, broiled",
+      "kcal": 201,
+      "protein": 29.2,
+      "carbs": 0,
+      "fat": 8.45
+    },
+    "raw": {
+      "fdcId": 173116,
+      "description": "Beef, short loin, top loin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw",
+      "kcal": 155,
+      "protein": 22.8,
+      "carbs": 0,
+      "fat": 6.43
+    }
+  },
+  {
+    "name": "Filet mignon",
+    "aliases": [
+      "filet mignon",
+      "filet",
+      "fillet",
+      "beef tenderloin",
+      "tenderloin steak",
+      "tenderloin"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 173117,
+      "description": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\" fat, choice, cooked, broiled",
+      "kcal": 206,
+      "protein": 29,
+      "carbs": 0,
+      "fat": 9.1
+    },
+    "raw": {
+      "fdcId": 174762,
+      "description": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw",
+      "kcal": 158,
+      "protein": 22.2,
+      "carbs": 0,
+      "fat": 7.07
+    }
+  },
+  {
+    "name": "Flank steak",
+    "aliases": [
+      "flank steak",
+      "flank",
+      "beef flank"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 168611,
+      "description": "Beef, flank, steak, separable lean only, trimmed to 0\" fat, choice, cooked, broiled",
+      "kcal": 194,
+      "protein": 27.8,
+      "carbs": 0,
+      "fat": 8.32
+    },
+    "raw": {
+      "fdcId": 168609,
+      "description": "Beef, flank, steak, separable lean only, trimmed to 0\" fat, choice, raw",
+      "kcal": 149,
+      "protein": 21.7,
+      "carbs": 0,
+      "fat": 6.29
+    }
+  },
+  {
+    "name": "Skirt steak",
+    "aliases": [
+      "skirt steak",
+      "skirt",
+      "inside skirt",
+      "carne asada"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 173375,
+      "description": "Beef, plate steak, boneless, inside skirt, separable lean only, trimmed to 0\" fat, choice, cooked, grilled",
+      "kcal": 242,
+      "protein": 29.6,
+      "carbs": 0,
+      "fat": 13.7
+    },
+    "raw": {
+      "fdcId": 172137,
+      "description": "Beef, plate steak, boneless, inside skirt, separable lean only, trimmed to 0\" fat, choice, raw",
+      "kcal": 171,
+      "protein": 20.9,
+      "carbs": 0,
+      "fat": 9.76
+    }
+  },
+  {
+    "name": "Chuck roast",
+    "aliases": [
+      "chuck roast",
+      "chuck",
+      "pot roast",
+      "beef chuck",
+      "shoulder roast",
+      "chuck shoulder"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 171198,
+      "description": "Beef, shoulder pot roast, boneless, separable lean only, trimmed to 0\" fat, choice, cooked, braised",
+      "kcal": 200,
+      "protein": 31.3,
+      "carbs": 0,
+      "fat": 8.3
+    },
+    "raw": {
+      "fdcId": 169481,
+      "description": "Beef, shoulder pot roast or steak, boneless, separable lean only, trimmed to 0\" fat, choice, raw",
+      "kcal": 125,
+      "protein": 21.4,
+      "carbs": 0.11,
+      "fat": 4.35
+    },
+    "notes": "Used the chuck shoulder pot roast pair because it is an exact raw/braised match. The 'chuck, arm pot roast' entries only existed as 1/8\" raw vs 0\" braised (trim mismatch)."
+  },
+  {
+    "name": "Brisket",
+    "aliases": [
+      "brisket",
+      "beef brisket",
+      "brisket flat"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 170601,
+      "description": "Beef, brisket, flat half, separable lean only, trimmed to 0\" fat, choice, cooked, braised",
+      "kcal": 212,
+      "protein": 32.6,
+      "carbs": 0,
+      "fat": 8.07
+    },
+    "raw": {
+      "fdcId": 168658,
+      "description": "Beef, brisket, flat half, boneless, separable lean only, trimmed to 0\" fat, select, raw",
+      "kcal": 124,
+      "protein": 21.7,
+      "carbs": 0,
+      "fat": 4.14
+    },
+    "notes": "Same cut (flat half, lean only, 0\" trim) but USDA grade differs: raw entry is select, cooked is choice. Only US brisket pair available; the alternative was New Zealand navel end."
+  },
+  {
+    "name": "Beef jerky",
+    "aliases": [
+      "beef jerky",
+      "jerky"
+    ],
+    "cooked": {
+      "fdcId": 2705860,
+      "description": "Beef jerky",
+      "kcal": 410,
+      "protein": 33.2,
+      "carbs": 11,
+      "fat": 25.6
+    },
+    "raw": null
+  },
+  {
+    "name": "Roast beef, deli",
+    "aliases": [
+      "roast beef",
+      "deli roast beef",
+      "roast beef deli",
+      "sliced roast beef",
+      "roast beef lunch meat"
+    ],
+    "cooked": {
+      "fdcId": 174570,
+      "description": "Roast beef, deli style, prepackaged, sliced",
+      "kcal": 115,
+      "protein": 18.6,
+      "carbs": 0.64,
+      "fat": 3.69
+    },
+    "raw": null
+  },
+  {
+    "name": "Pork chop",
+    "aliases": [
+      "pork chop",
+      "pork chops",
+      "boneless pork chop",
+      "pork loin chop"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 168253,
+      "description": "Pork, fresh, loin, top loin (chops), boneless, separable lean only, cooked, broiled",
+      "kcal": 173,
+      "protein": 27.6,
+      "carbs": 0,
+      "fat": 6.08
+    },
+    "raw": {
+      "fdcId": 168251,
+      "description": "Pork, fresh, loin, top loin (chops), boneless, separable lean only, raw",
+      "kcal": 127,
+      "protein": 22.4,
+      "carbs": 0,
+      "fat": 3.42
+    },
+    "notes": "Boneless top loin chop, lean only. Chosen over bone-in center chops because gram weights of bone-in chops include bone."
+  },
+  {
+    "name": "Pork tenderloin",
+    "aliases": [
+      "pork tenderloin",
+      "tenderloin pork",
+      "pork fillet"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 168250,
+      "description": "Pork, fresh, loin, tenderloin, separable lean only, cooked, roasted",
+      "kcal": 143,
+      "protein": 26.2,
+      "carbs": 0,
+      "fat": 3.51
+    },
+    "raw": {
+      "fdcId": 168249,
+      "description": "Pork, fresh, loin, tenderloin, separable lean only, raw",
+      "kcal": 109,
+      "protein": 21,
+      "carbs": 0,
+      "fat": 2.17
+    }
+  },
+  {
+    "name": "Pork loin",
+    "aliases": [
+      "pork loin",
+      "pork loin roast",
+      "roast pork",
+      "pork roast"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 168233,
+      "description": "Pork, fresh, loin, whole, separable lean only, cooked, roasted",
+      "kcal": 209,
+      "protein": 28.6,
+      "carbs": 0,
+      "fat": 9.63
+    },
+    "raw": {
+      "fdcId": 168230,
+      "description": "Pork, fresh, loin, whole, separable lean only, raw",
+      "kcal": 143,
+      "protein": 21.4,
+      "carbs": 0,
+      "fat": 5.66
+    }
+  },
+  {
+    "name": "Ground pork",
+    "aliases": [
+      "ground pork",
+      "pork mince",
+      "minced pork",
+      "pork ground"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 169192,
+      "description": "Pork, ground, 84% lean / 16% fat, cooked, crumbles",
+      "kcal": 289,
+      "protein": 26.7,
+      "carbs": 0.58,
+      "fat": 20
+    },
+    "raw": {
+      "fdcId": 168372,
+      "description": "Pork, ground, 84% lean / 16% fat, raw",
+      "kcal": 218,
+      "protein": 18,
+      "carbs": 0.44,
+      "fat": 16
+    }
+  },
+  {
+    "name": "Pork ribs",
+    "aliases": [
+      "pork ribs",
+      "ribs",
+      "spare ribs",
+      "spareribs",
+      "pork spare ribs"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 167854,
+      "description": "Pork, fresh, spareribs, separable lean and fat, cooked, braised",
+      "kcal": 397,
+      "protein": 29.1,
+      "carbs": 0,
+      "fat": 30.3
+    },
+    "raw": {
+      "fdcId": 167853,
+      "description": "Pork, fresh, spareribs, separable lean and fat, raw",
+      "kcal": 277,
+      "protein": 15.5,
+      "carbs": 0,
+      "fat": 23.4
+    },
+    "notes": "Spareribs, lean and fat, no sauce. Values are per 100 g of edible meat (bone excluded)."
+  },
+  {
+    "name": "Bacon",
+    "aliases": [
+      "bacon",
+      "bacon strips",
+      "pork bacon"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2705889,
+      "description": "Pork bacon, smoked or cured, cooked",
+      "kcal": 468,
+      "protein": 33.92,
+      "carbs": 1.7,
+      "fat": 35.09
+    },
+    "raw": {
+      "fdcId": 168277,
+      "description": "Pork, cured, bacon, unprepared",
+      "kcal": 393,
+      "protein": 13.7,
+      "carbs": 0,
+      "fat": 37.1
+    },
+    "notes": "Cooked is the FNDDS generic cooked bacon; raw is SR uncooked cured bacon. Bacon loses ~2/3 of its weight cooking, so raw vs cooked grams differ a lot."
+  },
+  {
+    "name": "Ham, deli",
+    "aliases": [
+      "ham",
+      "deli ham",
+      "sliced ham",
+      "ham slices",
+      "ham lunch meat"
+    ],
+    "cooked": {
+      "fdcId": 332397,
+      "description": "Ham, sliced, pre-packaged, deli meat (96%fat free, water added)",
+      "kcal": 106,
+      "protein": 16.7,
+      "carbs": 0.27,
+      "fat": 3.73
+    },
+    "raw": null,
+    "notes": "Foundation Foods analyzed deli ham. FNDDS generic 'Ham' (2705878, 117 kcal) is the alternative."
+  },
+  {
+    "name": "Breakfast sausage",
+    "aliases": [
+      "breakfast sausage",
+      "pork sausage",
+      "sausage links",
+      "sausage patty",
+      "sausage patties",
+      "sausage"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 174578,
+      "description": "Pork sausage, link/patty, cooked, pan-fried",
+      "kcal": 325,
+      "protein": 18.5,
+      "carbs": 1.42,
+      "fat": 27.2
+    },
+    "raw": {
+      "fdcId": 172934,
+      "description": "Pork sausage, link/patty, unprepared",
+      "kcal": 288,
+      "protein": 15.4,
+      "carbs": 0.93,
+      "fat": 24.8
+    }
+  },
+  {
+    "name": "Italian sausage",
+    "aliases": [
+      "italian sausage",
+      "italian sausages",
+      "sweet italian sausage",
+      "mild italian sausage"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 746780,
+      "description": "Sausage, Italian, pork, mild, cooked, pan-fried",
+      "kcal": 322,
+      "protein": 18.2,
+      "carbs": 2.15,
+      "fat": 26.2
+    },
+    "raw": {
+      "fdcId": 171631,
+      "description": "Sausage, Italian, pork, mild, raw",
+      "kcal": 290,
+      "protein": 13.9,
+      "carbs": 2.97,
+      "fat": 24.3
+    }
+  },
+  {
+    "name": "Hot dog",
+    "aliases": [
+      "hot dog",
+      "hot dogs",
+      "hotdog",
+      "frankfurter",
+      "beef hot dog",
+      "wiener"
+    ],
+    "cooked": {
+      "fdcId": 2706167,
+      "description": "Hot dog, beef",
+      "kcal": 310,
+      "protein": 11.7,
+      "carbs": 2.89,
+      "fat": 28
+    },
+    "raw": null
+  },
+  {
+    "name": "Pepperoni",
+    "aliases": [
+      "pepperoni",
+      "pepperoni slices"
+    ],
+    "cooked": {
+      "fdcId": 174575,
+      "description": "Pepperoni, beef and pork, sliced",
+      "kcal": 504,
+      "protein": 19.2,
+      "carbs": 1.18,
+      "fat": 46.3
+    },
+    "raw": null
+  },
+  {
+    "name": "Salami",
+    "aliases": [
+      "salami",
+      "hard salami",
+      "dry salami",
+      "genoa salami"
+    ],
+    "cooked": {
+      "fdcId": 172938,
+      "description": "Salami, dry or hard, pork",
+      "kcal": 407,
+      "protein": 22.6,
+      "carbs": 1.6,
+      "fat": 33.7
+    },
+    "raw": null
+  },
+  {
+    "name": "Lamb chop",
+    "aliases": [
+      "lamb chop",
+      "lamb chops",
+      "lamb loin chop",
+      "lamb loin",
+      "lamb"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 174413,
+      "description": "Lamb, Australian, imported, fresh, loin, separable lean only, trimmed to 1/8\" fat, cooked, broiled",
+      "kcal": 192,
+      "protein": 26.5,
+      "carbs": 0,
+      "fat": 8.75
+    },
+    "raw": {
+      "fdcId": 172588,
+      "description": "Lamb, Australian, imported, fresh, loin, separable lean only, trimmed to 1/8\" fat, raw",
+      "kcal": 146,
+      "protein": 21,
+      "carbs": 0,
+      "fat": 6.24
+    },
+    "notes": "Australian loin pair used because it is an exact raw/broiled match; the US domestic 'Lamb, loin, lean only, 1/4\" fat, choice' raw entry never surfaced. Most US retail lamb is Australian anyway."
+  },
+  {
+    "name": "Ground lamb",
+    "aliases": [
+      "ground lamb",
+      "lamb mince",
+      "minced lamb",
+      "lamb ground"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 172544,
+      "description": "Lamb, ground, cooked, broiled",
+      "kcal": 283,
+      "protein": 24.8,
+      "carbs": 0,
+      "fat": 19.6
+    },
+    "raw": {
+      "fdcId": 174370,
+      "description": "Lamb, ground, raw",
+      "kcal": 282,
+      "protein": 16.6,
+      "carbs": 0,
+      "fat": 23.4
+    }
+  },
+  {
+    "name": "Ground bison",
+    "aliases": [
+      "ground bison",
+      "bison",
+      "bison ground",
+      "buffalo ground",
+      "ground buffalo",
+      "bison burger"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 174422,
+      "description": "Game meat, bison, ground, cooked, pan-broiled",
+      "kcal": 238,
+      "protein": 23.8,
+      "carbs": 0,
+      "fat": 15.1
+    },
+    "raw": {
+      "fdcId": 174421,
+      "description": "Game meat , bison, ground, raw",
+      "kcal": 223,
+      "protein": 18.7,
+      "carbs": 0,
+      "fat": 15.9
+    }
+  }
+]

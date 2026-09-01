@@ -1,0 +1,523 @@
+[
+  {
+    "name": "Chicken breast",
+    "aliases": [
+      "chicken breast",
+      "chicken breasts",
+      "grilled chicken",
+      "roasted chicken breast",
+      "baked chicken",
+      "chicken"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2705956,
+      "description": "Chicken breast, baked, broiled, or roasted, skin not eaten, from raw",
+      "kcal": 161,
+      "protein": 30.22,
+      "carbs": 0,
+      "fat": 3.52
+    },
+    "raw": {
+      "fdcId": 171077,
+      "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+      "kcal": 120,
+      "protein": 22.5,
+      "carbs": 0,
+      "fat": 2.62
+    },
+    "notes": "Cooked = FNDDS baked/broiled/roasted skin not eaten (161 kcal/30 P). FNDDS 'Chicken breast, grilled without sauce, skin not eaten' (2705968, 176 kcal/5.5 F) is a plausible alternative but reads high in fat for skinless breast."
+  },
+  {
+    "name": "Chicken thigh, skinless",
+    "aliases": [
+      "chicken thigh",
+      "chicken thighs",
+      "skinless chicken thigh",
+      "boneless skinless thigh",
+      "chicken thigh skinless"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2706030,
+      "description": "Chicken thigh, baked, broiled, or roasted, skin not eaten, from raw",
+      "kcal": 178,
+      "protein": 24.61,
+      "carbs": 0,
+      "fat": 8.1
+    },
+    "raw": {
+      "fdcId": 173627,
+      "description": "Chicken, broilers or fryers, dark meat, thigh, meat only, raw",
+      "kcal": 121,
+      "protein": 19.7,
+      "carbs": 0,
+      "fat": 4.12
+    }
+  },
+  {
+    "name": "Chicken drumstick",
+    "aliases": [
+      "chicken drumstick",
+      "chicken drumsticks",
+      "drumstick",
+      "drumsticks",
+      "chicken leg"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2706003,
+      "description": "Chicken drumstick, baked, broiled, or roasted, skin not eaten, from raw",
+      "kcal": 154,
+      "protein": 24.1,
+      "carbs": 0,
+      "fat": 5.67
+    },
+    "raw": {
+      "fdcId": 173614,
+      "description": "Chicken, broilers or fryers, dark meat, drumstick, meat only, raw",
+      "kcal": 116,
+      "protein": 19.4,
+      "carbs": 0,
+      "fat": 3.71
+    },
+    "notes": "Skin not eaten. Raw is SR 'dark meat, drumstick, meat only, raw'."
+  },
+  {
+    "name": "Chicken wing",
+    "aliases": [
+      "chicken wing",
+      "chicken wings",
+      "wings",
+      "plain wings"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2706057,
+      "description": "Chicken wing, baked, broiled, or roasted, from raw",
+      "kcal": 252,
+      "protein": 23.6,
+      "carbs": 0,
+      "fat": 16.74
+    },
+    "raw": {
+      "fdcId": 172390,
+      "description": "Chicken, broilers or fryers, wing, meat and skin, raw",
+      "kcal": 191,
+      "protein": 17.5,
+      "carbs": 0,
+      "fat": 12.8
+    },
+    "notes": "Both halves are meat AND skin (wings are eaten with skin). Cooked is plain baked/roasted from raw, not sauced or breaded."
+  },
+  {
+    "name": "Chicken leg (drumstick + thigh)",
+    "aliases": [
+      "chicken leg",
+      "chicken legs",
+      "leg quarter",
+      "drumstick and thigh",
+      "chicken leg quarter"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2705985,
+      "description": "Chicken leg, drumstick and thigh, baked or broiled, skin not eaten",
+      "kcal": 168,
+      "protein": 24.41,
+      "carbs": 0,
+      "fat": 7.13
+    },
+    "raw": {
+      "fdcId": 173619,
+      "description": "Chicken, broilers or fryers, leg, meat only, raw",
+      "kcal": 120,
+      "protein": 19.2,
+      "carbs": 0,
+      "fat": 4.22
+    },
+    "notes": "Skin not eaten. Raw is SR 'leg, meat only, raw'."
+  },
+  {
+    "name": "Rotisserie chicken, meat only",
+    "aliases": [
+      "rotisserie chicken",
+      "rotisserie",
+      "costco chicken",
+      "whole chicken",
+      "roast chicken"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2705937,
+      "description": "Chicken, NS as to part, rotisserie, skin not eaten",
+      "kcal": 164,
+      "protein": 26.79,
+      "carbs": 0,
+      "fat": 6.36
+    },
+    "raw": {
+      "fdcId": 171052,
+      "description": "Chicken, broilers or fryers, meat only, raw",
+      "kcal": 119,
+      "protein": 21.4,
+      "carbs": 0,
+      "fat": 3.08
+    },
+    "notes": "Cooked is FNDDS rotisserie, part not specified, skin not eaten. Raw is SR whole broiler/fryer meat only raw (closest same-food raw; rotisserie birds are brined so cooked sodium differs, macros comparable)."
+  },
+  {
+    "name": "Ground chicken",
+    "aliases": [
+      "ground chicken",
+      "chicken mince",
+      "minced chicken",
+      "chicken crumbles"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2706091,
+      "description": "Chicken, ground",
+      "kcal": 201,
+      "protein": 27.14,
+      "carbs": 0,
+      "fat": 10.31
+    },
+    "raw": {
+      "fdcId": 171116,
+      "description": "Chicken, ground, raw",
+      "kcal": 143,
+      "protein": 17.4,
+      "carbs": 0.04,
+      "fat": 8.1
+    },
+    "notes": "Cooked is FNDDS 'Chicken, ground' (as consumed, cooked); raw is SR 'Chicken, ground, raw'. USDA does not distinguish fat % for ground chicken."
+  },
+  {
+    "name": "Chicken tenderloin, plain",
+    "aliases": [
+      "chicken tenderloin",
+      "chicken tenderloins",
+      "chicken tenders plain",
+      "grilled chicken tenders",
+      "chicken strips grilled",
+      "tenderloins"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2705956,
+      "description": "Chicken breast, baked, broiled, or roasted, skin not eaten, from raw",
+      "kcal": 161,
+      "protein": 30.22,
+      "carbs": 0,
+      "fat": 3.52
+    },
+    "raw": {
+      "fdcId": 171077,
+      "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+      "kcal": 120,
+      "protein": 22.5,
+      "carbs": 0,
+      "fat": 2.62
+    },
+    "notes": "USDA has no plain (unbreaded) tenderloin item in Foundation/SR/FNDDS; tenderloin is skinless breast muscle so this reuses the Chicken breast pair. Intentional duplicate fdcIds."
+  },
+  {
+    "name": "Chicken tenders, breaded",
+    "aliases": [
+      "breaded chicken tenders",
+      "chicken tenders",
+      "chicken strips",
+      "chicken fingers",
+      "breaded chicken strips"
+    ],
+    "cooked": {
+      "fdcId": 2706102,
+      "description": "Chicken tenders or strips, breaded, from frozen",
+      "kcal": 240,
+      "protein": 14.62,
+      "carbs": 14.86,
+      "fat": 13.58
+    },
+    "raw": null,
+    "notes": "FNDDS breaded, from frozen, cooked. No raw half by design."
+  },
+  {
+    "name": "Chicken nuggets",
+    "aliases": [
+      "chicken nuggets",
+      "nuggets",
+      "chicken nugget",
+      "mcnuggets"
+    ],
+    "cooked": {
+      "fdcId": 2706092,
+      "description": "Chicken nuggets, NFS",
+      "kcal": 307,
+      "protein": 15.92,
+      "carbs": 14.93,
+      "fat": 20.36
+    },
+    "raw": null,
+    "notes": "FNDDS 'Chicken nuggets, NFS' (cooked, generic). No raw half by design."
+  },
+  {
+    "name": "Chicken sausage",
+    "aliases": [
+      "chicken sausage",
+      "chicken sausages",
+      "chicken sausage link",
+      "turkey or chicken sausage"
+    ],
+    "cooked": {
+      "fdcId": 2706200,
+      "description": "Turkey or chicken sausage",
+      "kcal": 193,
+      "protein": 19.65,
+      "carbs": 1.09,
+      "fat": 12.24
+    },
+    "raw": null,
+    "notes": "FNDDS combines turkey and chicken sausage into one item; cooked/as-eaten only."
+  },
+  {
+    "name": "Chicken liver",
+    "aliases": [
+      "chicken liver",
+      "chicken livers",
+      "liver"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 171061,
+      "description": "Chicken, liver, all classes, cooked, simmered",
+      "kcal": 167,
+      "protein": 24.5,
+      "carbs": 0.87,
+      "fat": 6.51
+    },
+    "raw": {
+      "fdcId": 171060,
+      "description": "Chicken, liver, all classes, raw",
+      "kcal": 119,
+      "protein": 16.9,
+      "carbs": 0.73,
+      "fat": 4.83
+    },
+    "notes": "Cooked = simmered."
+  },
+  {
+    "name": "Turkey breast, roasted",
+    "aliases": [
+      "turkey breast",
+      "roasted turkey",
+      "roast turkey",
+      "turkey",
+      "turkey breast roasted",
+      "turkey light meat"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 174516,
+      "description": "Turkey, retail parts, breast, meat only, cooked, roasted",
+      "kcal": 136,
+      "protein": 29.5,
+      "carbs": 0,
+      "fat": 1.97
+    },
+    "raw": {
+      "fdcId": 174515,
+      "description": "Turkey, retail parts, breast, meat only, raw",
+      "kcal": 114,
+      "protein": 23.3,
+      "carbs": 0,
+      "fat": 2.33
+    },
+    "notes": "SR 'retail parts, breast, meat only' pair (roasted / raw)."
+  },
+  {
+    "name": "Ground turkey, 93/7",
+    "aliases": [
+      "ground turkey",
+      "ground turkey 93/7",
+      "93/7 turkey",
+      "lean ground turkey",
+      "turkey mince",
+      "turkey crumbles",
+      "93% ground turkey"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 746785,
+      "description": "Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles",
+      "kcal": 220,
+      "protein": 27.1,
+      "carbs": 0,
+      "fat": 11.6
+    },
+    "raw": {
+      "fdcId": 172850,
+      "description": "Turkey, ground, 93% lean, 7% fat, raw",
+      "kcal": 150,
+      "protein": 18.7,
+      "carbs": 0,
+      "fat": 8.34
+    },
+    "notes": "Cooked = pan-broiled crumbles."
+  },
+  {
+    "name": "Ground turkey, 85/15",
+    "aliases": [
+      "ground turkey 85/15",
+      "85/15 turkey",
+      "85% ground turkey",
+      "ground turkey 85"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 174494,
+      "description": "Turkey, ground, 85% lean, 15% fat, pan-broiled crumbles",
+      "kcal": 258,
+      "protein": 25.1,
+      "carbs": 0,
+      "fat": 17.4
+    },
+    "raw": {
+      "fdcId": 174493,
+      "description": "Turkey, ground, 85% lean, 15% fat, raw",
+      "kcal": 180,
+      "protein": 16.9,
+      "carbs": 0,
+      "fat": 12.5
+    },
+    "notes": "Cooked = pan-broiled crumbles."
+  },
+  {
+    "name": "Deli turkey breast",
+    "aliases": [
+      "deli turkey",
+      "turkey deli meat",
+      "sliced turkey",
+      "turkey lunch meat",
+      "turkey cold cuts",
+      "turkey slices",
+      "deli turkey breast"
+    ],
+    "cooked": {
+      "fdcId": 2706215,
+      "description": "Turkey, prepackaged or deli, luncheon meat",
+      "kcal": 106,
+      "protein": 14.81,
+      "carbs": 2.2,
+      "fat": 3.77
+    },
+    "raw": null,
+    "notes": "FNDDS 'Turkey, prepackaged or deli, luncheon meat'. No raw state."
+  },
+  {
+    "name": "Turkey bacon",
+    "aliases": [
+      "turkey bacon",
+      "turkey bacon strips"
+    ],
+    "cooked": {
+      "fdcId": 2706135,
+      "description": "Turkey bacon, cooked",
+      "kcal": 368,
+      "protein": 29.5,
+      "carbs": 4.24,
+      "fat": 25.87
+    },
+    "raw": null,
+    "notes": "FNDDS cooked turkey bacon. No raw half (unprepared turkey bacon not meaningfully logged)."
+  },
+  {
+    "name": "Turkey sausage",
+    "aliases": [
+      "turkey sausage",
+      "turkey sausages",
+      "turkey breakfast sausage",
+      "turkey sausage link",
+      "turkey sausage patty"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 173871,
+      "description": "Sausage, turkey, fresh, cooked",
+      "kcal": 196,
+      "protein": 23.9,
+      "carbs": 0,
+      "fat": 10.4
+    },
+    "raw": {
+      "fdcId": 174617,
+      "description": "Sausage, turkey, fresh, raw",
+      "kcal": 155,
+      "protein": 18.8,
+      "carbs": 0.47,
+      "fat": 8.08
+    },
+    "notes": "SR 'Sausage, turkey, fresh' pair (cooked / raw)."
+  },
+  {
+    "name": "Duck breast, skin-on",
+    "aliases": [
+      "duck breast",
+      "duck",
+      "roasted duck breast",
+      "duck breast with skin",
+      "pekin duck breast"
+    ],
+    "cooked": {
+      "fdcId": 171510,
+      "description": "Duck, young duckling, domesticated, White Pekin, breast, meat and skin, boneless, cooked, roasted",
+      "kcal": 202,
+      "protein": 24.5,
+      "carbs": 0,
+      "fat": 10.8
+    },
+    "raw": null,
+    "notes": "SR White Pekin duck breast, meat and skin, boneless, roasted. The matching raw item (same description, raw) was not returned by the endpoint after 3 attempts, so raw is null. See 'Duck, skinless' for a raw/cooked pair."
+  },
+  {
+    "name": "Duck, skinless",
+    "aliases": [
+      "duck skinless",
+      "duck meat only",
+      "duck skin not eaten",
+      "duck meat"
+    ],
+    "default": "cooked",
+    "rawLabel": "Raw",
+    "cooked": {
+      "fdcId": 2706140,
+      "description": "Duck, roasted, skin not eaten",
+      "kcal": 200,
+      "protein": 23.38,
+      "carbs": 0,
+      "fat": 11.15
+    },
+    "raw": {
+      "fdcId": 172410,
+      "description": "Duck, domesticated, meat only, raw",
+      "kcal": 135,
+      "protein": 18.3,
+      "carbs": 0.94,
+      "fat": 5.95
+    },
+    "notes": "Cooked = FNDDS 'Duck, roasted, skin not eaten'; raw = SR 'Duck, domesticated, meat only, raw'. Whole-duck meat, not breast-specific."
+  }
+]

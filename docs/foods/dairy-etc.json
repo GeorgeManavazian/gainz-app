@@ -1,0 +1,1114 @@
+[
+  {
+    "name": "Milk, whole",
+    "aliases": [
+      "whole milk",
+      "milk",
+      "milk whole",
+      "full fat milk",
+      "3% milk",
+      "vitamin d milk"
+    ],
+    "cooked": {
+      "fdcId": 2705385,
+      "description": "Milk, whole",
+      "kcal": 61,
+      "protein": 3.27,
+      "carbs": 4.63,
+      "fat": 3.2
+    },
+    "raw": null
+  },
+  {
+    "name": "Milk, 2%",
+    "aliases": [
+      "2% milk",
+      "2 percent milk",
+      "two percent milk",
+      "reduced fat milk",
+      "milk 2%"
+    ],
+    "cooked": {
+      "fdcId": 2705386,
+      "description": "Milk, reduced fat (2%)",
+      "kcal": 50,
+      "protein": 3.36,
+      "carbs": 4.9,
+      "fat": 1.9
+    },
+    "raw": null
+  },
+  {
+    "name": "Milk, 1%",
+    "aliases": [
+      "1% milk",
+      "1 percent milk",
+      "one percent milk",
+      "low fat milk",
+      "lowfat milk",
+      "milk 1%"
+    ],
+    "cooked": {
+      "fdcId": 2705387,
+      "description": "Milk, low fat (1%)",
+      "kcal": 43,
+      "protein": 3.38,
+      "carbs": 5.18,
+      "fat": 0.95
+    },
+    "raw": null
+  },
+  {
+    "name": "Milk, skim",
+    "aliases": [
+      "skim milk",
+      "nonfat milk",
+      "non-fat milk",
+      "fat free milk",
+      "fat-free milk",
+      "milk skim"
+    ],
+    "cooked": {
+      "fdcId": 2705388,
+      "description": "Milk, fat free (skim)",
+      "kcal": 34,
+      "protein": 3.43,
+      "carbs": 4.92,
+      "fat": 0.08
+    },
+    "raw": null
+  },
+  {
+    "name": "Almond milk, unsweetened",
+    "aliases": [
+      "almond milk",
+      "unsweetened almond milk",
+      "almond milk unsweetened",
+      "almondmilk"
+    ],
+    "cooked": {
+      "fdcId": 2705409,
+      "description": "Almond milk, unsweetened",
+      "kcal": 15,
+      "protein": 0.55,
+      "carbs": 0.34,
+      "fat": 1.22
+    },
+    "raw": null
+  },
+  {
+    "name": "Oat milk",
+    "aliases": [
+      "oat milk",
+      "oatmilk",
+      "oatly",
+      "planet oat"
+    ],
+    "cooked": {
+      "fdcId": 2705412,
+      "description": "Oat milk",
+      "kcal": 45,
+      "protein": 0.66,
+      "carbs": 5.37,
+      "fat": 2.33
+    },
+    "raw": null
+  },
+  {
+    "name": "Fairlife 2% milk",
+    "aliases": [
+      "fairlife",
+      "fairlife milk",
+      "fairlife 2%",
+      "fairlife 2% milk",
+      "ultra filtered milk",
+      "ultra-filtered milk"
+    ],
+    "cooked": {
+      "fdcId": 2757397,
+      "description": "Fairlife Milk, Ultra- Filtered",
+      "kcal": 41.7,
+      "protein": 5.42,
+      "carbs": 2.5,
+      "fat": 1.04
+    },
+    "raw": null,
+    "notes": "Branded label entry (Fairlife ultra-filtered reduced fat 2%). Numbers are per 100 g derived from the 240 mL label serving."
+  },
+  {
+    "name": "Fairlife fat free milk",
+    "aliases": [
+      "fairlife fat free",
+      "fairlife skim",
+      "fairlife 0%",
+      "fairlife fat free milk"
+    ],
+    "cooked": {
+      "fdcId": 2756934,
+      "description": "Fairlife Fat Free Ultra- Filtered Milk",
+      "kcal": 33.3,
+      "protein": 5.42,
+      "carbs": 2.5,
+      "fat": 0
+    },
+    "raw": null,
+    "notes": "Branded label entry."
+  },
+  {
+    "name": "Fairlife whole milk",
+    "aliases": [
+      "fairlife whole",
+      "fairlife whole milk",
+      "fairlife 3.5%"
+    ],
+    "cooked": {
+      "fdcId": 2757704,
+      "description": "Fairlife Whole Ultra- Filtered Milk",
+      "kcal": 62.5,
+      "protein": 5.42,
+      "carbs": 2.5,
+      "fat": 3.33
+    },
+    "raw": null,
+    "notes": "Branded label entry."
+  },
+  {
+    "name": "Greek yogurt, nonfat",
+    "aliases": [
+      "greek yogurt",
+      "nonfat greek yogurt",
+      "0% greek yogurt",
+      "fat free greek yogurt",
+      "plain greek yogurt",
+      "greek yogurt nonfat",
+      "fage 0%",
+      "oikos triple zero",
+      "chobani nonfat"
+    ],
+    "cooked": {
+      "fdcId": 2705424,
+      "description": "Yogurt, Greek, nonfat milk, plain",
+      "kcal": 59,
+      "protein": 10.3,
+      "carbs": 3.64,
+      "fat": 0.37
+    },
+    "raw": null
+  },
+  {
+    "name": "Greek yogurt, 2%",
+    "aliases": [
+      "2% greek yogurt",
+      "greek yogurt 2%",
+      "low fat greek yogurt",
+      "lowfat greek yogurt",
+      "fage 2%",
+      "greek yogurt low fat"
+    ],
+    "cooked": {
+      "fdcId": 2705423,
+      "description": "Yogurt, Greek, low fat milk, plain",
+      "kcal": 67,
+      "protein": 10.2,
+      "carbs": 3.6,
+      "fat": 1.36
+    },
+    "raw": null
+  },
+  {
+    "name": "Greek yogurt, whole milk",
+    "aliases": [
+      "whole milk greek yogurt",
+      "greek yogurt whole milk",
+      "5% greek yogurt",
+      "full fat greek yogurt",
+      "fage 5%"
+    ],
+    "cooked": {
+      "fdcId": 2705422,
+      "description": "Yogurt, Greek, whole milk, plain",
+      "kcal": 94,
+      "protein": 8.78,
+      "carbs": 4.75,
+      "fat": 4.39
+    },
+    "raw": null
+  },
+  {
+    "name": "Greek yogurt, vanilla",
+    "aliases": [
+      "vanilla greek yogurt",
+      "greek yogurt vanilla",
+      "flavored greek yogurt",
+      "greek yogurt flavored",
+      "oikos vanilla",
+      "chobani vanilla"
+    ],
+    "cooked": {
+      "fdcId": 170907,
+      "description": "Yogurt, Greek, vanilla, lowfat",
+      "kcal": 95,
+      "protein": 8.64,
+      "carbs": 9.54,
+      "fat": 2.5
+    },
+    "raw": null,
+    "notes": "SR Legacy lowfat vanilla Greek; flavored/sweetened Greek yogurts vary a lot by brand."
+  },
+  {
+    "name": "Yogurt, plain",
+    "aliases": [
+      "yogurt",
+      "plain yogurt",
+      "regular yogurt",
+      "whole milk yogurt",
+      "yogurt plain",
+      "yoghurt"
+    ],
+    "cooked": {
+      "fdcId": 2705418,
+      "description": "Yogurt, whole milk, plain",
+      "kcal": 78,
+      "protein": 3.82,
+      "carbs": 5.57,
+      "fat": 4.48
+    },
+    "raw": null,
+    "notes": "Whole-milk plain (non-Greek) yogurt."
+  },
+  {
+    "name": "Yogurt, plain, low fat",
+    "aliases": [
+      "low fat yogurt",
+      "lowfat yogurt",
+      "plain low fat yogurt",
+      "yogurt low fat"
+    ],
+    "cooked": {
+      "fdcId": 2705419,
+      "description": "Yogurt, low fat milk, plain",
+      "kcal": 63,
+      "protein": 5.25,
+      "carbs": 7.04,
+      "fat": 1.55
+    },
+    "raw": null
+  },
+  {
+    "name": "Cottage cheese, 2%",
+    "aliases": [
+      "cottage cheese",
+      "low fat cottage cheese",
+      "lowfat cottage cheese",
+      "2% cottage cheese",
+      "cottage cheese 2%",
+      "good culture"
+    ],
+    "cooked": {
+      "fdcId": 328841,
+      "description": "Cheese, cottage, lowfat, 2% milkfat",
+      "kcal": 84,
+      "protein": 11,
+      "carbs": 4.31,
+      "fat": 2.3
+    },
+    "raw": null
+  },
+  {
+    "name": "Cottage cheese, 1%",
+    "aliases": [
+      "1% cottage cheese",
+      "cottage cheese 1%",
+      "cottage cheese nonfat"
+    ],
+    "cooked": {
+      "fdcId": 173417,
+      "description": "Cheese, cottage, lowfat, 1% milkfat",
+      "kcal": 72,
+      "protein": 12.4,
+      "carbs": 2.72,
+      "fat": 1.02
+    },
+    "raw": null
+  },
+  {
+    "name": "Cheddar cheese",
+    "aliases": [
+      "cheddar",
+      "cheddar cheese",
+      "cheese",
+      "shredded cheddar",
+      "sharp cheddar"
+    ],
+    "cooked": {
+      "fdcId": 2705709,
+      "description": "Cheese, Cheddar",
+      "kcal": 409,
+      "protein": 23.3,
+      "carbs": 2.44,
+      "fat": 34
+    },
+    "raw": null
+  },
+  {
+    "name": "Mozzarella, part skim",
+    "aliases": [
+      "mozzarella",
+      "mozzarella cheese",
+      "part skim mozzarella",
+      "shredded mozzarella",
+      "low moisture mozzarella"
+    ],
+    "cooked": {
+      "fdcId": 2705723,
+      "description": "Cheese, Mozzarella, part skim",
+      "kcal": 296,
+      "protein": 23.7,
+      "carbs": 4.44,
+      "fat": 20.4
+    },
+    "raw": null
+  },
+  {
+    "name": "American cheese",
+    "aliases": [
+      "american cheese",
+      "american",
+      "cheese slice",
+      "kraft singles",
+      "processed cheese"
+    ],
+    "cooked": {
+      "fdcId": 2705764,
+      "description": "Cheese, American",
+      "kcal": 340,
+      "protein": 16.79,
+      "carbs": 7.16,
+      "fat": 27.16
+    },
+    "raw": null
+  },
+  {
+    "name": "Parmesan cheese",
+    "aliases": [
+      "parmesan",
+      "parmesan cheese",
+      "parmigiano",
+      "parmigiano reggiano",
+      "grated parmesan"
+    ],
+    "cooked": {
+      "fdcId": 2705730,
+      "description": "Cheese, Parmesan, hard",
+      "kcal": 412,
+      "protein": 29.87,
+      "carbs": 8.36,
+      "fat": 28.75
+    },
+    "raw": null
+  },
+  {
+    "name": "Feta cheese",
+    "aliases": [
+      "feta",
+      "feta cheese",
+      "crumbled feta"
+    ],
+    "cooked": {
+      "fdcId": 2705714,
+      "description": "Cheese, Feta",
+      "kcal": 273,
+      "protein": 19.71,
+      "carbs": 5.58,
+      "fat": 19.08
+    },
+    "raw": null
+  },
+  {
+    "name": "Cream cheese",
+    "aliases": [
+      "cream cheese",
+      "philadelphia",
+      "cream cheese plain"
+    ],
+    "cooked": {
+      "fdcId": 2705760,
+      "description": "Cream cheese, regular, plain",
+      "kcal": 343,
+      "protein": 5.79,
+      "carbs": 4.56,
+      "fat": 33.49
+    },
+    "raw": null
+  },
+  {
+    "name": "String cheese",
+    "aliases": [
+      "string cheese",
+      "cheese stick",
+      "cheese sticks",
+      "mozzarella stick",
+      "frigo string cheese"
+    ],
+    "cooked": {
+      "fdcId": 2553837,
+      "description": "STRING CHEESE",
+      "kcal": 286,
+      "protein": 25,
+      "carbs": 3.57,
+      "fat": 17.9
+    },
+    "raw": null,
+    "notes": "Branded-label 'STRING CHEESE' (part-skim mozzarella stick). Generic FNDDS 'Cheese, Mozzarella, part skim' (2705723) is nearly identical if this id ever disappears."
+  },
+  {
+    "name": "Butter",
+    "aliases": [
+      "butter",
+      "salted butter",
+      "butter salted",
+      "stick butter",
+      "kerrygold"
+    ],
+    "cooked": {
+      "fdcId": 173410,
+      "description": "Butter, salted",
+      "kcal": 717,
+      "protein": 0.85,
+      "carbs": 0.06,
+      "fat": 81.1
+    },
+    "raw": null
+  },
+  {
+    "name": "Whey protein powder",
+    "aliases": [
+      "whey",
+      "whey protein",
+      "protein powder",
+      "whey protein powder",
+      "protein shake powder",
+      "whey isolate",
+      "scoop of protein"
+    ],
+    "cooked": {
+      "fdcId": 173180,
+      "description": "Beverages, Protein powder whey based",
+      "kcal": 352,
+      "protein": 78.1,
+      "carbs": 6.25,
+      "fat": 1.56
+    },
+    "raw": null,
+    "notes": "Generic SR Legacy whey-based protein powder (~78 g protein/100 g). Real tubs vary; override with label when known."
+  },
+  {
+    "name": "Casein protein powder",
+    "aliases": [
+      "casein",
+      "casein protein",
+      "micellar casein",
+      "casein powder"
+    ],
+    "cooked": {
+      "fdcId": 2412812,
+      "description": "CASEIN PROTEIN 24 G MICELLAR CASEIN POWDER, UNFLAVORED, UNFLAVORED",
+      "kcal": 367,
+      "protein": 80,
+      "carbs": 0,
+      "fat": 0
+    },
+    "raw": null,
+    "notes": "Only branded label entries exist for casein in USDA; this is an unflavored micellar casein (80 g protein/100 g)."
+  },
+  {
+    "name": "Protein bar",
+    "aliases": [
+      "protein bar",
+      "protein bars",
+      "quest bar",
+      "barebells",
+      "built bar",
+      "one bar"
+    ],
+    "cooked": {
+      "fdcId": 2708124,
+      "description": "Nutrition bar (South Beach Living High Protein Bar)",
+      "kcal": 412,
+      "protein": 30.34,
+      "carbs": 38.4,
+      "fat": 15.17
+    },
+    "raw": null,
+    "notes": "Generic placeholder (FNDDS 'High Protein Bar' ~412 kcal / 30 P per 100 g). Real bars vary widely; override with label when known."
+  },
+  {
+    "name": "Peanut butter",
+    "aliases": [
+      "peanut butter",
+      "pb",
+      "creamy peanut butter",
+      "smooth peanut butter",
+      "natural peanut butter",
+      "jif"
+    ],
+    "cooked": {
+      "fdcId": 2707537,
+      "description": "Peanut butter",
+      "kcal": 598,
+      "protein": 22.21,
+      "carbs": 22.31,
+      "fat": 51.36
+    },
+    "raw": null
+  },
+  {
+    "name": "Skippy peanut butter",
+    "aliases": [
+      "skippy",
+      "skippy peanut butter",
+      "skippy creamy"
+    ],
+    "cooked": {
+      "fdcId": 1759570,
+      "description": "SKIPPY, PEANUT BUTTER",
+      "kcal": 594,
+      "protein": 21.9,
+      "carbs": 18.8,
+      "fat": 50
+    },
+    "raw": null,
+    "notes": "Branded label entry."
+  },
+  {
+    "name": "Almond butter",
+    "aliases": [
+      "almond butter",
+      "almond butter creamy"
+    ],
+    "cooked": {
+      "fdcId": 2707533,
+      "description": "Almond butter",
+      "kcal": 641,
+      "protein": 20.67,
+      "carbs": 21.11,
+      "fat": 52.72
+    },
+    "raw": null
+  },
+  {
+    "name": "Almonds",
+    "aliases": [
+      "almonds",
+      "almond",
+      "raw almonds",
+      "whole almonds",
+      "nuts"
+    ],
+    "cooked": {
+      "fdcId": 2707486,
+      "description": "Almonds, unroasted",
+      "kcal": 626,
+      "protein": 21.45,
+      "carbs": 20.03,
+      "fat": 51.09
+    },
+    "raw": null,
+    "notes": "Unroasted (raw) almonds; roasted is within a few percent."
+  },
+  {
+    "name": "Walnuts",
+    "aliases": [
+      "walnuts",
+      "walnut",
+      "english walnuts",
+      "walnut halves"
+    ],
+    "cooked": {
+      "fdcId": 170187,
+      "description": "Nuts, walnuts, english",
+      "kcal": 654,
+      "protein": 15.2,
+      "carbs": 13.7,
+      "fat": 65.2
+    },
+    "raw": null
+  },
+  {
+    "name": "Cashews",
+    "aliases": [
+      "cashews",
+      "cashew",
+      "roasted cashews",
+      "salted cashews",
+      "cashew nuts"
+    ],
+    "cooked": {
+      "fdcId": 2707495,
+      "description": "Cashews, salted",
+      "kcal": 578,
+      "protein": 14.7,
+      "carbs": 31.4,
+      "fat": 47.48
+    },
+    "raw": null,
+    "notes": "Roasted salted; unsalted (2707497) is within 1%."
+  },
+  {
+    "name": "Peanuts",
+    "aliases": [
+      "peanuts",
+      "peanut",
+      "roasted peanuts",
+      "salted peanuts"
+    ],
+    "cooked": {
+      "fdcId": 2707515,
+      "description": "Peanuts, roasted, salted",
+      "kcal": 599,
+      "protein": 28.03,
+      "carbs": 15.26,
+      "fat": 52.5
+    },
+    "raw": null
+  },
+  {
+    "name": "Pistachios",
+    "aliases": [
+      "pistachios",
+      "pistachio",
+      "pistachio nuts",
+      "roasted pistachios",
+      "wonderful pistachios"
+    ],
+    "cooked": {
+      "fdcId": 2707528,
+      "description": "Pistachio nuts, salted",
+      "kcal": 576,
+      "protein": 20.22,
+      "carbs": 27.16,
+      "fat": 46.98
+    },
+    "raw": null,
+    "notes": "Salted, kernel weight (shells removed)."
+  },
+  {
+    "name": "Mixed nuts",
+    "aliases": [
+      "mixed nuts",
+      "mixed nut",
+      "nut mix",
+      "planters mixed nuts"
+    ],
+    "cooked": {
+      "fdcId": 2707507,
+      "description": "Mixed nuts, with peanuts, lightly salted",
+      "kcal": 612,
+      "protein": 19.67,
+      "carbs": 20.99,
+      "fat": 54.04
+    },
+    "raw": null,
+    "notes": "With peanuts, lightly salted."
+  },
+  {
+    "name": "Olive oil",
+    "aliases": [
+      "olive oil",
+      "evoo",
+      "extra virgin olive oil",
+      "oil"
+    ],
+    "cooked": {
+      "fdcId": 2710186,
+      "description": "Olive oil",
+      "kcal": 900,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 100
+    },
+    "raw": null
+  },
+  {
+    "name": "Avocado oil",
+    "aliases": [
+      "avocado oil",
+      "chosen foods"
+    ],
+    "cooked": {
+      "fdcId": 173573,
+      "description": "Oil, avocado",
+      "kcal": 884,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 100
+    },
+    "raw": null
+  },
+  {
+    "name": "Coconut oil",
+    "aliases": [
+      "coconut oil"
+    ],
+    "cooked": {
+      "fdcId": 2710182,
+      "description": "Coconut oil",
+      "kcal": 895,
+      "protein": 0,
+      "carbs": 0.84,
+      "fat": 99.1
+    },
+    "raw": null
+  },
+  {
+    "name": "Mayonnaise",
+    "aliases": [
+      "mayo",
+      "mayonnaise",
+      "regular mayo",
+      "hellmann's",
+      "hellmans",
+      "full fat mayo"
+    ],
+    "cooked": {
+      "fdcId": 2710204,
+      "description": "Mayonnaise, regular",
+      "kcal": 680,
+      "protein": 0.96,
+      "carbs": 0.57,
+      "fat": 74.85
+    },
+    "raw": null
+  },
+  {
+    "name": "Mayonnaise, light",
+    "aliases": [
+      "light mayo",
+      "light mayonnaise",
+      "lite mayo",
+      "reduced fat mayo",
+      "mayo light"
+    ],
+    "cooked": {
+      "fdcId": 2710220,
+      "description": "Mayonnaise, light",
+      "kcal": 238,
+      "protein": 0.37,
+      "carbs": 9.23,
+      "fat": 22.22
+    },
+    "raw": null
+  },
+  {
+    "name": "Ketchup",
+    "aliases": [
+      "ketchup",
+      "catsup",
+      "heinz ketchup",
+      "tomato ketchup"
+    ],
+    "cooked": {
+      "fdcId": 2709733,
+      "description": "Ketchup",
+      "kcal": 109,
+      "protein": 1.08,
+      "carbs": 27.1,
+      "fat": 0.32
+    },
+    "raw": null
+  },
+  {
+    "name": "Mustard",
+    "aliases": [
+      "mustard",
+      "yellow mustard",
+      "dijon",
+      "dijon mustard",
+      "prepared mustard"
+    ],
+    "cooked": {
+      "fdcId": 2710085,
+      "description": "Mustard",
+      "kcal": 69,
+      "protein": 4.25,
+      "carbs": 5.3,
+      "fat": 3.38
+    },
+    "raw": null
+  },
+  {
+    "name": "BBQ sauce",
+    "aliases": [
+      "bbq sauce",
+      "barbecue sauce",
+      "barbeque sauce",
+      "bbq"
+    ],
+    "cooked": {
+      "fdcId": 2709750,
+      "description": "Barbecue sauce",
+      "kcal": 172,
+      "protein": 0.82,
+      "carbs": 40.77,
+      "fat": 0.63
+    },
+    "raw": null
+  },
+  {
+    "name": "Honey",
+    "aliases": [
+      "honey",
+      "raw honey"
+    ],
+    "cooked": {
+      "fdcId": 2710281,
+      "description": "Honey",
+      "kcal": 304,
+      "protein": 0.3,
+      "carbs": 82.4,
+      "fat": 0
+    },
+    "raw": null
+  },
+  {
+    "name": "Maple syrup",
+    "aliases": [
+      "maple syrup",
+      "pure maple syrup",
+      "syrup"
+    ],
+    "cooked": {
+      "fdcId": 169661,
+      "description": "Syrups, maple",
+      "kcal": 260,
+      "protein": 0.04,
+      "carbs": 67,
+      "fat": 0.06
+    },
+    "raw": null
+  },
+  {
+    "name": "Jam",
+    "aliases": [
+      "jam",
+      "jelly",
+      "preserves",
+      "strawberry jam",
+      "grape jelly",
+      "fruit spread"
+    ],
+    "cooked": {
+      "fdcId": 2710301,
+      "description": "Jam",
+      "kcal": 278,
+      "protein": 0.37,
+      "carbs": 68.86,
+      "fat": 0.07
+    },
+    "raw": null
+  },
+  {
+    "name": "Sugar",
+    "aliases": [
+      "sugar",
+      "white sugar",
+      "granulated sugar",
+      "table sugar",
+      "cane sugar"
+    ],
+    "cooked": {
+      "fdcId": 2710258,
+      "description": "Sugar, white, granulated or lump",
+      "kcal": 401,
+      "protein": 0,
+      "carbs": 99.6,
+      "fat": 0.32
+    },
+    "raw": null
+  },
+  {
+    "name": "Sour cream",
+    "aliases": [
+      "sour cream",
+      "regular sour cream",
+      "daisy sour cream"
+    ],
+    "cooked": {
+      "fdcId": 2705614,
+      "description": "Sour cream, regular",
+      "kcal": 196,
+      "protein": 3.07,
+      "carbs": 5.56,
+      "fat": 17.99
+    },
+    "raw": null
+  },
+  {
+    "name": "Ranch dressing",
+    "aliases": [
+      "ranch",
+      "ranch dressing",
+      "hidden valley",
+      "ranch dip"
+    ],
+    "cooked": {
+      "fdcId": 2710212,
+      "description": "Ranch dressing",
+      "kcal": 430,
+      "protein": 1.32,
+      "carbs": 5.9,
+      "fat": 44.54
+    },
+    "raw": null
+  },
+  {
+    "name": "Soy sauce",
+    "aliases": [
+      "soy sauce",
+      "shoyu",
+      "tamari",
+      "kikkoman"
+    ],
+    "cooked": {
+      "fdcId": 2707442,
+      "description": "Soy sauce",
+      "kcal": 53,
+      "protein": 8.14,
+      "carbs": 4.93,
+      "fat": 0.57
+    },
+    "raw": null
+  },
+  {
+    "name": "Hot sauce",
+    "aliases": [
+      "hot sauce",
+      "tabasco",
+      "franks red hot",
+      "frank's red hot",
+      "cholula",
+      "hot pepper sauce"
+    ],
+    "cooked": {
+      "fdcId": 2710093,
+      "description": "Hot pepper sauce",
+      "kcal": 12,
+      "protein": 1.29,
+      "carbs": 0.8,
+      "fat": 0.76
+    },
+    "raw": null
+  },
+  {
+    "name": "Sriracha",
+    "aliases": [
+      "sriracha",
+      "sriracha sauce",
+      "huy fong"
+    ],
+    "cooked": {
+      "fdcId": 171186,
+      "description": "Sauce, hot chile, sriracha",
+      "kcal": 93,
+      "protein": 1.93,
+      "carbs": 19.2,
+      "fat": 0.93
+    },
+    "raw": null,
+    "notes": "Separate from generic hot sauce because sriracha has ~8x the carbs of vinegar-based hot sauce."
+  },
+  {
+    "name": "Salsa",
+    "aliases": [
+      "salsa",
+      "red salsa",
+      "tomato salsa",
+      "pico de gallo",
+      "salsa roja"
+    ],
+    "cooked": {
+      "fdcId": 2709736,
+      "description": "Salsa, NFS",
+      "kcal": 34,
+      "protein": 1.44,
+      "carbs": 6.74,
+      "fat": 0.19
+    },
+    "raw": null
+  },
+  {
+    "name": "Dark chocolate",
+    "aliases": [
+      "dark chocolate",
+      "chocolate",
+      "dark chocolate bar",
+      "70% chocolate",
+      "lindt dark"
+    ],
+    "cooked": {
+      "fdcId": 170271,
+      "description": "Chocolate, dark, 45- 59% cacao solids",
+      "kcal": 546,
+      "protein": 4.88,
+      "carbs": 61.2,
+      "fat": 31.3
+    },
+    "raw": null,
+    "notes": "45-59% cacao entry; 70-85% bars run ~600 kcal/100 g with more fat and fewer carbs."
+  },
+  {
+    "name": "Ice cream, vanilla",
+    "aliases": [
+      "ice cream",
+      "vanilla ice cream",
+      "ice cream vanilla",
+      "icecream"
+    ],
+    "cooked": {
+      "fdcId": 2705630,
+      "description": "Ice cream, vanilla",
+      "kcal": 207,
+      "protein": 3.5,
+      "carbs": 23.6,
+      "fat": 11
+    },
+    "raw": null
+  },
+  {
+    "name": "Heavy cream",
+    "aliases": [
+      "heavy cream",
+      "heavy whipping cream",
+      "whipping cream",
+      "cream"
+    ],
+    "cooked": {
+      "fdcId": 2705597,
+      "description": "Cream, heavy",
+      "kcal": 343,
+      "protein": 2.02,
+      "carbs": 3.8,
+      "fat": 35.56
+    },
+    "raw": null
+  },
+  {
+    "name": "Half and half",
+    "aliases": [
+      "half and half",
+      "half & half",
+      "half-and-half",
+      "coffee cream",
+      "creamer"
+    ],
+    "cooked": {
+      "fdcId": 2705594,
+      "description": "Cream, half and half",
+      "kcal": 131,
+      "protein": 3.13,
+      "carbs": 4.3,
+      "fat": 11.5
+    },
+    "raw": null
+  }
+]
