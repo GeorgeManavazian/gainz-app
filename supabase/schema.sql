@@ -73,3 +73,20 @@ create policy "own weigh_ins" on weigh_ins for all
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 
 alter table profiles add column if not exists last_adjusted_at timestamptz;
+
+-- Sub-project 3: workouts (paste this block only — the blocks above already exist)
+create table if not exists workouts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) default auth.uid(),
+  started_at timestamptz not null default now(),
+  ended_at timestamptz,
+  muscle_groups text[] not null default '{}'
+);
+
+alter table workouts enable row level security;
+
+create policy "own workouts" on workouts for all
+  using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+alter table lifts add column if not exists workout_id uuid references workouts(id);
+create index if not exists lifts_workout_id_idx on lifts (workout_id);
