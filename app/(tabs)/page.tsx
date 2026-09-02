@@ -1,6 +1,7 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import Ring from "@/components/Ring";
 import WeighInCard from "@/components/WeighInCard";
@@ -16,12 +17,24 @@ import { nextMeal, remaining } from "@/lib/hub";
 type Meal = { id: string; food_name: string; grams: number; calories: number;
   protein_g: number; carbs_g: number; fat_g: number; logged_at: string };
 
-export default function Hub() {
+function HubInner() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [profile, setProfile] = useState<ProfileRow | null | "error" | undefined>(undefined);
   const [weighIns, setWeighIns] = useState<WeighInRow[]>([]);
   const [active, setActive] = useState<WorkoutRow | null>(null);
   const [done, setDone] = useState<{ w: WorkoutRow; sets: number } | null>(null);
+  const params = useSearchParams();
+  const router = useRouter();
+  const [toast, setToast] = useState("");
+  useEffect(() => {
+    const n = Number(params.get("logged"));
+    if (n > 0) {
+      setToast(`Logged ${n} food${n === 1 ? "" : "s"} ✓`);
+      router.replace("/");
+      const t = setTimeout(() => setToast(""), 2500);
+      return () => clearTimeout(t);
+    }
+  }, [params, router]);
 
   const load = useCallback(async () => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
@@ -84,6 +97,9 @@ export default function Hub() {
   return (
     <AuthGuard>
       <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-28 pt-6 text-foreground">
+        {toast && (
+          <p className="rounded-xl border border-success/30 bg-success/10 px-4 py-2.5 text-sm font-medium text-success">{toast}</p>
+        )}
         <div className="flex items-center justify-between">
           <span className="text-2xl font-black italic tracking-tight text-accent">GAINZ</span>
           <div className="flex items-center gap-2">
@@ -228,5 +244,13 @@ export default function Hub() {
           trend={trend} slope={slope} onSave={saveWeight} />
       </main>
     </AuthGuard>
+  );
+}
+
+export default function Hub() {
+  return (
+    <Suspense fallback={null}>
+      <HubInner />
+    </Suspense>
   );
 }

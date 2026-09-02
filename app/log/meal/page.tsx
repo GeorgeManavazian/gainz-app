@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
 import { supabase } from "@/lib/supabase";
 import { logMeal } from "@/lib/log";
+import { listPatterns } from "@/lib/patterns-db";
+import { scaleItem, sortPatterns, totals, type PatternRow } from "@/lib/patterns";
 
 type Per100 = { kcal: number; protein: number; carbs: number; fat: number };
 type Item = { fdcId: number; name: string; description: string; group: string; badge: "raw" | "cooked" | null; pairable: boolean; per100g: Per100;
@@ -32,6 +35,8 @@ export default function LogMeal() {
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [patterns, setPatterns] = useState<PatternRow[]>([]);
+  useEffect(() => { listPatterns().then((p) => setPatterns(sortPatterns(p))).catch(() => setPatterns([])); }, []);
 
   // Foods you've logged before — instant, same values as last time.
   useEffect(() => {
@@ -269,6 +274,31 @@ export default function LogMeal() {
               className="w-full rounded-2xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
               placeholder="Search food… e.g. grilled chicken breast"
               value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
+
+            {q.trim().length < 2 && patterns.length > 0 && (
+              <section className="flex flex-col gap-1.5">
+                <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Your meals</h2>
+                <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border">
+                  {patterns.map((p) => {
+                    const t = totals(p.items.map((it) => scaleItem(it, it.grams)));
+                    return (
+                      <li key={p.id}>
+                        <Link href={`/log/meal/pattern/${p.id}`}
+                          className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2">
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-[15px] font-semibold text-foreground">{p.name}</span>
+                            <span className="mt-0.5 block text-[12px] tabular-nums text-muted">
+                              {p.items.length} foods · {t.kcal} kcal · {t.protein_g} P
+                            </span>
+                          </span>
+                          <span className="text-muted">›</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
 
             {historyHits.length > 0 && (
               <section className="flex flex-col gap-1.5">
