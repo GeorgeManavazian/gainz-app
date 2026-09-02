@@ -1,0 +1,23 @@
+{
+  "conversionId": "7da1a3f8-8c42-44c8-9981-f7ab297910e7",
+  "operationExpiresAt": "2026-09-09T00:06:26.874Z",
+  "manifestFile": "/home/user/code/gainz-app/docs/superpowers/design/2026-09-01-pattern-html/review/2026-09-01-pattern-review-12ui-B.html.assets/manifest.json",
+  "artifacts": [
+    {
+      "id": "responsive-reference-mobile",
+      "role": "responsive-reference",
+      "mediaType": "image/png",
+      "sha256": "d3ce79b032e46cd248c758e8d5e703dac88960f8da22652728a373368a81850f",
+      "sourceHref": "https://12ui.com/api/v1/convert/7da1a3f8-8c42-44c8-9981-f7ab297910e7?artifact=responsive-reference-mobile&expires=1788912386&signature=Lc0MG8Wy8HvNlk3pX3LT_bkE9PCceB2pnIFP05wNPHM",
+      "localPath": "/home/user/code/gainz-app/docs/superpowers/design/2026-09-01-pattern-html/review/2026-09-01-pattern-review-12ui-B.html.assets/responsive-reference-mobile-d3ce79b032e4.png"
+    },
+    {
+      "id": "source",
+      "role": "source",
+      "mediaType": "image/png",
+      "sha256": "c9703fb94c83bb4a98f29d644c6cc4913144430e59a538b146b51ca78d2050f3",
+      "sourceHref": "https://12ui.com/api/v1/convert/7da1a3f8-8c42-44c8-9981-f7ab297910e7?artifact=source&expires=1788912386&signature=cBZ_IymQHHjTfvZ4ZRgzvUrCiQWAJ_iEaieEcQdQVT0",
+      "localPath": "/home/user/code/gainz-app/docs/superpowers/design/2026-09-01-pattern-html/review/2026-09-01-pattern-review-12ui-B.html.assets/source-c9703fb94c83.png"
+    }
+  ]
+}

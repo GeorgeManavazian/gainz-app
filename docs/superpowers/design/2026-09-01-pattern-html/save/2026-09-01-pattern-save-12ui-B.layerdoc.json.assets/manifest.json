@@ -1,0 +1,15 @@
+{
+  "conversionId": "c5f90b29-2a6b-4ae0-8a7a-56afa03f5ed1",
+  "operationExpiresAt": "2026-09-09T00:10:13.477Z",
+  "manifestFile": "/home/user/code/gainz-app/docs/superpowers/design/2026-09-01-pattern-html/save/2026-09-01-pattern-save-12ui-B.layerdoc.json.assets/manifest.json",
+  "artifacts": [
+    {
+      "id": "source",
+      "role": "source",
+      "mediaType": "image/png",
+      "sha256": "e18cb49570ac756536217ba5cb3db94c3708558b8db5fca8354a0d233c44cec2",
+      "sourceHref": "https://12ui.com/api/v1/convert/c5f90b29-2a6b-4ae0-8a7a-56afa03f5ed1?artifact=source&expires=1788912613&signature=35W2ZhrY8QABr2xqP5JhYvEBbvYaR8lF4i9xgaWlMIo",
+      "localPath": "/home/user/code/gainz-app/docs/superpowers/design/2026-09-01-pattern-html/save/2026-09-01-pattern-save-12ui-B.layerdoc.json.assets/source-e18cb49570ac.png"
+    }
+  ]
+}
