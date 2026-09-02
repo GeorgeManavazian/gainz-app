@@ -31,10 +31,13 @@ function HubInner() {
     if (n > 0) {
       setToast(`Logged ${n} food${n === 1 ? "" : "s"} ✓`);
       router.replace("/");
-      const t = setTimeout(() => setToast(""), 2500);
-      return () => clearTimeout(t);
     }
   }, [params, router]);
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(""), 2500);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   const load = useCallback(async () => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
