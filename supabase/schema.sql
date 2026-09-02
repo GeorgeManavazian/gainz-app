@@ -90,3 +90,17 @@ create policy "own workouts" on workouts for all
 
 alter table lifts add column if not exists workout_id uuid references workouts(id);
 create index if not exists lifts_workout_id_idx on lifts (workout_id);
+
+-- Sub-project 4a: meal patterns (2026-09-01). Paste this block once.
+create table if not exists meal_patterns (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) default auth.uid(),
+  name text not null,
+  items jsonb not null,
+  created_at timestamptz not null default now(),
+  last_used_at timestamptz,
+  use_count integer not null default 0
+);
+alter table meal_patterns enable row level security;
+create policy "own meal_patterns" on meal_patterns for all
+  using (user_id = auth.uid()) with check (user_id = auth.uid());
