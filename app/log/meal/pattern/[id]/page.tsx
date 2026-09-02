@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
@@ -22,6 +22,7 @@ export default function PatternReview() {
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const loggedCountRef = useRef(0);   // total rows logged in this session of taps, across retries
 
   useEffect(() => {
     getPattern(id).then((p) => {
@@ -44,14 +45,20 @@ export default function PatternReview() {
   async function logAll() {
     if (!canLog || !pattern || pattern === "missing") return;
     setBusy(true); setErr("");
-    try {
-      for (const e of entries) await logMeal(e.entry);          // in order; queue keeps FIFO
-      markUsed(pattern).catch(() => { /* ordering only */ });
-      router.replace(`/?logged=${entries.length}`);
-    } catch {
-      setErr("Couldn't log. Check your connection and try again.");
-      setBusy(false);
+    for (const e of entries) {                                  // in order; queue keeps FIFO
+      try {
+        await logMeal(e.entry);
+      } catch {
+        // Row not yet sent (and everything after it) stays on screen so a retry only re-sends the remainder.
+        setErr(`Couldn't log ${e.row.food_name}. Tap Log all to retry the rest.`);
+        setBusy(false);
+        return;
+      }
+      loggedCountRef.current += 1;
+      setRows((rs) => rs.filter((r) => r.key !== e.row.key));
     }
+    markUsed(pattern).catch(() => { /* ordering only */ });
+    router.replace(`/?logged=${loggedCountRef.current}`);
   }
 
   async function remove() {
