@@ -18,7 +18,7 @@ const FlameIcon = () => (
 export default function PatternReview() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [pattern, setPattern] = useState<PatternRow | null | "missing" | undefined>(undefined);
+  const [pattern, setPattern] = useState<PatternRow | null | "missing" | "error" | undefined>(undefined);
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -29,11 +29,11 @@ export default function PatternReview() {
       if (!p) return setPattern("missing");
       setPattern(p);
       setRows(p.items.map((it, i) => ({ key: i, food_name: it.food_name, grams: String(it.grams) })));
-    }).catch(() => setPattern("missing"));
+    }).catch(() => setPattern("error"));
   }, [id]);
 
   const entries = useMemo(() => {
-    if (!pattern || pattern === "missing") return [];
+    if (!pattern || pattern === "missing" || pattern === "error") return [];
     return rows.map((r) => {
       const g = parseFloat(r.grams) || 0;
       return { row: r, grams: g, entry: scaleItem(pattern.items[r.key], g) };
@@ -43,14 +43,14 @@ export default function PatternReview() {
   const canLog = entries.length > 0 && entries.every((e) => e.grams > 0) && !busy;
 
   async function logAll() {
-    if (!canLog || !pattern || pattern === "missing") return;
+    if (!canLog || !pattern || pattern === "missing" || pattern === "error") return;
     setBusy(true); setErr("");
     for (const e of entries) {                                  // in order; queue keeps FIFO
       try {
         await logMeal(e.entry);
       } catch {
         // Row not yet sent (and everything after it) stays on screen so a retry only re-sends the remainder.
-        setErr(`Couldn't log ${e.row.food_name}. Tap Log all to retry the rest.`);
+        setErr(`Couldn't log ${e.row.food_name} — it was rejected. Remove it with ✕ and log the rest.`);
         setBusy(false);
         return;
       }
@@ -62,7 +62,7 @@ export default function PatternReview() {
   }
 
   async function remove() {
-    if (!pattern || pattern === "missing") return;
+    if (!pattern || pattern === "missing" || pattern === "error") return;
     if (!window.confirm(`Delete "${pattern.name}"? Today's logged meals are not affected.`)) return;
     try { await deletePattern(pattern.id); router.replace("/log/meal"); }
     catch { setErr("Couldn't delete. Try again."); }
@@ -75,7 +75,7 @@ export default function PatternReview() {
           <Link href="/log/meal" aria-label="Back"
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border text-accent active:bg-surface-2">←</Link>
           <div>
-            <h1 className="text-2xl font-bold leading-tight">{pattern && pattern !== "missing" ? pattern.name : "Saved meal"}</h1>
+            <h1 className="text-2xl font-bold leading-tight">{pattern && pattern !== "missing" && pattern !== "error" ? pattern.name : "Saved meal"}</h1>
             <p className="text-sm text-muted">Log saved meal</p>
           </div>
         </div>
@@ -86,8 +86,13 @@ export default function PatternReview() {
             This meal was deleted. <Link href="/log/meal" className="text-accent">Back to Log meal</Link>
           </p>
         )}
+        {pattern === "error" && (
+          <p className="rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-muted">
+            Couldn&apos;t load this meal. Check your connection. <Link href="/log/meal" className="text-accent">Back to Log meal</Link>
+          </p>
+        )}
 
-        {pattern && pattern !== "missing" && (
+        {pattern && pattern !== "missing" && pattern !== "error" && (
           <>
             <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border">
               {entries.map(({ row, entry }) => (
@@ -107,7 +112,7 @@ export default function PatternReview() {
                   </label>
                   <button type="button" aria-label={`Remove ${row.food_name}`}
                     onClick={() => setRows((rs) => rs.filter((r) => r.key !== row.key))}
-                    className="px-1 text-lg text-accent/80 active:text-accent">×</button>
+                    className="flex h-10 w-10 shrink-0 items-center justify-center text-lg text-accent/80 active:text-accent">×</button>
                 </li>
               ))}
               {entries.length === 0 && <li className="px-4 py-3 text-sm text-muted">Nothing left to log.</li>}
@@ -119,7 +124,7 @@ export default function PatternReview() {
                 <span key={l} className="flex items-center gap-3">
                   {i > 0 && <span className="text-lg text-muted">·</span>}
                   <span className="text-center">
-                    <span className={`block text-2xl font-bold tabular-nums ${l === "kcal" ? "text-accent" : "text-foreground"}`}>{v}</span>
+                    <span className="block text-2xl font-bold tabular-nums text-accent">{v}</span>
                     <span className="text-[12px] text-muted">{l}</span>
                   </span>
                 </span>

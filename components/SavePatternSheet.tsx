@@ -13,13 +13,24 @@ export default function SavePatternSheet({ meals, onSaved, onClose }: {
   const [picked, setPicked] = useState<Set<string>>(new Set(meals.map((m) => m.id)));
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const offline = typeof navigator !== "undefined" && !navigator.onLine;
+  const [offline, setOffline] = useState(() => typeof navigator !== "undefined" && !navigator.onLine);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  useEffect(() => {
+    const goOnline = () => setOffline(false);
+    const goOffline = () => setOffline(true);
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
+  }, []);
 
   const canSave = name.trim().length > 0 && picked.size > 0 && !busy && !offline;
 
@@ -41,7 +52,7 @@ export default function SavePatternSheet({ meals, onSaved, onClose }: {
         <h2 id="save-pattern-title" className="text-2xl font-bold">Save as meal</h2>
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Breakfast" autoFocus
           className="mt-3 w-full rounded-2xl border border-border bg-background px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none" />
-        <p className="mt-4 text-[11px] font-medium uppercase tracking-wider text-muted">Today&apos;s foods</p>
+        <p className="mt-4 text-sm text-foreground">Today&apos;s foods</p>
         <ul className="mt-1.5 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-background">
           {meals.map((m) => {
             const on = picked.has(m.id);

@@ -288,7 +288,7 @@ export default function LogMeal() {
                           <span className="min-w-0 flex-1">
                             <span className="block truncate text-[15px] font-semibold text-foreground">{p.name}</span>
                             <span className="mt-0.5 block text-[12px] tabular-nums text-muted">
-                              {p.items.length} foods · {t.kcal} kcal · {t.protein_g} P
+                              {p.items.length} food{p.items.length === 1 ? "" : "s"} · {t.kcal} kcal · {t.protein_g} P
                             </span>
                           </span>
                           <span className="text-muted">›</span>
