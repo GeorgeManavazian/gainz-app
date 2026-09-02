@@ -13,9 +13,10 @@ import { addDays, slopeLbPerWk, trendWeight } from "@/lib/trend";
 import { getActiveWorkout, getTodayCompletedWorkout, listLiftsForWorkout } from "@/lib/workouts-db";
 import { formatElapsed, totalSets, workoutTitle, type WorkoutRow } from "@/lib/workouts";
 import { nextMeal, remaining } from "@/lib/hub";
+import SavePatternSheet from "@/components/SavePatternSheet";
 
 type Meal = { id: string; food_name: string; grams: number; calories: number;
-  protein_g: number; carbs_g: number; fat_g: number; logged_at: string };
+  protein_g: number; carbs_g: number; fat_g: number; logged_at: string; fdc_id?: string | null };
 
 function HubInner() {
   const [meals, setMeals] = useState<Meal[]>([]);
@@ -26,6 +27,7 @@ function HubInner() {
   const params = useSearchParams();
   const router = useRouter();
   const [toast, setToast] = useState("");
+  const [saveOpen, setSaveOpen] = useState(false);
   useEffect(() => {
     const n = Number(params.get("logged"));
     if (n > 0) {
@@ -209,7 +211,14 @@ function HubInner() {
         )}
 
         <section className="flex flex-col gap-2">
-          <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Today</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Today</h2>
+            {meals.length > 0 && (
+              <button type="button" onClick={() => setSaveOpen(true)} className="text-[12px] font-semibold text-accent active:opacity-80">
+                Save as meal
+              </button>
+            )}
+          </div>
           <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface text-sm">
             {meals.map((m) => (
               <li key={m.id} className="flex justify-between px-4 py-3">
@@ -245,6 +254,11 @@ function HubInner() {
 
         <WeighInCard compact todayWeight={todayRow?.weight_lb ?? null} lastWeight={last?.weight_lb ?? null}
           trend={trend} slope={slope} onSave={saveWeight} />
+
+        {saveOpen && (
+          <SavePatternSheet meals={meals} onClose={() => setSaveOpen(false)}
+            onSaved={() => { setSaveOpen(false); setToast("Saved ✓"); }} />
+        )}
       </main>
     </AuthGuard>
   );
