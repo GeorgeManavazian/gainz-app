@@ -43,6 +43,10 @@ Weigh-ins spec: docs/superpowers/specs/2026-08-30-weigh-ins-design.md. Plan: doc
 Workout flow spec: `docs/superpowers/specs/2026-09-01-workout-flow-design.md`. Plan: `docs/superpowers/plans/2026-09-01-workout-flow.md`. Design: `docs/superpowers/design/2026-09-01-workout-12ui-C.png`; branch screens: `docs/superpowers/design/2026-09-01-workout-branch-a-new-workout.png`, `docs/superpowers/design/2026-09-01-workout-branch-b-exercise-list.png`, `docs/superpowers/design/2026-09-01-workout-branch-c-summary.png`.
 Hub tabs spec: `docs/superpowers/specs/2026-09-01-hub-tabs-design.md`. Plan: `docs/superpowers/plans/2026-09-01-hub-tabs.md`. Designs: `docs/superpowers/design/2026-09-01-hub-tabs-*.png`.
 
+## Sub-project 4a — Meal patterns (2026-09-01)
+Saved meals: HUB "Save as meal" sheet → `meal_patterns` (jsonb items, direct writes) → `/log/meal` "Your meals" → `/log/meal/pattern/[id]` review (edit grams, ✕ per row, Log all = N `logMeal` inserts via the queue, Delete meal). Pure logic + tests in `lib/patterns.ts`. Deferred: swaps, fits-your-macros, seeding from Daily notes, building a pattern from search, editing a saved pattern.
+SQL to paste once: the `meal_patterns` block at the end of `supabase/schema.sql`.
+
 ## Known deferred items (from final review)
 - food-search route is unauthenticated on the public URL (USDA quota exposure only)
 - package.json still named "gainz-tmp"
