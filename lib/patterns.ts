@@ -1,7 +1,8 @@
 import type { MealEntry } from "@/lib/log";
 
 export type Per100 = { kcal: number; protein: number; carbs: number; fat: number };
-export type PatternItem = { food_name: string; grams: number; per100g: Per100; fdc_id: string | null };
+export type PatternItem = { food_name: string; grams: number; per100g: Per100; fdc_id: string | null;
+  manual?: true };
 export type PatternRow = { id: string; name: string; items: PatternItem[]; created_at: string;
   last_used_at: string | null; use_count: number };
 export type MealLike = { food_name: string; grams: number; calories: number; protein_g: number;
@@ -51,4 +52,14 @@ export function sortPatterns<T extends { last_used_at: string | null; created_at
     if (b.last_used_at) return 1;
     return b.created_at.localeCompare(a.created_at);
   });
+}
+
+/** A line typed by hand: "1 serving" of exactly these macros. */
+export function manualItem(label: string, m: { kcal: number; protein: number; carbs: number; fat: number }): PatternItem {
+  return { food_name: label.trim(), grams: 1, fdc_id: null, manual: true,
+    per100g: { kcal: m.kcal * 100, protein: m.protein * 100, carbs: m.carbs * 100, fat: m.fat * 100 } };
+}
+
+export function unitOf(item: Pick<PatternItem, "manual">): "g" | "serving" {
+  return item.manual ? "serving" : "g";
 }

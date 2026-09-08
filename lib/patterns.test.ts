@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { itemsFromMeals, scaleItem, totals, sortPatterns, type PatternItem } from "./patterns";
+import { itemsFromMeals, scaleItem, totals, sortPatterns, manualItem, unitOf, type PatternItem } from "./patterns";
 
 const yogurt: PatternItem = { food_name: "Greek yogurt, nonfat", grams: 320,
   per100g: { kcal: 59.0625, protein: 10.3125, carbs: 3.59375, fat: 0.40625 }, fdc_id: "170903" };
@@ -66,5 +66,22 @@ describe("sortPatterns", () => {
     const copy = [...rows];
     sortPatterns(rows);
     expect(rows).toEqual(copy);
+  });
+});
+
+describe("manual items", () => {
+  const shake = manualItem("  Chipotle bowl ", { kcal: 900, protein: 55, carbs: 90, fat: 35 });
+  it("stores 1 serving with per-100-servings macros and a manual flag", () => {
+    expect(shake).toEqual({ food_name: "Chipotle bowl", grams: 1, fdc_id: null, manual: true,
+      per100g: { kcal: 90000, protein: 5500, carbs: 9000, fat: 3500 } });
+  });
+  it("scales exactly: 1 serving = typed macros, 1.5 servings = ×1.5", () => {
+    expect(scaleItem(shake, 1)).toEqual({ food_name: "Chipotle bowl", grams: 1, calories: 900, protein_g: 55, carbs_g: 90, fat_g: 35 });
+    expect(scaleItem(shake, 1.5)).toEqual({ food_name: "Chipotle bowl", grams: 1.5, calories: 1350, protein_g: 82.5, carbs_g: 135, fat_g: 52.5 });
+  });
+  it("unitOf: manual → serving, food → g", () => {
+    expect(unitOf(shake)).toBe("serving");
+    expect(unitOf({ manual: undefined })).toBe("g");
+    expect(unitOf(yogurt)).toBe("g");
   });
 });
