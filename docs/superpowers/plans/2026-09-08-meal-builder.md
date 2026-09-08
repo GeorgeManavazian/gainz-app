@@ -10,7 +10,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-08-meal-builder-design.md`
 
-**Design reference (implement FROM this, do not re-derive):** `docs/superpowers/design/2026-09-08-builder-12ui-C.png` and its converted HTML under `docs/superpowers/design/2026-09-08-builder-html/`. The macro sheet reuses the shell of `components/SavePatternSheet.tsx`; the picker is the existing log-meal UI.
+**Design reference (implement FROM this, do not re-derive):** `docs/superpowers/design/2026-09-08-builder-12ui-C.png` and its converted HTML `docs/superpowers/design/2026-09-08-builder-html/derived.fixed.html`. The macro sheet reuses the shell of `components/SavePatternSheet.tsx`; the picker is the existing log-meal UI.
 
 ## Global Constraints
 
