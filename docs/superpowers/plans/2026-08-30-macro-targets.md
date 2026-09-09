@@ -156,7 +156,7 @@ Append to `lib/targets.test.ts` (add `ageOn, estimateTdee` to the import):
 describe("ageOn", () => {
   const today = new Date(2026, 7, 30); // 2026-08-30 local
   it("counts full years when birthday already passed this year", () => {
-    expect(ageOn("1990-01-01", today)).toBe(19);
+    expect(ageOn("2007-06-01", today)).toBe(19);
   });
   it("does not count the year when birthday has not passed yet", () => {
     expect(ageOn("2007-09-15", today)).toBe(18);
@@ -169,7 +169,7 @@ describe("ageOn", () => {
 describe("estimateTdee (Mifflin-St Jeor × activity)", () => {
   const today = new Date(2026, 7, 30);
   it("male 170 lb, 70 in, age 19, moderate → 3109", () => {
-    expect(estimateTdee({ sex: "male", birth_date: "1990-01-01", height_in: 70,
+    expect(estimateTdee({ sex: "male", birth_date: "2007-06-01", height_in: 70,
       weight_lb: 170, activity: "moderate" }, today)).toBe(3109);
   });
   it("female 150 lb, 65 in, age 30, light → 1927", () => {
@@ -262,7 +262,7 @@ Append to `lib/targets.test.ts` (add `computeTargets` and `type Profile` to the 
 describe("computeTargets", () => {
   const today = new Date(2026, 7, 30);
   const george: Profile = {
-    sex: "male", birth_date: "1990-01-01", height_in: 70, weight_lb: 170,
+    sex: "male", birth_date: "2007-06-01", height_in: 70, weight_lb: 170,
     activity: "moderate", phase: "cut", rate_lb_per_wk: 1.5,
     protein_g_per_lb: 1.1, tdee_override: 3100,
   };
@@ -281,8 +281,8 @@ describe("computeTargets", () => {
   });
 
   it("uses the phase default protein when protein_g_per_lb is null", () => {
-    expect(computeTargets({ ...george, protein_g_per_lb: null }, today).protein_g).toBe(223); // 1.1 × 203
-    expect(computeTargets({ ...george, protein_g_per_lb: null, phase: "maintain" }, today).protein_g).toBe(203); // 1.0 × 203
+    expect(computeTargets({ ...george, protein_g_per_lb: null }, today).protein_g).toBe(223); // 1.1 × 200
+    expect(computeTargets({ ...george, protein_g_per_lb: null, phase: "maintain" }, today).protein_g).toBe(200); // 1.0 × 200
   });
 
   it("maintain ignores rate", () => {
@@ -609,7 +609,7 @@ export default function ProfilePage() {
               </label>
               <label className="flex flex-col gap-1">
                 <span className={labelCls}>Weight (lb)</span>
-                <input className={inputCls} inputMode="decimal" placeholder="203" value={form.weight_lb}
+                <input className={inputCls} inputMode="decimal" placeholder="200" value={form.weight_lb}
                   onChange={(e) => set("weight_lb")(e.target.value)} />
               </label>
             </div>
@@ -705,7 +705,7 @@ Expected: tsc clean; build lists `/profile` in the route table with no errors.
 - [ ] **Step 3: Manual check in the browser**
 
 Run: `npm run dev`, open `http://localhost:3000/profile`, sign in if redirected.
-- Enter: male, 1990-01-01 (or your real birth date), 74, 203, Moderate, Cut, rate 1.5, protein blank, override 3100.
+- Enter: male, 2007-06-01 (or your real birth date), 74, 200, Moderate, Cut, rate 1.5, protein blank, override 3100.
 - Expected preview: **2350 kcal · 223 P · 214 C · 67 F**, footer `TDEE est. 3109 · using override 3100`.
 - Clear override → kcal becomes 2359, footer shows only `TDEE est. 3109`.
 - Tap **Maintain** → rate field shows 0 and is disabled; kcal 3100 (with override restored) or 3109.

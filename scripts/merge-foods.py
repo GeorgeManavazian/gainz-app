@@ -1,5 +1,5 @@
 import json, glob, os, sys
-D="/private/tmp/claude-501/-Users-georgiemanavazian-Documents-Gainz/2b2b2b10-4a2f-4711-8679-98c78123d3f2/scratchpad/foods"
+D=os.environ.get("FOODS_SRC", os.path.join(os.path.dirname(__file__), "..", "docs", "foods"))
 ORDER=["poultry","redmeat","fish-eggs","grains","dairy-etc","produce"]
 out=[]; seen_names=set(); id_owner={}
 for cat in ORDER:
@@ -35,7 +35,7 @@ for cat in ORDER:
                 id_owner[fid]=r["name"]
         out.append(r)
 print(len(out),"entries")
-json.dump(out,open(os.path.expanduser("~/code/gainz-app/lib/foods.data.json"),"w"),indent=1,ensure_ascii=False)
+json.dump(out,open(os.path.join(os.path.dirname(__file__), "..", "lib", "foods.data.json"),"w"),indent=1,ensure_ascii=False)
 
 # ---- Apply independent-verifier verdicts (verdict-<cat>.json) on top of the merged table ----
 import glob as _glob
@@ -78,4 +78,4 @@ if verdict_files:
         if k=="ground beef, 90/10":
             r["aliases"]=sorted(set(r["aliases"])|{"ground beef","hamburger","hamburger meat","lean ground beef"})  # generic "ground beef" lands on the lean default
     print(f"verdicts applied: {removed} removed, {fixed} fixed, {added} added → {len(out)} entries")
-    json.dump(out,open(os.path.expanduser("~/code/gainz-app/lib/foods.data.json"),"w"),indent=1,ensure_ascii=False)
+    json.dump(out,open(os.path.join(os.path.dirname(__file__), "..", "lib", "foods.data.json"),"w"),indent=1,ensure_ascii=False)
