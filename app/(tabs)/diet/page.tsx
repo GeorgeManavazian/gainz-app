@@ -11,7 +11,8 @@ import { deleteWeighIn, listWeighIns, localDateKey, upsertWeighIn, type WeighInR
 import { addDays, assessProgress, emaTrend, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight, type Assessment } from "@/lib/trend";
 
 type Range = 30 | 90 | "all";
-type MealRow = { id: string; food_name: string; grams: number; calories: number; protein_g: number };
+type MealRow = { id: string; food_name: string; grams: number; calories: number; protein_g: number;
+  unit?: string | null };
 type DayMeals = { date: string; kcal: number; protein: number; meals: MealRow[] };
 
 function fmtDate(iso: string): string {
@@ -118,7 +119,7 @@ export default function DietPage() {
         const entry = rowsByDay.get(key) ?? { date: key, kcal: 0, protein: 0, meals: [] };
         entry.kcal += Number(raw.calories);
         entry.protein += Number(raw.protein_g);
-        entry.meals.push({ id: raw.id, food_name: raw.food_name, grams: raw.grams, calories: raw.calories, protein_g: raw.protein_g });
+        entry.meals.push({ id: raw.id, food_name: raw.food_name, grams: raw.grams, calories: raw.calories, protein_g: raw.protein_g, unit: raw.unit });
         rowsByDay.set(key, entry);
       }
       setDays([...rowsByDay.values()].sort((a, b) => (a.date < b.date ? 1 : -1)));
@@ -270,7 +271,7 @@ export default function DietPage() {
                         <path d="M4 12 A8 5 0 0 0 20 12 Z" /><path d="M9 8 C9 6 11 6 11 8 M14 8 C14 5 17 5 17 8" />
                       </svg>
                     </span>
-                    <span className="flex-1">{m.food_name} <span className="text-muted">· {m.grams}g</span></span>
+                    <span className="flex-1">{m.food_name} <span className="text-muted">· {m.unit === "serving" ? `${m.grams} serving${Number(m.grams) === 1 ? "" : "s"}` : `${m.grams}g`}</span></span>
                     <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
                   </div>
                 ))}

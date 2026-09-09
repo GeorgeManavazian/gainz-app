@@ -16,7 +16,8 @@ import { nextMeal, remaining } from "@/lib/hub";
 import SavePatternSheet from "@/components/SavePatternSheet";
 
 type Meal = { id: string; food_name: string; grams: number; calories: number;
-  protein_g: number; carbs_g: number; fat_g: number; logged_at: string; fdc_id?: string | null };
+  protein_g: number; carbs_g: number; fat_g: number; logged_at: string; fdc_id?: string | null;
+  unit?: string | null };
 
 function HubInner() {
   const [meals, setMeals] = useState<Meal[]>([]);
@@ -224,7 +225,7 @@ function HubInner() {
           <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface text-sm">
             {meals.map((m) => (
               <li key={m.id} className="flex justify-between px-4 py-3">
-                <span>{m.food_name} · {m.grams}g</span>
+                <span>{m.food_name} · {m.unit === "serving" ? `${m.grams} serving${Number(m.grams) === 1 ? "" : "s"}` : `${m.grams}g`}</span>
                 <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
               </li>
             ))}

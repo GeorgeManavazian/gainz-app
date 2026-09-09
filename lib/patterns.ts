@@ -6,7 +6,7 @@ export type PatternItem = { food_name: string; grams: number; per100g: Per100; f
 export type PatternRow = { id: string; name: string; items: PatternItem[]; created_at: string;
   last_used_at: string | null; use_count: number };
 export type MealLike = { food_name: string; grams: number; calories: number; protein_g: number;
-  carbs_g: number; fat_g: number; fdc_id?: string | null };
+  carbs_g: number; fat_g: number; fdc_id?: string | null; unit?: string | null };
 
 const r1 = (v: number) => Math.round(v * 10) / 10;
 
@@ -17,11 +17,13 @@ export function itemsFromMeals(meals: MealLike[]): PatternItem[] {
     const g = Number(m.grams);
     if (!(g > 0)) continue;
     const s = 100 / g;
-    out.push({
+    const item: PatternItem = {
       food_name: m.food_name, grams: g, fdc_id: m.fdc_id ?? null,
       per100g: { kcal: Number(m.calories) * s, protein: Number(m.protein_g) * s,
         carbs: Number(m.carbs_g) * s, fat: Number(m.fat_g) * s },
-    });
+    };
+    if (m.unit === "serving") item.manual = true;
+    out.push(item);
   }
   return out;
 }
@@ -35,6 +37,7 @@ export function scaleItem(item: PatternItem, grams: number): MealEntry {
     carbs_g: r1(item.per100g.carbs * k), fat_g: r1(item.per100g.fat * k),
   };
   if (item.fdc_id) e.fdc_id = item.fdc_id;
+  if (item.manual) e.unit = "serving";
   return e;
 }
 

@@ -103,13 +103,12 @@ export default function PatternReview() {
                       {Math.round(entry.calories)} kcal · {Math.round(entry.protein_g)} P
                     </span>
                   </span>
-                  <label className="flex h-11 w-[104px] shrink-0 items-center justify-end gap-1 rounded-xl border border-border bg-surface px-3 focus-within:border-accent">
+                  <label className={`flex h-11 ${unitOf(pattern.items[row.key]) === "serving" ? "w-[140px]" : "w-[104px]"} shrink-0 items-center justify-end gap-1 rounded-xl border border-border bg-surface px-3 focus-within:border-accent`}>
                     <input inputMode="decimal" value={row.grams} aria-label={`${row.food_name} ${unitOf(pattern.items[row.key]) === "g" ? "grams" : "servings"}`}
-                      step={unitOf(pattern.items[row.key]) === "g" ? 1 : 0.5}
                       onFocus={(e) => e.currentTarget.select()}
                       onChange={(e) => setRows((rs) => rs.map((r) => r.key === row.key ? { ...r, grams: e.target.value } : r))}
                       className="w-full bg-transparent text-right text-xl font-bold tabular-nums text-accent focus:outline-none" />
-                    <span className="text-sm text-muted">{unitOf(pattern.items[row.key]) === "g" ? "g" : "srv"}</span>
+                    <span className="text-sm text-muted">{unitOf(pattern.items[row.key]) === "g" ? "g" : "serving"}</span>
                   </label>
                   <button type="button" aria-label={`Remove ${row.food_name}`}
                     onClick={() => setRows((rs) => rs.filter((r) => r.key !== row.key))}

@@ -64,7 +64,9 @@ export default function SavePatternSheet({ meals, onSaved, onClose }: {
                   <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border ${
                     on ? "border-accent bg-accent text-accent-foreground" : "border-border"}`} aria-hidden>{on ? "✓" : ""}</span>
                   <span className="min-w-0 flex-1 truncate text-[15px] text-foreground">{m.food_name}</span>
-                  <span className="shrink-0 text-[13px] tabular-nums text-muted">{m.grams} g · {Math.round(Number(m.calories))} kcal</span>
+                  <span className="shrink-0 text-[13px] tabular-nums text-muted">
+                    {m.unit === "serving" ? `${m.grams} serving${Number(m.grams) === 1 ? "" : "s"}` : `${m.grams} g`} · {Math.round(Number(m.calories))} kcal
+                  </span>
                 </button>
               </li>
             );

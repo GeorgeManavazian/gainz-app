@@ -35,7 +35,7 @@ v1 shipped 2026-08-30 and works end-to-end, but George considers it unfinished a
 - `components/Wheel.tsx`: the scroll-wheel picker used for sets/reps/weight in the set sheet.
 
 ## Deploy order
-Every sub-project's `supabase/schema.sql` block must be pasted into the Supabase SQL editor BEFORE pushing `main` — inserts against a missing table/column are permanent rejections and dead-letter silently. Sub-project 3 block: `workouts` + `lifts.workout_id`. One-time backfill after applying: rename the `lifts.exercise` row `DB Chest press` → `DB Chest Press`.
+Every sub-project's `supabase/schema.sql` block must be pasted into the Supabase SQL editor BEFORE pushing `main` — inserts against a missing table/column are permanent rejections and dead-letter silently. Sub-project 3 block: `workouts` + `lifts.workout_id`. One-time backfill after applying: rename the `lifts.exercise` row `DB Chest press` → `DB Chest Press`. Sub-project 4b block: `meals.unit` — must be pasted before logging any manual macro line, or the insert is rejected; ordinary grams rows never reference the column client-side, so the deploy itself is safe before the paste.
 
 ## Docs
 Spec: `docs/superpowers/specs/2026-08-29-gainz-app-design.md`. Build plan: `docs/superpowers/plans/2026-08-29-gainz-app.md`. Macro targets spec: docs/superpowers/specs/2026-08-30-macro-targets-design.md. Plan: docs/superpowers/plans/2026-08-30-macro-targets.md.
@@ -48,7 +48,7 @@ Saved meals: HUB "Save as meal" sheet → `meal_patterns` (jsonb items, direct w
 SQL to paste once: the `meal_patterns` block at the end of `supabase/schema.sql`.
 
 ### 4b — Meal builder (2026-09-08)
-`/log/meal/new`: name + lines from `FoodPicker` (search extracted from the log page into `components/FoodPicker.tsx`) and/or `MacroSheet` manual lines (`manualItem`: grams = servings, per100g = macros × 100, `manual: true`); saves via `createPattern`. Review page shows "srv" for manual lines. Deferred: editing saved meals, reordering, drafts.
+`/log/meal/new`: name + lines from `FoodPicker` (search extracted from the log page into `components/FoodPicker.tsx`) and/or `MacroSheet` manual lines (`manualItem`: grams = servings, per100g = macros × 100, `manual: true`); saves via `createPattern`. Review page shows "serving" for manual lines. Manual lines log with `meals.unit = "serving"` so Recent foods and the HUB/DIET/save-sheet render them honestly instead of deriving per-100g nonsense from a servings count; reads filter on `unit` client-side rather than selecting it by name, so the deploy is safe before the SQL is pasted (see Deploy order). Deferred: editing saved meals, reordering, drafts; vault sync writes the Daily note "Grams" cell as the servings number for manual lines (e.g. 1); FoodPicker refetches history on every Add food in the builder.
 
 ## Known deferred items (from final review)
 - food-search route is unauthenticated on the public URL (USDA quota exposure only)

@@ -1,7 +1,7 @@
 import { enqueueOrSend } from "@/lib/queue";
 
 export type MealEntry = { food_name: string; grams: number; calories: number;
-  protein_g: number; carbs_g: number; fat_g: number; fdc_id?: string };
+  protein_g: number; carbs_g: number; fat_g: number; fdc_id?: string; unit?: "serving" };
 export type LiftEntry = { exercise: string; sets: number; reps: number;
   weight: number; notes?: string; workout_id?: string };
 

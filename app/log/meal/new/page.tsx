@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
@@ -62,19 +62,30 @@ export default function NewMeal() {
   const [mode, setMode] = useState<"list" | "food" | "macros">("list");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const nextKey = useMemo(() => (lines.length ? Math.max(...lines.map((l) => l.key)) + 1 : 0), [lines]);
+  const [offline, setOffline] = useState(() => typeof navigator !== "undefined" && !navigator.onLine);
+
+  useEffect(() => {
+    const goOnline = () => setOffline(false);
+    const goOffline = () => setOffline(true);
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
+  }, []);
 
   const entries = lines.map((l) => scaleItem(l.item, l.item.grams));
   const sum = totals(entries);
-  const canSave = name.trim().length > 0 && lines.length > 0 && !busy;
+  const canSave = name.trim().length > 0 && lines.length > 0 && !busy && !offline;
 
   function addFood(entry: MealEntry) {
     const [item] = itemsFromMeals([entry]);
-    if (item) setLines((ls) => [...ls, { key: nextKey, item }]);
+    if (item) setLines((ls) => [...ls, { key: ls.length ? Math.max(...ls.map((l) => l.key)) + 1 : 0, item }]);
     setMode("list");
   }
   function addMacros(item: PatternItem) {
-    setLines((ls) => [...ls, { key: nextKey, item }]);
+    setLines((ls) => [...ls, { key: ls.length ? Math.max(...ls.map((l) => l.key)) + 1 : 0, item }]);
     setMode("list");
   }
 
@@ -95,11 +106,13 @@ export default function NewMeal() {
       <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-10 pt-6 text-foreground">
         <div className="flex items-center gap-3">
           {mode === "list" ? (
-            <Link href="/log/meal" aria-label="Back" className="text-accent">
+            <Link href="/log/meal" aria-label="Back"
+              className="flex h-10 w-10 -ml-2 items-center justify-center text-accent">
               <BackIcon />
             </Link>
           ) : (
-            <button type="button" aria-label="Cancel" onClick={() => setMode("list")} className="text-accent">
+            <button type="button" aria-label="Cancel" onClick={() => setMode("list")}
+              className="flex h-10 w-10 -ml-2 items-center justify-center text-accent">
               <BackIcon />
             </button>
           )}
@@ -115,6 +128,7 @@ export default function NewMeal() {
                 <BowlIcon />
               </span>
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Chipotle bowl"
+                aria-label="Meal name"
                 className="w-full rounded-2xl border border-border bg-surface py-3.5 pl-12 pr-4 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none" />
             </label>
 
@@ -160,6 +174,7 @@ export default function NewMeal() {
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent px-4 py-4 text-lg font-semibold text-accent-foreground active:opacity-80 disabled:opacity-40">
               {busy ? "Saving…" : (<><SaveIcon /> Save meal</>)}
             </button>
+            {offline && <p className="text-sm text-muted">You&apos;re offline — saving a meal needs a connection.</p>}
           </>
         )}
 

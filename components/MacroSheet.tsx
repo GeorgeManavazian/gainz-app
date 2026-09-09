@@ -27,6 +27,7 @@ export default function MacroSheet({ onAdd, onClose }: { onAdd: (item: PatternIt
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
         <h2 id="macro-sheet-title" className="text-2xl font-bold">Add macros</h2>
         <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Protein shake" autoFocus
+          aria-label="Label"
           className="mt-3 w-full rounded-2xl border border-border bg-background px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none" />
         <div className="mt-3 grid grid-cols-4 gap-2">
           {field("kcal", "kcal")}{field("protein", "P")}{field("carbs", "C")}{field("fat", "F")}

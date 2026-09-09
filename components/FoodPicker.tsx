@@ -41,12 +41,15 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
 
   // Foods you've logged before — instant, same values as last time.
   useEffect(() => {
-    supabase.from("meals").select("food_name,grams,calories,protein_g,carbs_g,fat_g,fdc_id,logged_at")
+    // select("*") — not a named column list — so this stays safe once `unit` lands without a client change.
+    supabase.from("meals").select("*")
       .order("logged_at", { ascending: false }).limit(300)
       .then(({ data }) => {
         const seen = new Set<string>();
         const out: Picked[] = [];
-        for (const m of data ?? []) {
+        for (const m of (data ?? []) as Array<Record<string, unknown> & { food_name: string; grams: number }>) {
+          // Manual macro lines log servings, not grams — they don't belong in "Recent foods" per-100g.
+          if (m.unit === "serving") continue;
           const key = m.food_name.trim().toLowerCase();
           if (seen.has(key) || !(Number(m.grams) > 0)) continue;
           seen.add(key);
@@ -104,6 +107,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   }
 
   async function pickItem(v: Item) {
+    setErr("");
     setPicked(toPicked(v));
     setAmount("");
     const mine = weighingOf(v);
@@ -130,6 +134,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   }
 
   function pickHistory(h: Picked) {
+    setErr("");
     setPicked(h);
     setPairs({ raw: null, cooked: null });
     setUnits(BASE_UNITS);
@@ -264,7 +269,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
               onClick={save} disabled={grams <= 0}>{confirmLabel}</button>
             <button
               className="rounded-xl border border-border bg-surface px-4 py-3.5 text-base font-semibold text-foreground active:bg-surface-2"
-              onClick={() => setPicked(null)}>Back</button>
+              onClick={() => { setErr(""); setPicked(null); }}>Back</button>
           </div>
         </div>
       ) : (

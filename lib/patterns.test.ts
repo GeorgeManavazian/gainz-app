@@ -21,6 +21,20 @@ describe("itemsFromMeals", () => {
     expect(out).toHaveLength(1);
     expect(out[0].fdc_id).toBeNull();
   });
+  it("marks a manual line (unit: serving) so re-saving from the HUB sheet keeps it manual", () => {
+    const [it0] = itemsFromMeals([{ food_name: "Shake", grams: 2, calories: 600, protein_g: 60,
+      carbs_g: 40, fat_g: 16, unit: "serving" }]);
+    expect(it0).toEqual({ food_name: "Shake", grams: 2, fdc_id: null, manual: true,
+      per100g: { kcal: 30000, protein: 3000, carbs: 2000, fat: 800 } });
+  });
+  it("a grams row (unit: g or absent) is not marked manual", () => {
+    const [g] = itemsFromMeals([{ food_name: "Shake", grams: 2, calories: 600, protein_g: 60,
+      carbs_g: 40, fat_g: 16, unit: "g" }]);
+    expect("manual" in g).toBe(false);
+    const [noUnit] = itemsFromMeals([{ food_name: "Shake", grams: 2, calories: 600, protein_g: 60,
+      carbs_g: 40, fat_g: 16 }]);
+    expect("manual" in noUnit).toBe(false);
+  });
 });
 
 describe("scaleItem", () => {
@@ -32,6 +46,10 @@ describe("scaleItem", () => {
   it("omits fdc_id when the item has none", () => {
     const e = scaleItem({ ...yogurt, fdc_id: null }, 100);
     expect("fdc_id" in e).toBe(false);
+  });
+  it("a food item's entry carries no unit key", () => {
+    const e = scaleItem(yogurt, 250);
+    expect("unit" in e).toBe(false);
   });
 });
 
@@ -76,8 +94,11 @@ describe("manual items", () => {
       per100g: { kcal: 90000, protein: 5500, carbs: 9000, fat: 3500 } });
   });
   it("scales exactly: 1 serving = typed macros, 1.5 servings = ×1.5", () => {
-    expect(scaleItem(shake, 1)).toEqual({ food_name: "Chipotle bowl", grams: 1, calories: 900, protein_g: 55, carbs_g: 90, fat_g: 35 });
-    expect(scaleItem(shake, 1.5)).toEqual({ food_name: "Chipotle bowl", grams: 1.5, calories: 1350, protein_g: 82.5, carbs_g: 135, fat_g: 52.5 });
+    expect(scaleItem(shake, 1)).toEqual({ food_name: "Chipotle bowl", grams: 1, calories: 900, protein_g: 55, carbs_g: 90, fat_g: 35, unit: "serving" });
+    expect(scaleItem(shake, 1.5)).toEqual({ food_name: "Chipotle bowl", grams: 1.5, calories: 1350, protein_g: 82.5, carbs_g: 135, fat_g: 52.5, unit: "serving" });
+  });
+  it("scaleItem(manualItem(...), 1.5).unit === serving", () => {
+    expect(scaleItem(shake, 1.5).unit).toBe("serving");
   });
   it("unitOf: manual → serving, food → g", () => {
     expect(unitOf(shake)).toBe("serving");

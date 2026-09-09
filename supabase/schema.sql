@@ -104,3 +104,6 @@ create table if not exists meal_patterns (
 alter table meal_patterns enable row level security;
 create policy "own meal_patterns" on meal_patterns for all
   using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- Sub-project 4b: manual macro lines log servings, not grams (2026-09-08). Paste once.
+alter table meals add column if not exists unit text not null default 'g';
