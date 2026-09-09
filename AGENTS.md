@@ -47,6 +47,9 @@ Hub tabs spec: `docs/superpowers/specs/2026-09-01-hub-tabs-design.md`. Plan: `do
 Saved meals: HUB "Save as meal" sheet → `meal_patterns` (jsonb items, direct writes) → `/log/meal` "Your meals" → `/log/meal/pattern/[id]` review (edit grams, ✕ per row, Log all = N `logMeal` inserts via the queue, Delete meal). Pure logic + tests in `lib/patterns.ts`. Deferred: swaps, fits-your-macros, seeding from Daily notes, building a pattern from search, editing a saved pattern.
 SQL to paste once: the `meal_patterns` block at the end of `supabase/schema.sql`.
 
+### 4b — Meal builder (2026-09-08)
+`/log/meal/new`: name + lines from `FoodPicker` (search extracted from the log page into `components/FoodPicker.tsx`) and/or `MacroSheet` manual lines (`manualItem`: grams = servings, per100g = macros × 100, `manual: true`); saves via `createPattern`. Review page shows "srv" for manual lines. Deferred: editing saved meals, reordering, drafts.
+
 ## Known deferred items (from final review)
 - food-search route is unauthenticated on the public URL (USDA quota exposure only)
 - package.json still named "gainz-tmp"
