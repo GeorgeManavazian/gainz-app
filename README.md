@@ -20,12 +20,15 @@ Every macro tracker I tried failed the same way: logging a meal took ten taps an
 
 It is a personal tool first (one user, real data, daily use through a 15-week cut), built with the same rigor as production software: written specs, designed screens, a test suite, and reviewed pull-request-style changes.
 
-## Screenshots
+## Screens
 
-<!-- Real phone captures. -->
-| Home | Log meal | Saved meal | Performance |
+Design candidates are generated as images, one is chosen, and the screen is implemented from the render. Left to right: home, log meal, saved-meal review, meal builder.
+
+| Home | Log meal | Saved meal | Meal builder |
 |:---:|:---:|:---:|:---:|
-| ![Home](docs/readme/hub.png) | ![Log meal](docs/readme/log-meal.png) | ![Saved meal](docs/readme/saved-meal.png) | ![Performance](docs/readme/performance.png) |
+| ![Home](docs/superpowers/design/2026-09-01-hub-final-lavender-A.png) | ![Log meal](docs/superpowers/design/2026-09-01-diet-tab-12ui.png) | ![Saved meal](docs/superpowers/design/2026-09-01-pattern-review-12ui-B.png) | ![Meal builder](docs/superpowers/design/2026-09-08-builder-12ui-C.png) |
+
+<!-- Phone screenshots go in docs/readme/{hub,log-meal,saved-meal,performance}.png; swap this table for them when available. -->
 
 ## Features
 
