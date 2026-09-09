@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import { deletePattern, getPattern, markUsed } from "@/lib/patterns-db";
-import { scaleItem, totals, type PatternRow } from "@/lib/patterns";
+import { scaleItem, totals, unitOf, type PatternRow } from "@/lib/patterns";
 import { logMeal } from "@/lib/log";
 
 type Row = { key: number; food_name: string; grams: string };   // grams as typed
@@ -104,11 +104,12 @@ export default function PatternReview() {
                     </span>
                   </span>
                   <label className="flex h-11 w-[104px] shrink-0 items-center justify-end gap-1 rounded-xl border border-border bg-surface px-3 focus-within:border-accent">
-                    <input inputMode="decimal" value={row.grams} aria-label={`${row.food_name} grams`}
+                    <input inputMode="decimal" value={row.grams} aria-label={`${row.food_name} ${unitOf(pattern.items[row.key]) === "g" ? "grams" : "servings"}`}
+                      step={unitOf(pattern.items[row.key]) === "g" ? 1 : 0.5}
                       onFocus={(e) => e.currentTarget.select()}
                       onChange={(e) => setRows((rs) => rs.map((r) => r.key === row.key ? { ...r, grams: e.target.value } : r))}
                       className="w-full bg-transparent text-right text-xl font-bold tabular-nums text-accent focus:outline-none" />
-                    <span className="text-sm text-muted">g</span>
+                    <span className="text-sm text-muted">{unitOf(pattern.items[row.key]) === "g" ? "g" : "srv"}</span>
                   </label>
                   <button type="button" aria-label={`Remove ${row.food_name}`}
                     onClick={() => setRows((rs) => rs.filter((r) => r.key !== row.key))}
