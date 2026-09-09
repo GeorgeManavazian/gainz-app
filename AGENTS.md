@@ -52,6 +52,5 @@ SQL to paste once: the `meal_patterns` block at the end of `supabase/schema.sql`
 
 ## Known deferred items (from final review)
 - food-search route is unauthenticated on the public URL (USDA quota exposure only)
-- package.json still named "gainz-tmp"
 - no service worker → no cold-start offline; meals need network for search anyway
 - AuthGuard blank-flash pre-redirect; fetch/res.json unguarded in meal search
