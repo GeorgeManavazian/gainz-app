@@ -124,3 +124,7 @@ Built by [George Manavazian](https://github.com/GeorgeManavazian). Questions and
 ## License
 
 MIT
+
+---
+
+Built with AI-assisted development (Claude Code); product decisions and testing are mine.
