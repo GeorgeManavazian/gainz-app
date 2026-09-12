@@ -168,7 +168,7 @@ describe("ageOn", () => {
 
 describe("estimateTdee (Mifflin-St Jeor × activity)", () => {
   const today = new Date(2026, 7, 30);
-  it("male 170 lb, 70 in, age 19, moderate → 3109", () => {
+  it("male 170 lb, 70 in, age 19, moderate → 2778", () => {
     expect(estimateTdee({ sex: "male", birth_date: "2007-06-01", height_in: 70,
       weight_lb: 170, activity: "moderate" }, today)).toBe(3109);
   });
