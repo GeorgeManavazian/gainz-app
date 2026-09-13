@@ -8,7 +8,7 @@ Next.js 16 · TypeScript · Supabase · Tailwind v4 · Offline-first PWA
 
 [**Live app**](https://gainz-app-phi.vercel.app) · [Design specs](docs/superpowers/specs) · [Implementation plans](docs/superpowers/plans)
 
-![Next.js 16](https://img.shields.io/badge/Next.js-16-000?logo=nextdotjs) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white) ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-3FCF8E?logo=supabase&logoColor=white) ![Tests](https://img.shields.io/badge/tests-146%20passing-a6e3a1) ![Deployed on Vercel](https://img.shields.io/badge/deployed-Vercel-000?logo=vercel)
+![Next.js 16](https://img.shields.io/badge/Next.js-16-000?logo=nextdotjs) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white) ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-3FCF8E?logo=supabase&logoColor=white) [![tests](https://github.com/GeorgeManavazian/gainz-app/actions/workflows/tests.yml/badge.svg)](https://github.com/GeorgeManavazian/gainz-app/actions/workflows/tests.yml) ![Deployed on Vercel](https://img.shields.io/badge/deployed-Vercel-000?logo=vercel)
 
 </div>
 
