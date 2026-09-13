@@ -49,9 +49,9 @@ describe("computeTargets", () => {
     protein_g_per_lb: 1.02, tdee_override: 3100,
   };
 
-  it("reference: Cut Protocol week 1 → 2600 / 204P / 298C / 66F", () => {
+  it("reference: Cut Protocol week 1 → 2600 / 173P / 351C / 56F", () => {
     const t = computeTargets(athlete, today);
-    expect(t).toMatchObject({ kcal: 2600, protein_g: 204, carbs_g: 298, fat_g: 66, tdee: 3100 });
+    expect(t).toMatchObject({ kcal: 2600, protein_g: 173, carbs_g: 351, fat_g: 56, tdee: 3100 });
     expect(Math.abs(4 * t.protein_g + 4 * t.carbs_g + 9 * t.fat_g - t.kcal)).toBeLessThanOrEqual(2); // carbs are the plug (gram rounding)
     expect(t.warning).toBeUndefined();
   });
@@ -63,8 +63,8 @@ describe("computeTargets", () => {
   });
 
   it("uses the phase default protein when protein_g_per_lb is null", () => {
-    expect(computeTargets({ ...athlete, protein_g_per_lb: null }, today).protein_g).toBe(220); // 1.1 × 200
-    expect(computeTargets({ ...athlete, protein_g_per_lb: null, phase: "maintain" }, today).protein_g).toBe(200); // 1.0 × 200
+    expect(computeTargets({ ...athlete, protein_g_per_lb: null }, today).protein_g).toBe(187); // 1.1 × 170
+    expect(computeTargets({ ...athlete, protein_g_per_lb: null, phase: "maintain" }, today).protein_g).toBe(170); // 1.0 × 170
   });
 
   it("maintain ignores rate", () => {
