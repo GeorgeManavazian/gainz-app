@@ -94,7 +94,7 @@ function HubInner() {
     Math.round(meals.reduce((a, m) => a + Number(m[k]), 0));
   const totals = { calories: sum("calories"), protein_g: sum("protein_g"), carbs_g: sum("carbs_g"), fat_g: sum("fat_g") };
   const t = typeof targets === "object" && targets !== null ? targets : null;
-  const meal = t ? nextMeal(totals, { kcal: t.kcal, protein_g: t.protein_g, carbs_g: t.carbs_g, fat_g: t.fat_g }, meals.length) : null;
+  const meal = t ? nextMeal(totals, { kcal: t.kcal, protein_g: t.protein_g, carbs_g: t.carbs_g, fat_g: t.fat_g }, meals) : null;
 
   async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); await loadTargets(true); }
 

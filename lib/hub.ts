@@ -14,12 +14,25 @@ export function remaining(value: number, target: number): number {
 
 export type NextMeal = { kcal: number; protein_g: number; carbs_g: number; fat_g: number; mealsLeft: number };
 
-/** Placeholder for roadmap #5: remaining budget split evenly across meals left. */
-export function nextMeal(totals: MacroTotals, targets: MacroTargets, mealsLogged: number,
-  mealsPerDay = 4): NextMeal | null {
+const WINDOW_END_HOUR = 22;
+
+/** Remaining budget split across meals left, where meals-left tracks the clock:
+ *  the eating window runs from today's first logged meal (or now, if none yet)
+ *  to a fixed end hour, divided into mealsPerDay-sized slices. */
+export function nextMeal(totals: MacroTotals, targets: MacroTargets, meals: { logged_at: string }[],
+  now: Date = new Date(), mealsPerDay = 4): NextMeal | null {
   const kcalLeft = remaining(totals.calories, targets.kcal);
   if (kcalLeft <= 0) return null;
-  const mealsLeft = Math.max(mealsPerDay - mealsLogged, 1);
+
+  const windowEnd = new Date(now);
+  windowEnd.setHours(WINDOW_END_HOUR, 0, 0, 0);
+  const windowStart = meals.length
+    ? new Date(Math.min(...meals.map((m) => new Date(m.logged_at).getTime())))
+    : now;
+
+  const hoursPerMeal = Math.max((windowEnd.getTime() - windowStart.getTime()) / 3_600_000, 1) / mealsPerDay;
+  const hoursRemaining = Math.max((windowEnd.getTime() - now.getTime()) / 3_600_000, 0);
+  const mealsLeft = Math.max(Math.ceil(hoursRemaining / hoursPerMeal), 1);
   const per = (left: number) => Math.max(left, 0) / mealsLeft;
   return {
     kcal: Math.round(per(kcalLeft) / 10) * 10,

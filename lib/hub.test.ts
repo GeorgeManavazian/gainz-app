@@ -21,26 +21,50 @@ describe("remaining", () => {
 
 describe("nextMeal", () => {
   const targets = { kcal: 2600, protein_g: 206, carbs_g: 293, fat_g: 67 };
-  it("splits remaining across meals left, rounded (kcal→10, grams→1)", () => {
-    const t = { calories: 1360, protein_g: 118, carbs_g: 153, fat_g: 36 };
-    const n = nextMeal(t, targets, 2)!; // 4 meals/day → 2 left
-    expect(n.mealsLeft).toBe(2);
-    expect(n.kcal).toBe(620);        // 1240/2
-    expect(n.protein_g).toBe(44);    // 88/2
-    expect(n.carbs_g).toBe(70);      // 140/2
-    expect(n.fat_g).toBe(16);        // 31/2 → 15.5 → 16
+  const at = (h: number, m = 0) => new Date(`2026-09-24T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`);
+
+  it("no meals logged yet: window starts at now, splits across mealsPerDay", () => {
+    // window 10:00→22:00 = 12h, hoursPerMeal = 3h, hoursRemaining = 12h → mealsLeft = 4
+    const t = { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
+    const n = nextMeal(t, targets, [], at(10))!;
+    expect(n.mealsLeft).toBe(4);
+    expect(n.kcal).toBe(650); // 2600/4
   });
-  it("meals-left floor of 1", () => {
-    const n = nextMeal({ calories: 2000, protein_g: 150, carbs_g: 200, fat_g: 50 }, targets, 9)!;
+
+  it("early in the day with meals logged: many hours left → smaller per-meal split", () => {
+    // first meal 8:00, window 8:00→22:00 = 14h, hoursPerMeal = 3.5h, now 9:00 → hoursRemaining 13h → mealsLeft = ceil(13/3.5) = 4
+    const t = { calories: 1360, protein_g: 118, carbs_g: 153, fat_g: 36 };
+    const meals = [{ logged_at: at(8).toISOString() }];
+    const n = nextMeal(t, targets, meals, at(9))!;
+    expect(n.mealsLeft).toBe(4);
+    expect(n.kcal).toBe(310); // 1240/4 = 310
+  });
+
+  it("late in the day: few hours left → bigger per-meal split", () => {
+    // first meal 8:00, window 8:00→22:00 = 14h, hoursPerMeal = 3.5h, now 20:00 → hoursRemaining 2h → mealsLeft = ceil(2/3.5) = 1
+    const t = { calories: 1360, protein_g: 118, carbs_g: 153, fat_g: 36 };
+    const meals = [{ logged_at: at(8).toISOString() }];
+    const n = nextMeal(t, targets, meals, at(20))!;
+    expect(n.mealsLeft).toBe(1);
+    expect(n.kcal).toBe(1240);
+  });
+
+  it("past window end: meals-left floors at 1", () => {
+    const meals = [{ logged_at: at(8).toISOString() }];
+    const n = nextMeal({ calories: 2000, protein_g: 150, carbs_g: 200, fat_g: 50 }, targets, meals, at(23))!;
     expect(n.mealsLeft).toBe(1);
     expect(n.kcal).toBe(600);
   });
+
   it("negative macro remainders clamp to 0", () => {
-    const n = nextMeal({ calories: 2000, protein_g: 210, carbs_g: 200, fat_g: 50 }, targets, 3)!;
+    const meals = [{ logged_at: at(8).toISOString() }];
+    const n = nextMeal({ calories: 2000, protein_g: 210, carbs_g: 200, fat_g: 50 }, targets, meals, at(9))!;
     expect(n.protein_g).toBe(0);
   });
+
   it("null when kcal target hit", () => {
-    expect(nextMeal({ calories: 2600, protein_g: 0, carbs_g: 0, fat_g: 0 }, targets, 3)).toBeNull();
-    expect(nextMeal({ calories: 2700, protein_g: 0, carbs_g: 0, fat_g: 0 }, targets, 3)).toBeNull();
+    const meals = [{ logged_at: at(8).toISOString() }];
+    expect(nextMeal({ calories: 2600, protein_g: 0, carbs_g: 0, fat_g: 0 }, targets, meals, at(9))).toBeNull();
+    expect(nextMeal({ calories: 2700, protein_g: 0, carbs_g: 0, fat_g: 0 }, targets, meals, at(9))).toBeNull();
   });
 });
