@@ -9,6 +9,7 @@ import { getProfile, applyAdjustment, type ProfileRow } from "@/lib/profile";
 import { computeTargets } from "@/lib/targets";
 import { deleteWeighIn, listWeighIns, localDateKey, upsertWeighIn, type WeighInRow } from "@/lib/weighins";
 import { addDays, assessProgress, emaTrend, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight, type Assessment } from "@/lib/trend";
+import { computeAdaptiveTdee, ADAPTIVE_WINDOW_DAYS, type DailyKcal } from "@/lib/adaptive-tdee";
 
 type Range = 30 | 90 | "all";
 type MealRow = { id: string; food_name: string; grams: number; calories: number; protein_g: number;
@@ -97,12 +98,13 @@ export default function DietPage() {
   const [range, setRange] = useState<Range>(30);
   const [err, setErr] = useState("");
   const [days, setDays] = useState<DayMeals[]>([]);
+  const [dailyKcal, setDailyKcal] = useState<DailyKcal[]>([]);
   const [openDay, setOpenDay] = useState<string | null>(localDateKey());
 
   const load = useCallback(async () => {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
-    start.setDate(start.getDate() - 6);
+    start.setDate(start.getDate() - (ADAPTIVE_WINDOW_DAYS - 1));
     const [w, p, m] = await Promise.allSettled([
       listWeighIns(),
       getProfile(),
@@ -122,7 +124,10 @@ export default function DietPage() {
         entry.meals.push({ id: raw.id, food_name: raw.food_name, grams: raw.grams, calories: raw.calories, protein_g: raw.protein_g, unit: raw.unit });
         rowsByDay.set(key, entry);
       }
-      setDays([...rowsByDay.values()].sort((a, b) => (a.date < b.date ? 1 : -1)));
+      const allDays = [...rowsByDay.values()].sort((a, b) => (a.date < b.date ? 1 : -1));
+      const sevenDaysAgo = addDays(localDateKey(), -6);
+      setDays(allDays.filter((d) => d.date >= sevenDaysAgo));
+      setDailyKcal(allDays.map((d) => ({ date: d.date, kcal: d.kcal })));
     }
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -144,7 +149,13 @@ export default function DietPage() {
   const assessment: Assessment = profile ? assessProgress(slope, phase, rate) : "insufficient_data";
   const delta = suggestAdjustment(slope, phase, rate);
   const targets = profile ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }) : null;
-  const newKcal = targets ? (phase === "cut" ? targets.kcal - delta : targets.kcal + delta) : null;
+  const adaptive = computeAdaptiveTdee(dailyKcal, rows, today);
+  const adaptiveTargets = profile && adaptive
+    ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb, tdee_override: adaptive.tdee })
+    : null;
+  const newKcal = adaptiveTargets
+    ? adaptiveTargets.kcal
+    : targets ? (phase === "cut" ? targets.kcal - delta : targets.kcal + delta) : null;
   const suppressed = inCooldown(profile?.last_adjusted_at ?? null, new Date());
 
   async function save(weight_lb: number) { await upsertWeighIn(today, weight_lb); await load(); }
@@ -154,8 +165,12 @@ export default function DietPage() {
   }
   async function apply() {
     if (!profile || !targets) return;
-    const base = profile.tdee_override ?? targets.tdee_est;
-    await applyAdjustment(profile, phase === "cut" ? base - delta : base + delta);
+    if (adaptive) {
+      await applyAdjustment(profile, adaptive.tdee);
+    } else {
+      const base = profile.tdee_override ?? targets.tdee_est;
+      await applyAdjustment(profile, phase === "cut" ? base - delta : base + delta);
+    }
     await load();
   }
 
@@ -233,7 +248,8 @@ export default function DietPage() {
         </section>
 
         <ProgressCard assessment={assessment} slope={slope} rate={rate} phase={phase} delta={delta}
-          newKcal={newKcal} suppressed={suppressed} onApply={apply} />
+          newKcal={newKcal} measuredTdee={adaptive?.tdee ?? null} loggedDays={adaptive?.loggedDays ?? null}
+          suppressed={suppressed} onApply={apply} />
 
         <WeighInRowEntry todayWeight={todayRow?.weight_lb ?? null} lastWeight={last?.weight_lb ?? null} onSave={save} />
 
