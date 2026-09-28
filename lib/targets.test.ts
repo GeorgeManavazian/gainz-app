@@ -84,6 +84,28 @@ describe("computeTargets", () => {
     expect(t.warning).toBe("kcal too low for fat + protein floors");
   });
 
+  it("activityBonusKcal defaults to 0 — byte-identical to calling with two args", () => {
+    const withDefault = computeTargets(athlete, today);
+    const explicitZero = computeTargets(athlete, today, 0);
+    expect(withDefault).toEqual(explicitZero);
+  });
+
+  it("activityBonusKcal raises kcal and carbs, leaves protein and fat untouched", () => {
+    const base = computeTargets(athlete, today);
+    const bumped = computeTargets(athlete, today, 200);
+    expect(bumped.kcal).toBe(base.kcal + 200);
+    expect(bumped.protein_g).toBe(base.protein_g);
+    expect(bumped.fat_g).toBe(base.fat_g);
+    expect(bumped.carbs_g).toBe(base.carbs_g + 50); // +200 kcal / 4 kcal per carb gram
+  });
+
+  it("a large enough activityBonusKcal clears the too-low-kcal warning", () => {
+    const starved = computeTargets({ ...athlete, tdee_override: 1400 }, today); // 900 kcal, warns
+    expect(starved.warning).toBe("kcal too low for fat + protein floors");
+    const fed = computeTargets({ ...athlete, tdee_override: 1400 }, today, 600); // 1500 kcal
+    expect(fed.warning).toBeUndefined();
+  });
+
   it("defaults today to now (smoke)", () => {
     // override makes kcal age-independent, so this stays stable against the real clock
     expect(computeTargets(athlete).kcal).toBe(2600);

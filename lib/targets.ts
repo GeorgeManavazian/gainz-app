@@ -66,11 +66,11 @@ export type Targets = {
 export const FAT_G_PER_LB = 0.33;
 const KCAL_PER_LB_FAT = 3500;
 
-export function computeTargets(p: Profile, today: Date = new Date()): Targets {
+export function computeTargets(p: Profile, today: Date = new Date(), activityBonusKcal: number = 0): Targets {
   const tdee_est = estimateTdee(p, today);
   const tdee = p.tdee_override ?? tdee_est;
   const delta = (p.rate_lb_per_wk * KCAL_PER_LB_FAT) / 7;
-  const rawKcal = p.phase === "cut" ? tdee - delta : p.phase === "bulk" ? tdee + delta : tdee;
+  const rawKcal = (p.phase === "cut" ? tdee - delta : p.phase === "bulk" ? tdee + delta : tdee) + activityBonusKcal;
 
   const kcal = Math.round(rawKcal);
   const fat_g = Math.round(FAT_G_PER_LB * p.weight_lb);
