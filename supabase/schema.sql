@@ -107,3 +107,18 @@ create policy "own meal_patterns" on meal_patterns for all
 
 -- Sub-project 4b: manual macro lines log servings, not grams (2026-09-08). Paste once.
 alter table meals add column if not exists unit text not null default 'g';
+
+-- Sub-project 7: wearable activity (2026-09-28). Paste this block once.
+create table if not exists health_activity (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) default auth.uid(),
+  date date not null,
+  active_kcal numeric not null check (active_kcal >= 0),
+  created_at timestamptz not null default now(),
+  unique (user_id, date)
+);
+
+alter table health_activity enable row level security;
+
+create policy "own health_activity" on health_activity for all
+  using (user_id = auth.uid()) with check (user_id = auth.uid());
