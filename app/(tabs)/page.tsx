@@ -83,6 +83,13 @@ function HubInner() {
     });
   }, []);
   useEffect(() => { loadTargets(); }, [loadTargets]);
+  useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState === "visible") loadTargets(true);
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [loadTargets]);
 
   useEffect(() => { loadWorkouts(); }, [loadWorkouts]);
 

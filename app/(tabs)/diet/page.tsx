@@ -136,6 +136,13 @@ export default function DietPage() {
     }
   }, []);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState === "visible") load();
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [load]);
 
   const today = localDateKey();
   const trended = useMemo(() => emaTrend(rows), [rows]);
@@ -157,14 +164,17 @@ export default function DietPage() {
   const targets = profile
     ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, new Date(), activityBonus)
     : null;
+  const baseTargets = profile
+    ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, new Date())
+    : null;
   const adaptive = computeAdaptiveTdee(dailyKcal, rows, today);
   const adaptiveTargets = profile && adaptive
-    ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb, tdee_override: adaptive.tdee }, new Date(), activityBonus)
+    ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb, tdee_override: adaptive.tdee }, new Date())
     : null;
   const adaptiveUsable = adaptive && adaptiveTargets && !adaptiveTargets.warning ? adaptive : null;
   const newKcal = adaptiveUsable && adaptiveTargets
     ? adaptiveTargets.kcal
-    : targets ? (phase === "cut" ? targets.kcal - delta : targets.kcal + delta) : null;
+    : baseTargets ? (phase === "cut" ? baseTargets.kcal - delta : baseTargets.kcal + delta) : null;
   const suppressed = inCooldown(profile?.last_adjusted_at ?? null, new Date());
 
   async function save(weight_lb: number) { await upsertWeighIn(today, weight_lb); await load(); }
@@ -269,13 +279,15 @@ export default function DietPage() {
             <span className="text-[11px] text-muted">kcal</span>
           </div>
           <ul className="card-grad divide-y divide-border overflow-hidden rounded-3xl border border-border text-sm">
-            {days.map((d) => (
+            {days.map((d) => {
+              const dayTarget = d.date === today ? targets : baseTargets;
+              return (
               <li key={d.date}>
                 <button type="button" onClick={() => setOpenDay(openDay === d.date ? null : d.date)}
                   aria-expanded={openDay === d.date}
                   className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2">
                   <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
-                    targets && d.kcal <= targets.kcal ? "bg-success/15 text-success" : "bg-surface-2 text-muted"}`} aria-hidden>
+                    dayTarget && d.kcal <= dayTarget.kcal ? "bg-success/15 text-success" : "bg-surface-2 text-muted"}`} aria-hidden>
                     {openDay === d.date ? "▾" : "✓"}
                   </span>
                   <span className="flex-1">
@@ -287,7 +299,7 @@ export default function DietPage() {
                 </button>
                 <div className="mx-4 mb-2 h-1 overflow-hidden rounded-full bg-surface-2">
                   <div className="h-full rounded-full bg-accent"
-                    style={{ width: `${targets ? Math.min(100, Math.round((d.kcal / targets.kcal) * 100)) : 0}%` }} />
+                    style={{ width: `${dayTarget ? Math.min(100, Math.round((d.kcal / dayTarget.kcal) * 100)) : 0}%` }} />
                 </div>
                 {openDay === d.date && d.meals.map((m) => (
                   <div key={m.id} className="flex items-center gap-3 border-t border-border py-2.5 pl-6 pr-4 text-[13px]">
@@ -301,7 +313,8 @@ export default function DietPage() {
                   </div>
                 ))}
               </li>
-            ))}
+              );
+            })}
             {days.length === 0 && <li className="px-4 py-3 text-muted">No meals in the last 7 days</li>}
           </ul>
         </section>
