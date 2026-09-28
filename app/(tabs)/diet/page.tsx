@@ -10,6 +10,8 @@ import { computeTargets } from "@/lib/targets";
 import { deleteWeighIn, listWeighIns, localDateKey, upsertWeighIn, type WeighInRow } from "@/lib/weighins";
 import { addDays, assessProgress, emaTrend, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight, type Assessment } from "@/lib/trend";
 import { computeAdaptiveTdee, ADAPTIVE_WINDOW_DAYS, type DailyKcal } from "@/lib/adaptive-tdee";
+import { computeActivityBonus, ACTIVITY_BASELINE_WINDOW_DAYS } from "@/lib/activity-adjustment";
+import { listHealthActivity, type HealthActivityRow } from "@/lib/health-activity";
 
 type Range = 30 | 90 | "all";
 type MealRow = { id: string; food_name: string; grams: number; calories: number; protein_g: number;
@@ -99,20 +101,23 @@ export default function DietPage() {
   const [err, setErr] = useState("");
   const [days, setDays] = useState<DayMeals[]>([]);
   const [dailyKcal, setDailyKcal] = useState<DailyKcal[]>([]);
+  const [activity, setActivity] = useState<HealthActivityRow[]>([]);
   const [openDay, setOpenDay] = useState<string | null>(localDateKey());
 
   const load = useCallback(async () => {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
     start.setDate(start.getDate() - (ADAPTIVE_WINDOW_DAYS - 1));
-    const [w, p, m] = await Promise.allSettled([
+    const [w, p, m, a] = await Promise.allSettled([
       listWeighIns(),
       getProfile(),
       supabase.from("meals").select("*").gte("logged_at", start.toISOString()).order("logged_at"),
+      listHealthActivity(addDays(localDateKey(), -ACTIVITY_BASELINE_WINDOW_DAYS)),
     ]);
     if (w.status === "fulfilled") { setRows(w.value); setErr(""); }
     else { setErr("Couldn't load weigh-ins."); }
     setProfile(p.status === "fulfilled" ? p.value : null);
+    setActivity(a.status === "fulfilled" ? a.value : []);
 
     if (m.status === "fulfilled" && !m.value.error) {
       const rowsByDay = new Map<string, DayMeals>();
@@ -148,10 +153,13 @@ export default function DietPage() {
   const rate = profile?.rate_lb_per_wk ?? 0;
   const assessment: Assessment = profile ? assessProgress(slope, phase, rate) : "insufficient_data";
   const delta = suggestAdjustment(slope, phase, rate);
-  const targets = profile ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }) : null;
+  const activityBonus = computeActivityBonus(activity, today);
+  const targets = profile
+    ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, new Date(), activityBonus)
+    : null;
   const adaptive = computeAdaptiveTdee(dailyKcal, rows, today);
   const adaptiveTargets = profile && adaptive
-    ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb, tdee_override: adaptive.tdee })
+    ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb, tdee_override: adaptive.tdee }, new Date(), activityBonus)
     : null;
   const adaptiveUsable = adaptive && adaptiveTargets && !adaptiveTargets.warning ? adaptive : null;
   const newKcal = adaptiveUsable && adaptiveTargets
