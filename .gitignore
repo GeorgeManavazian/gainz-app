@@ -43,3 +43,6 @@ __pycache__/
 
 # superpowers scratch
 .superpowers/
+
+# claude code worktrees (nested checkouts double-discovered by vitest otherwise)
+.claude/worktrees/
