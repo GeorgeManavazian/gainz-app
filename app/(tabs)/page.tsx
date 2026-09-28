@@ -10,6 +10,8 @@ import { computeTargets } from "@/lib/targets";
 import { getProfile, type ProfileRow } from "@/lib/profile";
 import { listWeighIns, localDateKey, upsertWeighIn, type WeighInRow } from "@/lib/weighins";
 import { addDays, slopeLbPerWk, trendWeight } from "@/lib/trend";
+import { computeActivityBonus, ACTIVITY_BASELINE_WINDOW_DAYS } from "@/lib/activity-adjustment";
+import { listHealthActivity, type HealthActivityRow } from "@/lib/health-activity";
 import { getActiveWorkout, getTodayCompletedWorkout, listLiftsForWorkout } from "@/lib/workouts-db";
 import { formatElapsed, totalSets, workoutTitle, type WorkoutRow } from "@/lib/workouts";
 import { nextMeal, remaining } from "@/lib/hub";
@@ -23,6 +25,7 @@ function HubInner() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [profile, setProfile] = useState<ProfileRow | null | "error" | undefined>(undefined);
   const [weighIns, setWeighIns] = useState<WeighInRow[]>([]);
+  const [activity, setActivity] = useState<HealthActivityRow[]>([]);
   const [active, setActive] = useState<WorkoutRow | null>(null);
   const [done, setDone] = useState<{ w: WorkoutRow; sets: number } | null>(null);
   const params = useSearchParams();
@@ -69,9 +72,14 @@ function HubInner() {
 
   const loadTargets = useCallback((soft = false) => {
     if (!soft) setProfile(undefined);
-    return Promise.allSettled([getProfile(), listWeighIns(addDays(localDateKey(), -120))]).then(([p, w]) => {
+    return Promise.allSettled([
+      getProfile(),
+      listWeighIns(addDays(localDateKey(), -120)),
+      listHealthActivity(addDays(localDateKey(), -ACTIVITY_BASELINE_WINDOW_DAYS)),
+    ]).then(([p, w, a]) => {
       setWeighIns(w.status === "fulfilled" ? w.value : []);
       setProfile(p.status === "fulfilled" ? p.value : "error");
+      setActivity(a.status === "fulfilled" ? a.value : []);
     });
   }, []);
   useEffect(() => { loadTargets(); }, [loadTargets]);
@@ -80,11 +88,12 @@ function HubInner() {
 
   const today = localDateKey();
   const trend = trendWeight(weighIns);
+  const activityBonus = computeActivityBonus(activity, today);
   const targets =
     profile === undefined ? undefined
     : profile === null ? null
     : profile === "error" ? "error"
-    : computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb });
+    : computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, new Date(), activityBonus);
 
   const todayRow = weighIns.find((r) => r.date === today) ?? null;
   const last = weighIns.length ? weighIns[weighIns.length - 1] : null;
@@ -111,7 +120,12 @@ function HubInner() {
         <div className="flex items-center justify-between">
           <span className="text-2xl font-black italic tracking-tight text-accent">GAINZ</span>
           <div className="flex items-center gap-2">
-            {/* burn pill slot — hidden until Oura burn data exists (roadmap #6) */}
+            {activityBonus > 0 && (
+              <span className="flex h-9 items-center rounded-full border border-accent/30 bg-accent/10 px-3 text-[13px] font-semibold text-accent"
+                aria-label={`Plus ${activityBonus} calories today from activity`}>
+                +{activityBonus}
+              </span>
+            )}
             <Link href="/profile" aria-label="Profile"
               className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted active:text-foreground">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"
