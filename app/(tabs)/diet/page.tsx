@@ -153,7 +153,8 @@ export default function DietPage() {
   const adaptiveTargets = profile && adaptive
     ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb, tdee_override: adaptive.tdee })
     : null;
-  const newKcal = adaptiveTargets
+  const adaptiveUsable = adaptive && adaptiveTargets && !adaptiveTargets.warning ? adaptive : null;
+  const newKcal = adaptiveUsable && adaptiveTargets
     ? adaptiveTargets.kcal
     : targets ? (phase === "cut" ? targets.kcal - delta : targets.kcal + delta) : null;
   const suppressed = inCooldown(profile?.last_adjusted_at ?? null, new Date());
@@ -165,8 +166,8 @@ export default function DietPage() {
   }
   async function apply() {
     if (!profile || !targets) return;
-    if (adaptive) {
-      await applyAdjustment(profile, adaptive.tdee);
+    if (adaptiveUsable) {
+      await applyAdjustment(profile, adaptiveUsable.tdee);
     } else {
       const base = profile.tdee_override ?? targets.tdee_est;
       await applyAdjustment(profile, phase === "cut" ? base - delta : base + delta);
@@ -248,7 +249,7 @@ export default function DietPage() {
         </section>
 
         <ProgressCard assessment={assessment} slope={slope} rate={rate} phase={phase} delta={delta}
-          newKcal={newKcal} measuredTdee={adaptive?.tdee ?? null} loggedDays={adaptive?.loggedDays ?? null}
+          newKcal={newKcal} measuredTdee={adaptiveUsable?.tdee ?? null} loggedDays={adaptiveUsable?.loggedDays ?? null}
           suppressed={suppressed} onApply={apply} />
 
         <WeighInRowEntry todayWeight={todayRow?.weight_lb ?? null} lastWeight={last?.weight_lb ?? null} onSave={save} />

@@ -10,6 +10,10 @@ export type DailyKcal = { date: string /* YYYY-MM-DD */; kcal: number };
  * ADAPTIVE_WINDOW_DAYS. Days with no dailyKcal row are gaps, never counted
  * as 0. Returns null if fewer than ADAPTIVE_MIN_LOGGED_DAYS are logged in
  * the window, or if slopeLbPerWk can't produce a slope (not enough weigh-ins).
+ *
+ * The intake-averaging window excludes today (it ends at yesterday), since
+ * today's logging is typically still partial and would bias the average low.
+ * The weight-trend window is unaffected and still runs through today.
  */
 export function computeAdaptiveTdee(
   dailyKcal: DailyKcal[],
@@ -17,7 +21,8 @@ export function computeAdaptiveTdee(
   today: string
 ): { tdee: number; loggedDays: number } | null {
   const start = addDays(today, -(ADAPTIVE_WINDOW_DAYS - 1));
-  const inWindow = dailyKcal.filter((d) => d.date >= start && d.date <= today);
+  const intakeEnd = addDays(today, -1);
+  const inWindow = dailyKcal.filter((d) => d.date >= start && d.date <= intakeEnd);
   if (inWindow.length < ADAPTIVE_MIN_LOGGED_DAYS) return null;
 
   const slope = slopeLbPerWk(weighIns, today, ADAPTIVE_WINDOW_DAYS);
