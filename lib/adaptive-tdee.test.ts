@@ -35,7 +35,7 @@ describe("computeAdaptiveTdee", () => {
   });
 
   it("null with fewer than 8 weigh-ins in the window, even with 14 logged days", () => {
-    const dates = Array.from({ length: 14 }, (_, i) => addDays(today, -i));
+    const dates = Array.from({ length: 14 }, (_, i) => addDays(today, -(i + 1)));
     const dailyKcal = kcalDays(dates, 2200);
     const weighIns = weighSeries(today, 7, 203, -1.0 / 7);
     expect(computeAdaptiveTdee(dailyKcal, weighIns, today)).toBeNull();
