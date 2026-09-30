@@ -1,5 +1,7 @@
 # Adaptive TDEE — Design
 
+> **Reverted 2026-09-30.** Shipped, then pulled back to the original weight-only stall nudge — logged intake can't be trusted as a hard input (weighing errors, misremembered macros, missed logs), while a morning weigh-in is the one honest, consistent signal. See the [[2026-09-30 — Revert adaptive TDEE|dev log]] for the reasoning and exact revert. Left here as a historical record, not current behavior.
+
 Sub-project 6 of the Gainz roadmap (per `docs/superpowers/specs/2026-08-30-weigh-ins-design.md:61-63,95`). Depends on sub-project 1 (macro targets: `profiles`, `computeTargets`) and sub-project 2 (weigh-ins/trend: `lib/trend.ts`, `slopeLbPerWk`).
 
 ## Purpose

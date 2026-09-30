@@ -4,10 +4,9 @@ import type { Assessment } from "@/lib/trend";
 
 type Phase = "cut" | "maintain" | "bulk";
 
-export default function ProgressCard({ assessment, slope, rate, phase, delta, newKcal, measuredTdee, loggedDays, suppressed, onApply }: {
+export default function ProgressCard({ assessment, slope, rate, phase, delta, newKcal, suppressed, onApply }: {
   assessment: Assessment; slope: number | null; rate: number; phase: Phase; delta: number;
-  newKcal: number | null; measuredTdee: number | null; loggedDays: number | null;
-  suppressed: boolean; onApply: () => Promise<void>;
+  newKcal: number | null; suppressed: boolean; onApply: () => Promise<void>;
 }) {
   const [applying, setApplying] = useState(false);
   const [err, setErr] = useState("");
@@ -25,13 +24,13 @@ export default function ProgressCard({ assessment, slope, rate, phase, delta, ne
 
   const stalled = assessment === "stalled";
   const title = stalled
-    ? measuredTdee !== null ? `Measured TDEE: ${measuredTdee} kcal` : "Trend flat 14 days"
+    ? "Trend flat 14 days"
     : `${phase === "cut" ? "Losing" : "Gaining"} ${Math.abs(slope).toFixed(1)} lb/wk`;
   const line1 = stalled
-    ? measuredTdee !== null ? `From ${loggedDays} days tracked.` : `(${fmt(slope)} lb/wk, goal ${goal}).`
+    ? `(${fmt(slope)} lb/wk, goal ${goal}).`
     : `Faster than ${(rate + 0.75).toFixed(2)} lb/wk.`;
   const line2 = stalled
-    ? `${measuredTdee !== null ? "Update" : phase === "cut" ? "Drop" : "Add"} ${measuredTdee !== null ? "" : `${delta} kcal `}→ ${newKcal ?? "—"}?`
+    ? `${phase === "cut" ? "Drop" : "Add"} ${delta} kcal → ${newKcal ?? "—"}?`
     : `Consider ${phase === "cut" ? "adding" : "cutting"} 100–200 kcal.`;
 
   return (
