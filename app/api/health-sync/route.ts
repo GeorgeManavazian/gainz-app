@@ -23,7 +23,10 @@ export async function POST(req: NextRequest) {
       { user_id: process.env.HEALTH_SYNC_USER_ID, date: parsed.date, active_kcal: parsed.active_kcal },
       { onConflict: "user_id,date" }
     );
-  if (error) return NextResponse.json({ error: "db error" }, { status: 500 });
+  if (error) {
+    console.error("health-sync upsert failed:", error);
+    return NextResponse.json({ error: "db error" }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }

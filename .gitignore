@@ -46,3 +46,6 @@ __pycache__/
 
 # claude code worktrees (nested checkouts double-discovered by vitest otherwise)
 .claude/worktrees/
+
+# playwright mcp scratch
+.playwright-mcp/
