@@ -1,6 +1,6 @@
 import { findExercise } from "./exercises";
 import type { Library } from "./exercises";
-import { MUSCLES, regionOf, targetOf } from "./muscles";
+import { MUSCLES, regionOf } from "./muscles";
 import type { Muscle, MuscleGroup } from "./muscles";
 import { localDateOf } from "./workouts";
 import type { LiftRow } from "./workouts";
