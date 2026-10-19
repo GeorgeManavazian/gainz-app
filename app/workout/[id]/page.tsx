@@ -5,13 +5,15 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import ExerciseRow from "@/components/ExerciseRow";
+import MuscleStrip, { type StripChip } from "@/components/MuscleStrip";
 import NewExerciseSheet from "@/components/NewExerciseSheet";
 import SetSheet, { REPS, SETS, WEIGHT, type SheetState } from "@/components/SetSheet";
 import WorkoutSummary from "@/components/WorkoutSummary";
-import { EXERCISES, MUSCLE_GROUPS, exercisesFor, findExercise, normalizeName, searchExercises } from "@/lib/exercises";
+import { EXERCISES, MUSCLE_GROUPS, exercisesFor, exercisesForMuscle, findExercise, normalizeName, searchExercises } from "@/lib/exercises";
 import { mergeLibrary, type CustomExerciseRow } from "@/lib/custom-exercises";
 import { createCustomExercise, listCustomExercises } from "@/lib/custom-exercises-db";
-import type { Muscle } from "@/lib/muscles";
+import { behindThisWeek, hasCompletedWorkoutThisWeek, muscleWeek, musclesHit, splitByRegion, weekStartOf } from "@/lib/muscle-week";
+import { muscleName, targetOf, type Muscle } from "@/lib/muscles";
 import { formatElapsed, groupByExercise, lastSession, recentExercises, workoutTitle, type LiftRow, type WorkoutRow } from "@/lib/workouts";
 import { deleteWorkout, endWorkout, getWorkout, listLiftsForWorkout, deleteSet, listRecentLifts, logSet } from "@/lib/workouts-db";
 
@@ -32,6 +34,7 @@ export default function WorkoutPage() {
   const [wheel, setWheel] = useState<Record<string, SheetState>>({});
   const [now, setNow] = useState(Date.now());
   const [err, setErr] = useState("");
+  const [focus, setFocus] = useState<Muscle | null>(null); // muscle the list is narrowed to
 
   useEffect(() => {
     getWorkout(id).then(setWorkout).catch(() => setWorkout(null));
@@ -48,6 +51,14 @@ export default function WorkoutPage() {
   const groups = workout?.muscle_groups ?? [];
   const library = useMemo(() => mergeLibrary(EXERCISES, customs), [customs]);
   const previousRows = useMemo(() => history.filter((r) => r.workout_id !== id), [history, id]);
+  const weekStart = weekStartOf(new Date());
+  const week = useMemo(() => muscleWeek(previousRows, library, weekStart), [previousRows, library, weekStart]);
+  const hitNow = useMemo(() => musclesHit(logged, library), [logged, library]);
+  const behind = useMemo(() => behindThisWeek(week).filter((m) => !hitNow.has(m)), [week, hitNow]);
+  const showStrip = hasCompletedWorkoutThisWeek(history, weekStart, id);
+  const { inRegion, other } = splitByRegion(behind, groups);
+  const toChip = (m: Muscle): StripChip => ({ muscle: m, hits: week[m].hits, target: targetOf(m)! });
+  useEffect(() => { if (!showStrip) setFocus(null); }, [showStrip]);
   const recents = useMemo(() => recentExercises(previousRows, groups, 8, library), [previousRows, groups, library]);
   const listedNames = useMemo(() => new Set([
     ...recents,
@@ -150,6 +161,10 @@ export default function WorkoutPage() {
         <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search exercises"
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-base placeholder:text-muted focus:border-accent focus:outline-none" />
 
+        {showStrip && (
+          <MuscleStrip inRegion={inRegion.map(toChip)} other={other.map(toChip)} active={focus} onPick={setFocus} />
+        )}
+
         {q ? (
           <section className="flex flex-col gap-2">
             <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Search</h2>
@@ -158,6 +173,16 @@ export default function WorkoutPage() {
                 <ExerciseRow key={x.name} name={x.name} muscle={x.muscles[0]} setCount={setCount(x.name)} onClick={() => openSheet(x.name)} />
               ))}
               {searchHits.length === 0 && <p className="px-3 py-3 text-sm text-muted">No matches — add it below.</p>}
+            </div>
+          </section>
+        ) : focus !== null ? (
+          <section className="flex flex-col gap-2">
+            <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">{muscleName(focus)}</h2>
+            <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+              {exercisesForMuscle(focus, library).map((x) => (
+                <ExerciseRow key={x.name} name={x.name} muscle={x.muscles[0]} setCount={setCount(x.name)} onClick={() => openSheet(x.name)} />
+              ))}
+              {exercisesForMuscle(focus, library).length === 0 && <p className="px-3 py-3 text-sm text-muted">No matches — add it below.</p>}
             </div>
           </section>
         ) : (
