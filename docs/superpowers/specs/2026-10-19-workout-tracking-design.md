@@ -43,6 +43,7 @@ The muscle-tracking piece changes the exercise library's muscle model from 8 coa
 - No hex colours outside the token sheet; reuse existing surface/border/accent classes.
 - `workouts.muscle_groups` keeps storing the existing 8 group ids. No data migration.
 - Existing tests keep passing except where this spec changes a contract (noted below).
+- Deploy order: paste the Sub-project 8 SQL (`custom_exercises`) into Supabase **before** merging/deploying this branch; until the table exists, creating a new exercise name fails with 'Couldn't save'.
 
 ---
 
@@ -90,7 +91,7 @@ type Exercise = {
 
 **Secondary muscles never affect section membership.** If they did, every press would show under Chest, Shoulders and Triceps and the Shoulders section would more than double. Consequence: a few exercises move sections versus today (e.g. "Incline DB Press" is chest-only now, "Deadlift" lands under Hams & Glutes and Back only because `lower_back` is primary). Secondary muscles exist for weekly hit counting and tap-to-narrow only.
 
-### Re-tagging the 160 library exercises
+### Re-tagging the 147 library exercises
 
 All entries get `primary`/`secondary`. Rules the builder applies, with examples:
 
