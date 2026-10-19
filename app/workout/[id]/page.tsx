@@ -59,6 +59,9 @@ export default function WorkoutPage() {
   const { inRegion, other } = splitByRegion(behind, groups);
   const toChip = (m: Muscle): StripChip => ({ muscle: m, hits: week[m].hits, target: targetOf(m)! });
   useEffect(() => { if (!showStrip) setFocus(null); }, [showStrip]);
+  // Once the narrowed muscle is no longer behind (e.g. just logged), widen back: the strip
+  // may have no chips left and would render nothing, including the "All" chip.
+  useEffect(() => { if (focus !== null && !behind.includes(focus)) setFocus(null); }, [behind, focus]);
   const recents = useMemo(() => recentExercises(previousRows, groups, 8, library), [previousRows, groups, library]);
   const listedNames = useMemo(() => new Set([
     ...recents,
