@@ -16,12 +16,24 @@ function shortDate(iso: string): string {
   return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export default function SetSheet({ exercise, muscle, previous, logged, state, onState, onAdd, onClose }: {
+export default function SetSheet({ exercise, muscle, previous, logged, state, onState, onAdd, onDelete, onClose }: {
   exercise: string; muscle?: MuscleGroup; previous: LiftRow[]; logged: LiftRow[];
-  state: SheetState; onState: (s: SheetState) => void; onAdd: () => Promise<void>; onClose: () => void;
+  state: SheetState; onState: (s: SheetState) => void; onAdd: () => Promise<void>; onDelete: (id: string) => Promise<void>; onClose: () => void;
 }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Parent passes a fresh filtered array every render, so key on the row ids, not the array identity.
+  const loggedKey = logged.map((r) => r.id).join(",");
+  useEffect(() => { setConfirmId(null); }, [loggedKey]);
+
+  async function remove(rid: string) {
+    if (deletingId) return;
+    setDeletingId(rid); setErr("");
+    try { await onDelete(rid); } catch { setErr("Couldn't delete. Please try again."); } finally { setDeletingId(null); setConfirmId(null); }
+  }
 
   async function add() {
     if (busy) return;
@@ -78,7 +90,17 @@ export default function SetSheet({ exercise, muscle, previous, logged, state, on
                 <li key={r.id} className="flex items-center gap-3 px-3 py-2.5">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-2 text-xs text-muted">{i + 1}</span>
                   <span className="flex-1 text-base tabular-nums">{r.weight} × {r.reps}{r.sets > 1 ? ` ×${r.sets}` : ""}</span>
-                  <span className="text-accent">✓</span>
+                  {confirmId === r.id ? (
+                    <button type="button" onClick={() => remove(r.id)} disabled={deletingId === r.id}
+                      className="rounded-md bg-danger/15 px-2 py-0.5 text-xs font-semibold text-danger active:opacity-80 disabled:opacity-60">
+                      Delete?
+                    </button>
+                  ) : (
+                    <button type="button" aria-label="Remove set" onClick={() => setConfirmId(r.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded-md text-muted active:bg-surface-2">
+                      ✕
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

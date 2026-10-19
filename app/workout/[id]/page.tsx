@@ -9,7 +9,7 @@ import SetSheet, { REPS, SETS, WEIGHT, type SheetState } from "@/components/SetS
 import WorkoutSummary from "@/components/WorkoutSummary";
 import { MUSCLE_GROUPS, exercisesFor, findExercise, normalizeName, searchExercises } from "@/lib/exercises";
 import { formatElapsed, groupByExercise, lastSession, recentExercises, workoutTitle, type LiftRow, type WorkoutRow } from "@/lib/workouts";
-import { deleteWorkout, endWorkout, getWorkout, listLiftsForWorkout, listRecentLifts, logSet } from "@/lib/workouts-db";
+import { deleteWorkout, endWorkout, getWorkout, listLiftsForWorkout, deleteSet, listRecentLifts, logSet } from "@/lib/workouts-db";
 
 const DEFAULT_STATE: SheetState = { sets: 1, reps: 8, weight: 0 };
 const snap = (v: number, values: number[]) => values.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
@@ -67,6 +67,12 @@ export default function WorkoutPage() {
     const s = wheel[open] ?? DEFAULT_STATE;
     const row = await logSet({ workout_id: id, exercise: open, sets: s.sets, reps: s.reps, weight: s.weight });
     setLogged((l) => [...l, row]);
+  }
+
+  async function removeSet(sid: string) {
+    const prev = logged;
+    setLogged((l) => l.filter((r) => r.id !== sid));
+    try { await deleteSet(sid); } catch (e) { setLogged(prev); throw e; }
   }
 
   async function complete() {
@@ -183,7 +189,7 @@ export default function WorkoutPage() {
             logged={logged.filter((r) => normalizeName(r.exercise) === normalizeName(open))}
             state={wheel[open] ?? DEFAULT_STATE}
             onState={(s) => setWheel((w) => ({ ...w, [open]: s }))}
-            onAdd={addSet} onClose={() => setOpen(null)} />
+            onAdd={addSet} onDelete={removeSet} onClose={() => setOpen(null)} />
         )}
       </main>
     </AuthGuard>
