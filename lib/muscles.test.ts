@@ -24,6 +24,15 @@ describe("taxonomy", () => {
     expect(isMuscle("lats")).toBe(true);
     expect(isMuscle("quadz")).toBe(false);
   });
+  it("region membership", () => {
+    expect(musclesIn("chest")).toEqual(["upper_chest", "mid_chest", "lower_chest"]);
+    expect(musclesIn("shoulders")).toEqual(["front_delts", "side_delts", "rear_delts"]);
+    expect(musclesIn("biceps")).toEqual(["biceps", "forearms"]);
+    expect(musclesIn("triceps")).toEqual(["triceps"]);
+    expect(musclesIn("quads")).toEqual(["quads"]);
+    expect(musclesIn("hamstrings_glutes")).toEqual(["hamstrings", "glutes", "calves"]);
+    expect(musclesIn("core")).toEqual(["abs"]);
+  });
   it("regions and presets moved intact", () => {
     expect(MUSCLE_GROUPS.map((m) => m.id)).toEqual(["chest", "back", "shoulders", "biceps", "triceps", "quads", "hamstrings_glutes", "core"]);
     expect(PRESETS.upper).toEqual(["chest", "back", "shoulders", "biceps", "triceps"]);

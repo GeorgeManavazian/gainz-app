@@ -40,7 +40,7 @@ export const MUSCLES: { id: Muscle; label: string; region: MuscleGroup; target: 
   { id: "quads", label: "Quads", region: "quads", target: 2 },
   { id: "hamstrings", label: "Hamstrings", region: "hamstrings_glutes", target: 2 },
   { id: "glutes", label: "Glutes", region: "hamstrings_glutes", target: 2 },
-  { id: "calves", label: "Calves", region: "quads", target: null },
+  { id: "calves", label: "Calves", region: "hamstrings_glutes", target: null },
   { id: "abs", label: "Abs", region: "core", target: null },
 ];
 
