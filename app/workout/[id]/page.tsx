@@ -18,6 +18,11 @@ import { formatElapsed, groupByExercise, lastSession, recentExercises, workoutTi
 import { deleteWorkout, endWorkout, getWorkout, listLiftsForWorkout, deleteSet, listRecentLifts, logSet } from "@/lib/workouts-db";
 
 const DEFAULT_STATE: SheetState = { sets: 1, reps: 8, weight: 0 };
+/** Fresh rows first, then earlier rows the fresh list doesn't have yet (by normalized name). */
+function mergeCustoms(prev: CustomExerciseRow[], fresh: CustomExerciseRow[]): CustomExerciseRow[] {
+  const names = new Set(fresh.map((r) => normalizeName(r.name)));
+  return [...fresh, ...prev.filter((r) => !names.has(normalizeName(r.name)))];
+}
 const snap = (v: number, values: number[]) => values.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
 
 export default function WorkoutPage() {
@@ -40,7 +45,7 @@ export default function WorkoutPage() {
     getWorkout(id).then(setWorkout).catch(() => setWorkout(null));
     listRecentLifts().then(setHistory).catch((e) => console.warn("gainz workouts: load failed", e));
     listLiftsForWorkout(id).then(setLogged).catch((e) => console.warn("gainz workouts: load failed", e));
-    listCustomExercises().then(setCustoms).catch((e) => console.warn("gainz workouts: load failed", e));
+    listCustomExercises().then((fresh) => setCustoms((prev) => mergeCustoms(prev, fresh))).catch((e) => console.warn("gainz workouts: load failed", e));
   }, [id]);
 
   useEffect(() => {
@@ -125,10 +130,7 @@ export default function WorkoutPage() {
     setCustoms((c) => [...c, row]);
     setNewName(null);
     openSheet(row.name);
-    listCustomExercises().then((fresh) => setCustoms((prev) => {
-      const names = new Set(fresh.map((r) => normalizeName(r.name)));
-      return [...fresh, ...prev.filter((r) => !names.has(normalizeName(r.name)))];
-    })).catch(() => {});
+    listCustomExercises().then((fresh) => setCustoms((prev) => mergeCustoms(prev, fresh))).catch(() => {});
   }
 
   if (workout === undefined) return <AuthGuard><main className="min-h-dvh bg-background" /></AuthGuard>;
