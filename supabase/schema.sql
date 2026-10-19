@@ -122,3 +122,18 @@ alter table health_activity enable row level security;
 
 create policy "own health_activity" on health_activity for all
   using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- Sub-project 8: custom exercises (2026-10-19). Paste this block once.
+create table if not exists custom_exercises (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) default auth.uid(),
+  name text not null,
+  primary_muscles text[] not null check (cardinality(primary_muscles) > 0),
+  secondary_muscles text[] not null default '{}',
+  created_at timestamptz not null default now()
+);
+create unique index if not exists custom_exercises_user_name_idx
+  on custom_exercises (user_id, lower(name));
+alter table custom_exercises enable row level security;
+create policy "own custom_exercises" on custom_exercises for all
+  using (user_id = auth.uid()) with check (user_id = auth.uid());
