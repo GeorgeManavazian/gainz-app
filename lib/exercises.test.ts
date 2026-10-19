@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { EXERCISES, MUSCLE_GROUPS, PRESETS, exercisesFor, findExercise, muscleShort,
+import { EXERCISES, MUSCLE_GROUPS, PRESETS, exercisesFor, findExercise, makeExercise, muscleShort,
   normalizeName, searchExercises } from "./exercises";
+import type { MuscleGroup } from "./exercises";
+import { regionOf } from "./muscles";
 
 describe("library shape", () => {
   it("has the 8 muscle groups in display order", () => {
@@ -25,6 +27,27 @@ describe("library shape", () => {
     }
     expect(EXERCISES.length).toBeGreaterThanOrEqual(100);
   });
+  it("every exercise has ≥1 primary, no overlap, and derived regions from primary only", () => {
+    for (const x of EXERCISES) {
+      expect(x.primary.length).toBeGreaterThan(0);
+      for (const m of x.secondary) expect(x.primary).not.toContain(m);
+      const derived = [...new Set(x.primary.map(regionOf))];
+      expect(x.muscles).toEqual(derived);
+      expect(x.muscles[0]).toBe(regionOf(x.primary[0]));
+    }
+  });
+  it("spec-pinned tags", () => {
+    expect(findExercise("BB Bench Press")).toMatchObject({ primary: ["mid_chest"], secondary: ["triceps", "front_delts"] });
+    expect(findExercise("Incline DB Press")).toMatchObject({ primary: ["upper_chest"], secondary: ["front_delts", "triceps"] });
+    expect(findExercise("DB Lateral Raise")).toMatchObject({ primary: ["side_delts"], secondary: [] });
+    expect(findExercise("Lat Pulldown")!.primary).toEqual(["lats"]);
+    expect(findExercise("Deadlift")!.primary).toEqual(["hamstrings", "glutes", "lower_back"]);
+    expect(findExercise("Standing Calf Raise")!.primary).toEqual(["calves"]);
+    expect(findExercise("Hip Adduction")!.primary).toEqual(["glutes"]);
+  });
+  it("makeExercise rejects an empty primary", () => {
+    expect(() => makeExercise("x", [])).toThrow();
+  });
 });
 
 describe("exercisesFor", () => {
@@ -33,12 +56,13 @@ describe("exercisesFor", () => {
     expect(chest.some((e) => e.name === "DB Chest Press")).toBe(true);
     expect(chest.some((e) => e.name === "Lat Pulldown")).toBe(false);
   });
-  it("multi-muscle exercise appears for either group, once for both", () => {
-    const incline = (g: Parameters<typeof exercisesFor>[0]) =>
-      exercisesFor(g).filter((e) => e.name === "Incline DB Press").length;
+  it("secondary muscles do not put an exercise in another section", () => {
+    const incline = (g: MuscleGroup[]) => exercisesFor(g).filter((x) => x.name === "Incline DB Press").length;
     expect(incline(["chest"])).toBe(1);
-    expect(incline(["shoulders"])).toBe(1);
-    expect(incline(["chest", "shoulders"])).toBe(1);
+    expect(incline(["shoulders"])).toBe(0);
+    const dl = (g: MuscleGroup[]) => exercisesFor(g).filter((x) => x.name === "Deadlift").length;
+    expect(dl(["back"])).toBe(1);
+    expect(dl(["hamstrings_glutes"])).toBe(1);
   });
   it("empty groups → empty", () => expect(exercisesFor([])).toEqual([]));
 });
