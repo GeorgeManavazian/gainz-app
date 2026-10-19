@@ -85,7 +85,7 @@ Each sub-project follows the same loop, and the artifacts are in the repo:
 3. **Plan** — bite-sized tasks with the exact code and tests (`docs/superpowers/plans/`).
 4. **Build with review** — each task is implemented, then reviewed for spec compliance and code quality, then a whole-branch review before it ships. Findings are fixed or explicitly parked with a written ruling.
 
-Result so far: 146 unit tests across 11 files, typed end to end, zero hex colours outside the token sheet.
+Result so far: 207 unit tests across 18 files, typed end to end, zero hex colours outside the token sheet.
 
 ## Running locally
 
@@ -106,14 +106,14 @@ npm run build
 
 ## Roadmap
 
-Shipped: macro targets → weigh-ins and stall detection → workout flow → HUB / Diet / Performance tabs → curated food search → saved meals → meal builder.
+Shipped: macro targets → weigh-ins and stall detection → workout flow → HUB / Diet / Performance tabs → curated food search → saved meals → meal builder → next-meal advice (time-aware) → wearable activity bonus (server side) → custom exercises, set delete and weekly 2× muscle frequency.
 
 Next:
-- **Next-meal advice** — the HUB card becomes real: remaining budget split across meals left, time-aware.
-- **Adaptive TDEE** — back-solve maintenance calories from logged intake versus the weight trend, replacing the formula estimate with measured reality.
-- **Wearable integration** — daily activity adjusts the calorie budget.
 - **Lift PRs and progression** — per-exercise records and suggested loads.
 - **Multi-user** — the schema is already per-user with RLS; a public release needs onboarding and a service worker for cold-start offline.
+- **Wearable integration, phone side** — the sync route is live; the on-device feed (Health Auto Export or native HealthKit) is parked until the App Store push.
+
+Adaptive TDEE shipped on 2026-09-28 and was reverted two days later: logged intake is not a trustworthy enough signal to back-solve maintenance from; a morning weigh-in is.
 
 The end goal is a tracker that closes the loop on its own: it knows what you ate, what you weigh, and how you trained, and tells you the one number that matters next.
 
