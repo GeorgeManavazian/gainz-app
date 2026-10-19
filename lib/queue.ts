@@ -26,8 +26,10 @@ export async function readQueue(): Promise<Queued[]> {
 // so a retried insert of an already-landed item fails with 23505 and is treated as done.
 // update is idempotent by construction (the only update is ended_at).
 // delete is idempotent: PostgREST returns no error when 0 rows match, so replaying a
-// delete (or deleting a row that never landed) is a no-error "ok". A delete queued behind
-// its own insert shares the item id; flushQueue settles both in one pass (keyed by id).
+// delete (or deleting a row that never landed) is a no-error "ok". A delete (or update) queued
+// behind its own insert shares the item id, so flushQueue settles items by identity
+// (id + op + queued_at), never by id alone: a settled insert must not take a pending
+// delete/update with the same id out of the queue (e.g. one enqueued mid-flush).
 // Insert payloads are per-table: only lifts and meals get logged_at stamped from queued_at.
 //
 // supabase-js postgrest calls do NOT throw on network failure — they resolve with
@@ -82,6 +84,9 @@ export async function enqueueOrSend(table: QueueTable, entry: Record<string, unk
 
 let isFlushing = false;
 
+/** Identity of a queued item: same id can appear with several ops (insert → delete). */
+const itemKey = (q: Queued) => `${q.id}:${q.op}:${q.queued_at}`;
+
 export async function flushQueue(): Promise<number> {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return 0;
@@ -99,7 +104,7 @@ export async function flushQueue(): Promise<number> {
           console.error("gainz queue: dead-lettering permanently rejected item", item.id);
           await update<Queued[]>(DEAD_KEY, (dq) => [...(dq ?? []), item]);
         }
-        done.add(item.id);
+        done.add(itemKey(item));
         flushed++;
       } catch (e) {
         console.warn("gainz queue: flush stopped (still offline?), keeping the rest in order", item.id, e);
@@ -107,7 +112,7 @@ export async function flushQueue(): Promise<number> {
       }
     }
     // Atomic: only remove items we know are settled; concurrent enqueues survive.
-    await update<unknown[]>(KEY, (cur) => (cur ?? []).filter((i) => !done.has(normalizeQueued(i).id)));
+    await update<unknown[]>(KEY, (cur) => (cur ?? []).filter((i) => !done.has(itemKey(normalizeQueued(i)))));
     return flushed;
   } finally {
     isFlushing = false;

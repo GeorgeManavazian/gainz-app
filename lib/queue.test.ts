@@ -7,6 +7,7 @@ const h = vi.hoisted(() => ({
   calls: [] as { table: string; op: string; payload: Record<string, unknown>; id?: string }[],
   failNext: [] as ("transient" | "permanent" | "duplicate" | undefined)[],
   store: new Map<string, unknown>(),
+  gate: null as Promise<void> | null, // when set, insert() awaits it after recording the call
 }));
 
 function outcome() {
@@ -21,7 +22,11 @@ vi.mock("@/lib/supabase", () => ({
   supabase: {
     auth: { getSession: async () => ({ data: { session: { user: { id: "u" } } } }) },
     from: (table: string) => ({
-      insert: async (payload: Row) => { h.calls.push({ table, op: "insert", payload }); return outcome(); },
+      insert: async (payload: Row) => {
+        h.calls.push({ table, op: "insert", payload });
+        if (h.gate) await h.gate;
+        return outcome();
+      },
       delete: () => ({
         eq: async (_col: string, id: string) => { h.calls.push({ table, op: "delete", payload: {}, id }); return outcome(); },
       }),
@@ -41,7 +46,7 @@ import { enqueueOrSend, flushQueue, normalizeQueued, type Queued } from "./queue
 const KEY = "gainz-offline-queue";
 const queue = () => (h.store.get(KEY) as Queued[] | undefined) ?? [];
 
-beforeEach(() => { h.calls.length = 0; h.failNext.length = 0; h.store.clear(); });
+beforeEach(() => { h.calls.length = 0; h.failNext.length = 0; h.store.clear(); h.gate = null; });
 
 // ---- tests -------------------------------------------------------------
 describe("normalizeQueued", () => {
@@ -134,5 +139,28 @@ describe("flushQueue", () => {
     expect(await flushQueue()).toBe(2);
     expect(queue()).toEqual([]);
     expect((h.store.get("gainz-offline-deadletter") as Queued[]).map((q) => q.id)).toEqual(["a"]);
+  });
+  it("insert ok, delete transient → delete remains queued", async () => {
+    h.store.set(KEY, [
+      { id: "s1", table: "lifts", op: "insert", entry: { exercise: "x" }, queued_at: "t" },
+      { id: "s1", table: "lifts", op: "delete", entry: {}, queued_at: "t2" },
+    ] satisfies Queued[]);
+    h.failNext.push(undefined, "transient");
+    expect(await flushQueue()).toBe(1);
+    expect(queue().map((q) => q.op)).toEqual(["delete"]);
+  });
+  it("delete enqueued during a running flush survives", async () => {
+    h.store.set(KEY, [
+      { id: "s1", table: "lifts", op: "insert", entry: { exercise: "x" }, queued_at: "t" },
+    ] satisfies Queued[]);
+    let release!: () => void;
+    h.gate = new Promise<void>((r) => { release = r; });
+    const running = flushQueue();
+    await vi.waitFor(() => expect(h.calls.length).toBe(1)); // flush is mid-insert
+    expect(await enqueueOrSend("lifts", {}, { id: "s1", op: "delete" })).toBe("queued");
+    release();
+    expect(await running).toBe(1);
+    expect(queue().map((q) => q.op)).toEqual(["delete"]);
+    expect(h.calls.length).toBe(1);
   });
 });
