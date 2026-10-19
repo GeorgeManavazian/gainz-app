@@ -56,7 +56,9 @@ vi.mock("@/lib/supabase", () => ({
         eq: async (_col: string, id: string) => { h.calls.push({ table, op: "update", payload, id }); return outcome(); },
       }),
       select: () => makeQuery(table),
-      delete: () => makeQuery(table),
+      delete: () => ({
+        eq: async (_col: string, id: string) => { h.calls.push({ table, op: "delete", payload: {}, id }); return outcome(); },
+      }),
     }),
   },
 }));
@@ -78,7 +80,7 @@ class MemoryStorage {
 (globalThis as unknown as { sessionStorage: Storage }).sessionStorage = new MemoryStorage() as unknown as Storage;
 
 import {
-  cacheWorkout, deleteWorkout, endWorkout, getActiveWorkout, listLiftsForWorkout, startWorkout,
+  cacheWorkout, deleteSet, deleteWorkout, endWorkout, getActiveWorkout, listLiftsForWorkout, startWorkout,
 } from "./workouts-db";
 import type { WorkoutRow } from "./workouts";
 
@@ -149,6 +151,27 @@ describe("listLiftsForWorkout", () => {
     ];
     const rows = await listLiftsForWorkout("w1");
     expect(rows.map((r) => r.id)).toEqual(["s1", "q2", "q1", "s2"]);
+  });
+
+  it("hides a server row whose id has a queued delete", async () => {
+    h.liftsData = [{ id: "s1", exercise: "x", sets: 1, reps: 5, weight: 100, logged_at: "2026-10-12T10:00:00Z", workout_id: "w1" }];
+    h.store.set(QKEY, [{ id: "s1", table: "lifts", op: "delete", entry: {}, queued_at: "t" }]);
+    expect(await listLiftsForWorkout("w1")).toEqual([]);
+  });
+
+  it("hides a queued insert that also has a queued delete", async () => {
+    h.store.set(QKEY, [
+      { id: "s1", table: "lifts", op: "insert", entry: { workout_id: "w1", exercise: "x", sets: 1, reps: 5, weight: 100 }, queued_at: "t" },
+      { id: "s1", table: "lifts", op: "delete", entry: {}, queued_at: "t2" },
+    ]);
+    expect(await listLiftsForWorkout("w1")).toEqual([]);
+  });
+});
+
+describe("deleteSet", () => {
+  it("sends a delete for the id", async () => {
+    await deleteSet("s1");
+    expect(h.calls.at(-1)).toMatchObject({ table: "lifts", op: "delete", id: "s1" });
   });
 });
 

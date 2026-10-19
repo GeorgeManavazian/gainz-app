@@ -107,9 +107,11 @@ export async function listCompletedWorkouts(limit = 30): Promise<WorkoutRow[]> {
 }
 
 export async function listLiftsForWorkout(id: string): Promise<LiftRow[]> {
-  const queued = (await readQueue())
-    .filter((q) => q.table === "lifts" && q.op === "insert" && q.entry.workout_id === id)
-    .map((q) => toLift({ ...q.entry, id: q.id, logged_at: q.queued_at, workout_id: id }));
+  const q = await readQueue();
+  const deleted = new Set(q.filter((x) => x.table === "lifts" && x.op === "delete").map((x) => x.id));
+  const queued = q
+    .filter((x) => x.table === "lifts" && x.op === "insert" && x.entry.workout_id === id && !deleted.has(x.id))
+    .map((x) => toLift({ ...x.entry, id: x.id, logged_at: x.queued_at, workout_id: id }));
 
   let server: LiftRow[] = [];
   try {
@@ -123,7 +125,11 @@ export async function listLiftsForWorkout(id: string): Promise<LiftRow[]> {
   const byId = new Map<string, LiftRow>();
   for (const r of queued) byId.set(r.id, r);
   for (const r of server) byId.set(r.id, r); // server row wins on id collision
-  return [...byId.values()].sort((a, b) => (a.logged_at < b.logged_at ? -1 : a.logged_at > b.logged_at ? 1 : 0));
+  return [...byId.values()].filter((r) => !deleted.has(r.id)).sort((a, b) => (a.logged_at < b.logged_at ? -1 : a.logged_at > b.logged_at ? 1 : 0));
+}
+
+export async function deleteSet(id: string): Promise<void> {
+  await enqueueOrSend("lifts", {}, { id, op: "delete" });
 }
 
 export async function listRecentLifts(limit = 400): Promise<LiftRow[]> {
