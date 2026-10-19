@@ -70,9 +70,14 @@ export default function WorkoutPage() {
   }
 
   async function removeSet(sid: string) {
-    const prev = logged;
+    const removed = logged.find((r) => r.id === sid);
     setLogged((l) => l.filter((r) => r.id !== sid));
-    try { await deleteSet(sid); } catch (e) { setLogged(prev); throw e; }
+    try { await deleteSet(sid); }
+    catch (e) {
+      if (removed) setLogged((l) => l.some((r) => r.id === sid) ? l
+        : [...l, removed].sort((a, b) => (a.logged_at < b.logged_at ? -1 : a.logged_at > b.logged_at ? 1 : 0)));
+      throw e;
+    }
   }
 
   async function complete() {
