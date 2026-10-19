@@ -105,11 +105,16 @@ export default function WorkoutPage() {
   }
 
   async function saveCustom(n: string, primary: Muscle[]) {
+    const hit = findExercise(n, library);
+    if (hit) { setNewName(null); openSheet(hit.name); return; }
     const row = await createCustomExercise(n, primary);
     setCustoms((c) => [...c, row]);
     setNewName(null);
     openSheet(row.name);
-    listCustomExercises().then(setCustoms).catch(() => {});
+    listCustomExercises().then((fresh) => setCustoms((prev) => {
+      const names = new Set(fresh.map((r) => normalizeName(r.name)));
+      return [...fresh, ...prev.filter((r) => !names.has(normalizeName(r.name)))];
+    })).catch(() => {});
   }
 
   if (workout === undefined) return <AuthGuard><main className="min-h-dvh bg-background" /></AuthGuard>;

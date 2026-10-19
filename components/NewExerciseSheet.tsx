@@ -21,7 +21,7 @@ export default function NewExerciseSheet({ initialName, groups, onSave, onClose 
   const [err, setErr] = useState("");
 
   const regionOrder = [
-    ...MUSCLE_GROUPS.filter((m) => groups.includes(m.id)),
+    ...groups.flatMap((g) => MUSCLE_GROUPS.filter((m) => m.id === g)),
     ...MUSCLE_GROUPS.filter((m) => !groups.includes(m.id)),
   ];
   const trimmed = name.trim();
