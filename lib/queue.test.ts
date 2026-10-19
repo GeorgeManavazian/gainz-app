@@ -22,6 +22,9 @@ vi.mock("@/lib/supabase", () => ({
     auth: { getSession: async () => ({ data: { session: { user: { id: "u" } } } }) },
     from: (table: string) => ({
       insert: async (payload: Row) => { h.calls.push({ table, op: "insert", payload }); return outcome(); },
+      delete: () => ({
+        eq: async (_col: string, id: string) => { h.calls.push({ table, op: "delete", payload: {}, id }); return outcome(); },
+      }),
       update: (payload: Row) => ({
         eq: async (_col: string, id: string) => { h.calls.push({ table, op: "update", payload, id }); return outcome(); },
       }),
@@ -65,6 +68,18 @@ describe("enqueueOrSend", () => {
     await enqueueOrSend("workouts", { started_at: "t", muscle_groups: ["chest"] }, { id: "w1" });
     expect(h.calls[0].payload).toEqual({ started_at: "t", muscle_groups: ["chest"], id: "w1" });
   });
+  it("delete op calls delete().eq('id') and sends immediately when the queue is empty", async () => {
+    expect(await enqueueOrSend("lifts", {}, { id: "s1", op: "delete" })).toBe("sent");
+    expect(h.calls[0]).toMatchObject({ table: "lifts", op: "delete", id: "s1" });
+  });
+  it("stamps logged_at for meals inserts", async () => {
+    await enqueueOrSend("meals", { name: "x" }, { id: "m1" });
+    expect(typeof h.calls[0].payload.logged_at).toBe("string");
+  });
+  it("does NOT stamp logged_at for custom_exercises inserts", async () => {
+    await enqueueOrSend("custom_exercises", { name: "Cable Y Raise", primary_muscles: ["rear_delts"], secondary_muscles: [] }, { id: "c1" });
+    expect(h.calls[0].payload).toEqual({ name: "Cable Y Raise", primary_muscles: ["rear_delts"], secondary_muscles: [], id: "c1" });
+  });
   it("update op calls update().eq('id')", async () => {
     await enqueueOrSend("workouts", { ended_at: "t" }, { id: "w1", op: "update" });
     expect(h.calls[0]).toMatchObject({ table: "workouts", op: "update", payload: { ended_at: "t" }, id: "w1" });
@@ -100,6 +115,15 @@ describe("flushQueue", () => {
     expect(await flushQueue()).toBe(1);
     expect(queue().map((q) => q.id)).toEqual(["b", "c"]);
     expect(h.calls.length).toBe(2);
+  });
+  it("a delete queued behind its own insert flushes insert then delete", async () => {
+    h.store.set(KEY, [
+      { id: "s1", table: "lifts", op: "insert", entry: { exercise: "x" }, queued_at: "t" },
+      { id: "s1", table: "lifts", op: "delete", entry: {}, queued_at: "t2" },
+    ] satisfies Queued[]);
+    expect(await flushQueue()).toBe(2);
+    expect(h.calls.map((c) => c.op)).toEqual(["insert", "delete"]);
+    expect(queue()).toEqual([]);
   });
   it("dead-letters permanent failures and continues; duplicates count as done", async () => {
     h.store.set(KEY, [

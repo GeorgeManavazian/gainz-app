@@ -1,8 +1,8 @@
 import { get, update } from "idb-keyval";
 import { supabase } from "@/lib/supabase";
 
-export type QueueTable = "meals" | "lifts" | "workouts";
-export type QueueOp = "insert" | "update";
+export type QueueTable = "meals" | "lifts" | "workouts" | "custom_exercises";
+export type QueueOp = "insert" | "update" | "delete";
 export type Queued = { id: string; table: QueueTable; op: QueueOp; entry: Record<string, unknown>; queued_at: string };
 
 const KEY = "gainz-offline-queue";
@@ -25,6 +25,10 @@ export async function readQueue(): Promise<Queued[]> {
 // insert is idempotent: the queued item's UUID becomes the row's primary key,
 // so a retried insert of an already-landed item fails with 23505 and is treated as done.
 // update is idempotent by construction (the only update is ended_at).
+// delete is idempotent: PostgREST returns no error when 0 rows match, so replaying a
+// delete (or deleting a row that never landed) is a no-error "ok". A delete queued behind
+// its own insert shares the item id; flushQueue settles both in one pass (keyed by id).
+// Insert payloads are per-table: only lifts and meals get logged_at stamped from queued_at.
 //
 // supabase-js postgrest calls do NOT throw on network failure — they resolve with
 // { error: { code: "", message: "TypeError: fetch failed" }, status: 0 }. So "no error"
@@ -34,10 +38,12 @@ async function send(item: Queued): Promise<"ok" | "duplicate" | "permanent"> {
   let result: { error: { code?: string; message: string } | null; status: number };
   if (item.op === "update") {
     result = await supabase.from(item.table).update(item.entry).eq("id", item.id);
+  } else if (item.op === "delete") {
+    result = await supabase.from(item.table).delete().eq("id", item.id);
   } else {
-    const payload = item.table === "workouts"
-      ? { ...item.entry, id: item.id }
-      : { ...item.entry, id: item.id, logged_at: item.queued_at };
+    const payload = item.table === "lifts" || item.table === "meals"
+      ? { ...item.entry, id: item.id, logged_at: item.queued_at }
+      : { ...item.entry, id: item.id };
     result = await supabase.from(item.table).insert(payload);
   }
   const { error, status } = result;
