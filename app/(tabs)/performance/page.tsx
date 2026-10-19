@@ -7,7 +7,11 @@ import { INDICATORS, bestSet, indexAdvice, indicatorStatus, sessionsFor, strengt
 import { listCompletedWorkouts, listRecentLifts } from "@/lib/workouts-db";
 import { formatElapsed, localDateOf, recentExercises, workoutTitle,
   type LiftRow, type WorkoutRow } from "@/lib/workouts";
-import { MUSCLE_GROUPS, normalizeName } from "@/lib/exercises";
+import { EXERCISES, MUSCLE_GROUPS, normalizeName } from "@/lib/exercises";
+import { mergeLibrary, type CustomExerciseRow } from "@/lib/custom-exercises";
+import { listCustomExercises } from "@/lib/custom-exercises-db";
+import { recentWeeks } from "@/lib/muscle-week";
+import WeeklyMuscles from "@/components/WeeklyMuscles";
 import { getProfile } from "@/lib/profile";
 
 function fmtDay(iso: string): string {
@@ -28,17 +32,21 @@ const LIFT_ICON = (
 export default function Performance() {
   const [rows, setRows] = useState<LiftRow[]>([]);       // newest-first
   const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
+  const [customs, setCustoms] = useState<CustomExerciseRow[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [phase, setPhase] = useState<"cut" | "maintain" | "bulk">("cut");
 
   useEffect(() => {
     listRecentLifts(2000).then(setRows).catch((e) => console.warn("gainz perf: lifts load failed", e));
     listCompletedWorkouts().then(setWorkouts).catch((e) => console.warn("gainz perf: workouts load failed", e));
+    listCustomExercises().then(setCustoms).catch((e) => console.warn("gainz perf: customs load failed", e));
     getProfile().then((p) => { if (p) setPhase(p.phase); }).catch(() => {});
   }, []);
 
+  const library = useMemo(() => mergeLibrary(EXERCISES, customs), [customs]);
+  const weeks = useMemo(() => recentWeeks(rows, library, 4, new Date()), [rows, library]);
   const recents = useMemo(
-    () => recentExercises(rows, MUSCLE_GROUPS.map((m) => m.id), 20), [rows]);
+    () => recentExercises(rows, MUSCLE_GROUPS.map((m) => m.id), 20, library), [rows, library]);
   const indicatorNames = INDICATORS.map((i) => normalizeName(i.name));
   const others = recents.filter((n) => !indicatorNames.includes(normalizeName(n)));
   const defaultExercise = INDICATORS.find((i) => sessionsFor(i.name, rows).length > 0)?.name ?? recents[0] ?? null;
@@ -93,6 +101,8 @@ export default function Performance() {
           <h1 className="text-3xl font-bold tracking-tight">Performance</h1>
           <p className="text-[13px] text-muted">Track strength. Beat your best.</p>
         </div>
+
+        <WeeklyMuscles weeks={weeks} />
 
         <section className="flex flex-col gap-2">
           <h2 className="text-[15px] font-semibold">Indicator lifts</h2>
