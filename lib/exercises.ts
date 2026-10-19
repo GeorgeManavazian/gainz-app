@@ -1,22 +1,7 @@
-export type MuscleGroup =
-  | "chest" | "back" | "shoulders" | "biceps" | "triceps"
-  | "quads" | "hamstrings_glutes" | "core";
-
-export const MUSCLE_GROUPS: { id: MuscleGroup; label: string; short: string }[] = [
-  { id: "chest", label: "Chest", short: "CH" },
-  { id: "back", label: "Back", short: "BK" },
-  { id: "shoulders", label: "Shoulders", short: "SH" },
-  { id: "biceps", label: "Biceps", short: "BI" },
-  { id: "triceps", label: "Triceps", short: "TR" },
-  { id: "quads", label: "Quads", short: "QD" },
-  { id: "hamstrings_glutes", label: "Hams & Glutes", short: "HG" },
-  { id: "core", label: "Core", short: "CO" },
-];
-
-export const PRESETS: Record<"upper" | "lower", MuscleGroup[]> = {
-  upper: ["chest", "back", "shoulders", "biceps", "triceps"],
-  lower: ["quads", "hamstrings_glutes", "core"],
-};
+import { MUSCLE_GROUPS } from "./muscles";
+import type { MuscleGroup } from "./muscles";
+export { MUSCLE_GROUPS, PRESETS } from "./muscles";
+export type { MuscleGroup } from "./muscles";
 
 export type Exercise = { name: string; muscles: MuscleGroup[] };
 
