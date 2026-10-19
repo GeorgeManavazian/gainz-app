@@ -1,12 +1,12 @@
 // components/WorkoutSummary.tsx
 "use client";
 import Link from "next/link";
-import { findExercise, muscleShort } from "@/lib/exercises";
+import { findExercise, muscleShort, type Library } from "@/lib/exercises";
 import { beatLastTime, formatElapsed, groupByExercise, lastSession, totalSets, totalVolume, workoutTitle,
   type LiftRow, type WorkoutRow } from "@/lib/workouts";
 
-export default function WorkoutSummary({ workout, logged, history }: {
-  workout: WorkoutRow; logged: LiftRow[]; history: LiftRow[];
+export default function WorkoutSummary({ workout, logged, history, library }: {
+  workout: WorkoutRow; logged: LiftRow[]; history: LiftRow[]; library: Library;
 }) {
   const started = new Date(workout.started_at);
   const ended = new Date(workout.ended_at ?? workout.started_at);
@@ -51,7 +51,7 @@ export default function WorkoutSummary({ workout, logged, history }: {
           <section key={g.exercise} className="rounded-2xl border border-border bg-surface p-4">
             <div className="flex items-center gap-3">
               <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-[11px] font-semibold text-muted">
-                {muscleShort(findExercise(g.exercise)?.muscles[0])}
+                {muscleShort(findExercise(g.exercise, library)?.muscles[0])}
               </span>
               <div className="flex flex-1 flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">

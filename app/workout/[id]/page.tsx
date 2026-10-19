@@ -5,9 +5,13 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import ExerciseRow from "@/components/ExerciseRow";
+import NewExerciseSheet from "@/components/NewExerciseSheet";
 import SetSheet, { REPS, SETS, WEIGHT, type SheetState } from "@/components/SetSheet";
 import WorkoutSummary from "@/components/WorkoutSummary";
-import { MUSCLE_GROUPS, exercisesFor, findExercise, normalizeName, searchExercises } from "@/lib/exercises";
+import { EXERCISES, MUSCLE_GROUPS, exercisesFor, findExercise, normalizeName, searchExercises } from "@/lib/exercises";
+import { mergeLibrary, type CustomExerciseRow } from "@/lib/custom-exercises";
+import { createCustomExercise, listCustomExercises } from "@/lib/custom-exercises-db";
+import type { Muscle } from "@/lib/muscles";
 import { formatElapsed, groupByExercise, lastSession, recentExercises, workoutTitle, type LiftRow, type WorkoutRow } from "@/lib/workouts";
 import { deleteWorkout, endWorkout, getWorkout, listLiftsForWorkout, deleteSet, listRecentLifts, logSet } from "@/lib/workouts-db";
 
@@ -22,6 +26,8 @@ export default function WorkoutPage() {
   const [logged, setLogged] = useState<LiftRow[]>([]);     // this workout, oldest-first
   const [query, setQuery] = useState("");
   const [custom, setCustom] = useState("");
+  const [customs, setCustoms] = useState<CustomExerciseRow[]>([]);
+  const [newName, setNewName] = useState<string | null>(null); // name in the new-exercise sheet
   const [open, setOpen] = useState<string | null>(null);   // exercise name in the sheet
   const [wheel, setWheel] = useState<Record<string, SheetState>>({});
   const [now, setNow] = useState(Date.now());
@@ -31,6 +37,7 @@ export default function WorkoutPage() {
     getWorkout(id).then(setWorkout).catch(() => setWorkout(null));
     listRecentLifts().then(setHistory).catch((e) => console.warn("gainz workouts: load failed", e));
     listLiftsForWorkout(id).then(setLogged).catch((e) => console.warn("gainz workouts: load failed", e));
+    listCustomExercises().then(setCustoms).catch((e) => console.warn("gainz workouts: load failed", e));
   }, [id]);
 
   useEffect(() => {
@@ -39,12 +46,13 @@ export default function WorkoutPage() {
   }, []);
 
   const groups = workout?.muscle_groups ?? [];
+  const library = useMemo(() => mergeLibrary(EXERCISES, customs), [customs]);
   const previousRows = useMemo(() => history.filter((r) => r.workout_id !== id), [history, id]);
-  const recents = useMemo(() => recentExercises(previousRows, groups), [previousRows, groups]);
+  const recents = useMemo(() => recentExercises(previousRows, groups, 8, library), [previousRows, groups, library]);
   const listedNames = useMemo(() => new Set([
     ...recents,
-    ...MUSCLE_GROUPS.filter((m) => groups.includes(m.id)).flatMap((m) => exercisesFor([m.id]).map((x) => x.name)),
-  ].map(normalizeName)), [recents, groups]);
+    ...MUSCLE_GROUPS.filter((m) => groups.includes(m.id)).flatMap((m) => exercisesFor([m.id], library).map((x) => x.name)),
+  ].map(normalizeName)), [recents, groups, library]);
   const thisWorkoutExtra = useMemo(() =>
     groupByExercise(logged).map((g) => g.exercise).filter((n) => !listedNames.has(normalizeName(n))),
     [logged, listedNames]);
@@ -92,7 +100,16 @@ export default function WorkoutPage() {
     const name = custom.trim();
     if (!name) return;
     setCustom("");
-    openSheet(findExercise(name)?.name ?? name);
+    const hit = findExercise(name, library);
+    if (hit) openSheet(hit.name); else setNewName(name);
+  }
+
+  async function saveCustom(n: string, primary: Muscle[]) {
+    const row = await createCustomExercise(n, primary);
+    setCustoms((c) => [...c, row]);
+    setNewName(null);
+    openSheet(row.name);
+    listCustomExercises().then(setCustoms).catch(() => {});
   }
 
   if (workout === undefined) return <AuthGuard><main className="min-h-dvh bg-background" /></AuthGuard>;
@@ -105,12 +122,12 @@ export default function WorkoutPage() {
     </AuthGuard>
   );
 
-  if (workout.ended_at) return <AuthGuard><WorkoutSummary workout={workout} logged={logged} history={history} /></AuthGuard>;
+  if (workout.ended_at) return <AuthGuard><WorkoutSummary workout={workout} logged={logged} history={history} library={library} /></AuthGuard>;
 
   const q = query.trim();
-  const searchHits = q ? searchExercises(q) : [];
+  const searchHits = q ? searchExercises(q, library) : [];
   const title = workoutTitle(groups);
-  const openMuscle = open ? findExercise(open)?.muscles[0] : undefined;
+  const openMuscle = open ? findExercise(open, library)?.muscles[0] : undefined;
 
   return (
     <AuthGuard>
@@ -145,7 +162,7 @@ export default function WorkoutPage() {
                 <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">This workout</h2>
                 <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
                   {thisWorkoutExtra.map((name) => (
-                    <ExerciseRow key={name} name={name} muscle={findExercise(name)?.muscles[0]} setCount={setCount(name)} onClick={() => openSheet(name)} />
+                    <ExerciseRow key={name} name={name} muscle={findExercise(name, library)?.muscles[0]} setCount={setCount(name)} onClick={() => openSheet(name)} />
                   ))}
                 </div>
               </section>
@@ -155,7 +172,7 @@ export default function WorkoutPage() {
                 <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Recently used</h2>
                 <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
                   {recents.map((name) => (
-                    <ExerciseRow key={name} name={name} muscle={findExercise(name)?.muscles[0]} setCount={setCount(name)} onClick={() => openSheet(name)} />
+                    <ExerciseRow key={name} name={name} muscle={findExercise(name, library)?.muscles[0]} setCount={setCount(name)} onClick={() => openSheet(name)} />
                   ))}
                 </div>
               </section>
@@ -164,7 +181,7 @@ export default function WorkoutPage() {
               <section key={m.id} className="flex flex-col gap-2">
                 <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">{m.label}</h2>
                 <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
-                  {exercisesFor([m.id]).slice().sort((a, b) => a.name.localeCompare(b.name)).map((x) => (
+                  {exercisesFor([m.id], library).slice().sort((a, b) => a.name.localeCompare(b.name)).map((x) => (
                     <ExerciseRow key={x.name} name={x.name} muscle={m.id} setCount={setCount(x.name)} onClick={() => openSheet(x.name)} />
                   ))}
                 </div>
@@ -187,6 +204,10 @@ export default function WorkoutPage() {
             ✓ Complete workout
           </button>
         </div>
+
+        {newName !== null && (
+          <NewExerciseSheet initialName={newName} groups={groups} onSave={saveCustom} onClose={() => setNewName(null)} />
+        )}
 
         {open && (
           <SetSheet exercise={open} muscle={openMuscle}
