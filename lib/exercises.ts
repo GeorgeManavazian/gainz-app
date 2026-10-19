@@ -186,22 +186,41 @@ export function normalizeName(s: string): string {
   return s.trim().toLowerCase();
 }
 
-const BY_NAME = new Map(EXERCISES.map((x) => [normalizeName(x.name), x]));
+export type Library = readonly Exercise[];
 
-export function findExercise(name: string): Exercise | undefined {
-  return BY_NAME.get(normalizeName(name));
+const NAME_MAPS = new WeakMap<Library, Map<string, Exercise>>();
+
+export function findExercise(name: string, lib: Library = EXERCISES): Exercise | undefined {
+  let map = NAME_MAPS.get(lib);
+  if (!map) {
+    map = new Map();
+    for (const x of lib) {
+      const key = normalizeName(x.name);
+      if (!map.has(key)) map.set(key, x);
+    }
+    NAME_MAPS.set(lib, map);
+  }
+  return map.get(normalizeName(name));
 }
 
-export function exercisesFor(groups: MuscleGroup[]): Exercise[] {
+export function exercisesFor(groups: MuscleGroup[], lib: Library = EXERCISES): Exercise[] {
   if (groups.length === 0) return [];
   const set = new Set(groups);
-  return EXERCISES.filter((x) => x.muscles.some((m) => set.has(m)));
+  return lib.filter((x) => x.muscles.some((m) => set.has(m)));
 }
 
-export function searchExercises(query: string): Exercise[] {
+export function searchExercises(query: string, lib: Library = EXERCISES): Exercise[] {
   const q = normalizeName(query);
   if (!q) return [];
-  return EXERCISES.filter((x) => normalizeName(x.name).includes(q));
+  return lib.filter((x) => normalizeName(x.name).includes(q));
+}
+
+/** Primary matches (A–Z) first, then secondary matches (A–Z). */
+export function exercisesForMuscle(m: Muscle, lib: Library = EXERCISES): Exercise[] {
+  const byName = (a: Exercise, b: Exercise) => a.name.localeCompare(b.name);
+  const primary = lib.filter((x) => x.primary.includes(m)).sort(byName);
+  const secondary = lib.filter((x) => !x.primary.includes(m) && x.secondary.includes(m)).sort(byName);
+  return [...primary, ...secondary];
 }
 
 export function muscleLabel(id: MuscleGroup): string {

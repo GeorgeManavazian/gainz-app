@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { beatLastTime, bestE1rm, e1rm, formatElapsed, formatSession, groupByExercise, lastSession,
   localDateOf, recentExercises, totalSets, totalVolume, workoutTitle, type LiftRow } from "./workouts";
+import { EXERCISES } from "./exercises";
+import { mergeLibrary } from "./custom-exercises";
 
 const row = (o: Partial<LiftRow> & { exercise: string; logged_at: string }): LiftRow => ({
   id: o.id ?? o.logged_at, sets: 1, reps: 6, weight: 95, workout_id: null, ...o });
@@ -26,6 +28,12 @@ describe("recentExercises", () => {
   });
   it("honours limit", () => {
     expect(recentExercises(HISTORY, ["chest", "back"], 1)).toEqual(["DB Chest Press"]);
+  });
+  it("uses the passed library to recognise custom names", () => {
+    const lib = mergeLibrary(EXERCISES, [{ id: "c", name: "Cable Y Raise", primary_muscles: ["rear_delts"], secondary_muscles: [] }]);
+    const rows = [row({ exercise: "cable y raise", logged_at: "2026-10-12T10:00:00Z" })];
+    expect(recentExercises(rows, ["quads"], 8, lib)).toEqual([]);
+    expect(recentExercises(rows, ["shoulders"], 8, lib)).toEqual(["Cable Y Raise"]);
   });
 });
 

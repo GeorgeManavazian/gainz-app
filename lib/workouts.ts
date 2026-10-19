@@ -1,4 +1,4 @@
-import { PRESETS, findExercise, muscleLabel, normalizeName, type MuscleGroup } from "./exercises";
+import { EXERCISES, PRESETS, findExercise, muscleLabel, normalizeName, type Library, type MuscleGroup } from "./exercises";
 
 export type LiftRow = { id: string; exercise: string; sets: number; reps: number; weight: number;
   logged_at: string; workout_id: string | null };
@@ -20,7 +20,7 @@ export function localDateOf(iso: string): string {
 }
 
 /** Distinct names, newest-first; custom names always, library names only when their muscles match. */
-export function recentExercises(rows: LiftRow[], groups: MuscleGroup[], limit = 8): string[] {
+export function recentExercises(rows: LiftRow[], groups: MuscleGroup[], limit = 8, lib: Library = EXERCISES): string[] {
   const set = new Set(groups);
   const seen = new Set<string>();
   const out: string[] = [];
@@ -28,9 +28,9 @@ export function recentExercises(rows: LiftRow[], groups: MuscleGroup[], limit = 
     const key = normalizeName(r.exercise);
     if (seen.has(key)) continue;
     seen.add(key);
-    const lib = findExercise(r.exercise);
-    if (lib && !lib.muscles.some((m) => set.has(m))) continue;
-    out.push(lib?.name ?? r.exercise.trim());
+    const hit = findExercise(r.exercise, lib);
+    if (hit && !hit.muscles.some((m) => set.has(m))) continue;
+    out.push(hit?.name ?? r.exercise.trim());
     if (out.length >= limit) break;
   }
   return out;

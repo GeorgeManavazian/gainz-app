@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { EXERCISES, MUSCLE_GROUPS, PRESETS, exercisesFor, findExercise, makeExercise, muscleShort,
-  normalizeName, searchExercises } from "./exercises";
+  normalizeName, searchExercises, exercisesForMuscle } from "./exercises";
 import type { MuscleGroup } from "./exercises";
 import { regionOf } from "./muscles";
 
@@ -81,5 +81,15 @@ describe("searchExercises / findExercise", () => {
     expect(muscleShort("chest")).toBe("CH");
     expect(muscleShort("hamstrings_glutes")).toBe("HG");
     expect(muscleShort(undefined)).toBe("••");
+  });
+});
+
+describe("exercisesForMuscle", () => {
+  it("lists primary matches first, each group alphabetical", () => {
+    const names = exercisesForMuscle("triceps").map((x) => x.name);
+    const firstSecondary = names.findIndex((n) => findExercise(n)!.secondary.includes("triceps"));
+    const lastPrimary = names.map((n) => findExercise(n)!.primary.includes("triceps")).lastIndexOf(true);
+    expect(lastPrimary).toBeLessThan(firstSecondary);
+    expect(names).toContain("BB Bench Press");
   });
 });
