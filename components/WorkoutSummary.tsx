@@ -1,7 +1,8 @@
 // components/WorkoutSummary.tsx
 "use client";
 import Link from "next/link";
-import { findExercise, muscleShort, type Library } from "@/lib/exercises";
+import { findExercise, muscleShort, normalizeName, type Library } from "@/lib/exercises";
+import { isPr } from "@/lib/progression";
 import { beatLastTime, formatElapsed, groupByExercise, lastSession, totalSets, totalVolume, workoutTitle,
   type LiftRow, type WorkoutRow } from "@/lib/workouts";
 
@@ -47,6 +48,7 @@ export default function WorkoutSummary({ workout, logged, history, library }: {
 
       {cards.map((g) => {
         const beat = g.beat;
+        const before = previousRows.filter((r) => normalizeName(r.exercise) === normalizeName(g.exercise));
         return (
           <section key={g.exercise} className="rounded-2xl border border-border bg-surface p-4">
             <div className="flex items-center gap-3">
@@ -59,12 +61,16 @@ export default function WorkoutSummary({ workout, logged, history, library }: {
                   {beat && <span className="rounded-full bg-accent/15 px-3 py-1 text-[13px] font-semibold text-accent">Beat last time</span>}
                 </div>
                 <ul className="flex flex-col gap-1">
-                  {g.rows.map((r, i) => (
-                    <li key={r.id} className="flex items-center gap-3">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-2 text-xs text-muted">{i + 1}</span>
-                      <span className="text-base tabular-nums">{r.weight} × {r.reps}{r.sets > 1 ? ` ×${r.sets}` : ""}</span>
-                    </li>
-                  ))}
+                  {g.rows.map((r, i) => {
+                    const pr = isPr(r, [...before, ...g.rows.slice(0, i)]);
+                    return (
+                      <li key={r.id} className="flex items-center gap-3">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-2 text-xs text-muted">{i + 1}</span>
+                        <span className="text-base tabular-nums">{r.weight} × {r.reps}{r.sets > 1 ? ` ×${r.sets}` : ""}</span>
+                        {pr && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-semibold text-accent">PR</span>}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
