@@ -30,6 +30,7 @@ export default function WorkoutPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [workout, setWorkout] = useState<WorkoutRow | null | undefined>(undefined);
+  const [historyLoaded, setHistoryLoaded] = useState(false); // false until history fetch succeeds: PR/best/suggestion would be wrong
   const [history, setHistory] = useState<LiftRow[]>([]);   // newest-first, all exercises
   const [logged, setLogged] = useState<LiftRow[]>([]);     // this workout, oldest-first
   const [query, setQuery] = useState("");
@@ -44,7 +45,7 @@ export default function WorkoutPage() {
 
   useEffect(() => {
     getWorkout(id).then(setWorkout).catch(() => setWorkout(null));
-    listRecentLifts().then(setHistory).catch((e) => console.warn("gainz workouts: load failed", e));
+    listRecentLifts(2000).then((h) => { setHistory(h); setHistoryLoaded(true); }).catch((e) => console.warn("gainz workouts: load failed", e));
     listLiftsForWorkout(id).then(setLogged).catch((e) => console.warn("gainz workouts: load failed", e));
     listCustomExercises().then((fresh) => setCustoms((prev) => mergeCustoms(prev, fresh))).catch((e) => console.warn("gainz workouts: load failed", e));
   }, [id]);
@@ -63,8 +64,8 @@ export default function WorkoutPage() {
   const behind = useMemo(() => behindThisWeek(week).filter((m) => !hitNow.has(m)), [week, hitNow]);
   const openRows = useMemo(() => open ? previousRows.filter((r) => normalizeName(r.exercise) === normalizeName(open)) : [], [open, previousRows]);
   const openLogged = useMemo(() => open ? logged.filter((r) => normalizeName(r.exercise) === normalizeName(open)) : [], [open, logged]);
-  const openSuggestion = useMemo(() => open ? suggestNext(open, previousRows, library) : null, [open, previousRows, library]);
-  const openBest = useMemo(() => bestByWeight([...openRows, ...openLogged]), [openRows, openLogged]);
+  const openSuggestion = useMemo(() => open && historyLoaded ? suggestNext(open, previousRows, library) : null, [open, historyLoaded, previousRows, library]);
+  const openBest = useMemo(() => historyLoaded ? bestByWeight([...openRows, ...openLogged]) : null, [historyLoaded, openRows, openLogged]);
   const showStrip = hasCompletedWorkoutThisWeek(history, weekStart, id);
   const { inRegion, other } = splitByRegion(behind, groups);
   const toChip = (m: Muscle): StripChip => ({ muscle: m, hits: week[m].hits, target: targetOf(m)! });
@@ -89,7 +90,7 @@ export default function WorkoutPage() {
       const seed = prev[0]
         ? { sets: snap(prev[0].sets, SETS), reps: snap(prev[0].reps, REPS), weight: snap(prev[0].weight, WEIGHT) }
         : { ...DEFAULT_STATE };
-      const suggestion = suggestNext(name, previousRows, library);
+      const suggestion = historyLoaded ? suggestNext(name, previousRows, library) : null;
       if (suggestion) seed.weight = snap(suggestion.weight, WEIGHT);
       setWheel((w) => ({ ...w, [name]: seed }));
     }
@@ -150,7 +151,7 @@ export default function WorkoutPage() {
     </AuthGuard>
   );
 
-  if (workout.ended_at) return <AuthGuard><WorkoutSummary workout={workout} logged={logged} history={history} library={library} /></AuthGuard>;
+  if (workout.ended_at) return <AuthGuard><WorkoutSummary workout={workout} logged={logged} history={history} library={library} showPr={historyLoaded} /></AuthGuard>;
 
   const q = query.trim();
   const searchHits = q ? searchExercises(q, library) : [];
@@ -254,7 +255,7 @@ export default function WorkoutPage() {
         {open && (
           <SetSheet exercise={open} muscle={openMuscle}
             previous={lastSession(open, previousRows)}
-            logged={openLogged} history={openRows} best={openBest} suggestion={openSuggestion}
+            logged={openLogged} history={openRows} best={openBest} suggestion={openSuggestion} showPr={historyLoaded}
             state={wheel[open] ?? DEFAULT_STATE}
             onState={(s) => setWheel((w) => ({ ...w, [open]: s }))}
             onAdd={addSet} onDelete={removeSet} onClose={() => setOpen(null)} />

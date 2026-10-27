@@ -28,7 +28,11 @@ export function isPr(row: LiftRow, before: LiftRow[]): boolean {
   return best === null || beats(row, best);
 }
 
+/** Heaviest weight the set-sheet wheel offers. */
+export const MAX_WEIGHT = 500;
+
 const snap = (n: number) => Math.round(n / 2.5) * 2.5;
+const wheelValue = (n: number) => Math.min(MAX_WEIGHT, snap(n));
 
 /** Median of positive consecutive top-set weight deltas between sessions, snapped to 2.5; `fallback` if none. */
 export function typicalJump(exercise: string, rows: LiftRow[], fallback: number): number {
@@ -48,17 +52,18 @@ export function isLowerBody(exercise: string, lib: Library = EXERCISES): boolean
   return first !== undefined && PRESETS.lower.includes(first);
 }
 
-/** Next-load suggestion from the most recent session's top set; null with no history. */
+/** Next-load suggestion from the most recent session's top set; null with no history or a bodyweight top set. Always a valid wheel value. */
 export function suggestNext(exercise: string, previousRows: LiftRow[], lib: Library = EXERCISES): Suggestion | null {
   const sessions = sessionsFor(exercise, previousRows);
   if (sessions.length === 0) return null;
   const top = bestByWeight(sessions[sessions.length - 1].rows)!;
+  if (top.weight === 0) return null; // bodyweight: no load to progress
   const base = { lastWeight: top.weight, lastReps: top.reps };
   if (top.reps >= 8) {
     const jump = typicalJump(exercise, previousRows, isLowerBody(exercise, lib) ? 10 : 5);
-    return { ...base, kind: "up", weight: snap(top.weight + jump) };
+    return { ...base, kind: "up", weight: wheelValue(top.weight + jump) };
   }
-  return { ...base, kind: top.reps >= 5 ? "stay" : "build", weight: top.weight };
+  return { ...base, kind: top.reps >= 5 ? "stay" : "build", weight: wheelValue(top.weight) };
 }
 
 /** Chip copy for a suggestion. */

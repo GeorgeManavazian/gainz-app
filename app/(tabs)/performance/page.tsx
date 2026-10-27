@@ -57,8 +57,8 @@ export default function Performance() {
   const allRows = sessions.flatMap((s) => s.rows);
   const best = bestByWeight(allRows);
   const prev = sessions.length > 1 ? sessions[sessions.length - 2] : null;
-  const latestTop = sessions.length ? bestSet(sessions[sessions.length - 1].rows) : null;
-  const prevTop = prev ? bestSet(prev.rows) : null;
+  const latestTop = sessions.length ? bestByWeight(sessions[sessions.length - 1].rows) : null;
+  const prevTop = prev ? bestByWeight(prev.rows) : null;
   const topDelta = latestTop && prevTop ? latestTop.weight - prevTop.weight : null;
 
   const index = useMemo(() => strengthIndex(rows), [rows]);
@@ -209,7 +209,7 @@ export default function Performance() {
                 </p>
               )}
             </div>
-            <LineChart data={recent12.map((s) => ({ date: s.date, value: bestSet(s.rows)?.weight ?? 0 }))} />
+            <LineChart data={recent12.map((s) => ({ date: s.date, value: bestByWeight(s.rows)?.weight ?? 0 }))} />
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div className="rounded-2xl border border-border bg-surface-2/60 p-3">
                 <p className="text-[11px] font-medium text-muted">Best set</p>

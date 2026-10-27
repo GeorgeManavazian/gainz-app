@@ -3,22 +3,22 @@
 import { useEffect, useState } from "react";
 import Wheel, { range } from "@/components/Wheel";
 import { muscleShort, type MuscleGroup } from "@/lib/exercises";
-import { isPr, suggestionLabel, type Suggestion } from "@/lib/progression";
+import { MAX_WEIGHT, isPr, suggestionLabel, type Suggestion } from "@/lib/progression";
 import { formatSession, localDateOf, type LiftRow } from "@/lib/workouts";
 
 export type SheetState = { sets: number; reps: number; weight: number };
 
 export const SETS = range(1, 10);
 export const REPS = range(1, 30);
-export const WEIGHT = range(0, 500, 2.5);
+export const WEIGHT = range(0, MAX_WEIGHT, 2.5);
 
 function shortDate(iso: string): string {
   const [y, m, d] = localDateOf(iso).split("-").map(Number);
   return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export default function SetSheet({ exercise, muscle, previous, logged, history, best, suggestion, state, onState, onAdd, onDelete, onClose }: {
-  exercise: string; muscle?: MuscleGroup; previous: LiftRow[]; logged: LiftRow[]; history: LiftRow[]; best: LiftRow | null; suggestion: Suggestion | null;
+export default function SetSheet({ exercise, muscle, previous, logged, history, best, suggestion, showPr, state, onState, onAdd, onDelete, onClose }: {
+  exercise: string; muscle?: MuscleGroup; previous: LiftRow[]; logged: LiftRow[]; history: LiftRow[]; best: LiftRow | null; suggestion: Suggestion | null; showPr: boolean;
   state: SheetState; onState: (s: SheetState) => void; onAdd: () => Promise<void>; onDelete: (id: string) => Promise<void>; onClose: () => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -102,24 +102,24 @@ export default function SetSheet({ exercise, muscle, previous, logged, history, 
             <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted">Sets logged this workout</h3>
             <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-background">
               {logged.map((r, i) => {
-                const pr = isPr(r, [...history, ...logged.slice(0, i)]);
+                const pr = showPr && isPr(r, [...history, ...logged.slice(0, i)]);
                 return (
-                <li key={r.id} className="flex items-center gap-3 px-3 py-2.5">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-2 text-xs text-muted">{i + 1}</span>
-                  <span className="flex-1 text-base tabular-nums">{r.weight} × {r.reps}{r.sets > 1 ? ` ×${r.sets}` : ""}</span>
-                  {pr && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-semibold text-accent">PR</span>}
-                  {confirmId === r.id ? (
-                    <button type="button" onClick={() => remove(r.id)} disabled={deletingId === r.id}
-                      className="rounded-md bg-danger/15 px-2 py-0.5 text-xs font-semibold text-danger active:opacity-80 disabled:opacity-60">
-                      Delete?
-                    </button>
-                  ) : (
-                    <button type="button" aria-label="Remove set" onClick={() => setConfirmId(r.id)}
-                      className="flex h-8 w-8 items-center justify-center rounded-md text-muted active:bg-surface-2">
-                      ✕
-                    </button>
-                  )}
-                </li>
+                  <li key={r.id} className="flex items-center gap-3 px-3 py-2.5">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-2 text-xs text-muted">{i + 1}</span>
+                    <span className="flex-1 text-base tabular-nums">{r.weight} × {r.reps}{r.sets > 1 ? ` ×${r.sets}` : ""}</span>
+                    {pr && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-semibold text-accent">PR</span>}
+                    {confirmId === r.id ? (
+                      <button type="button" onClick={() => remove(r.id)} disabled={deletingId === r.id}
+                        className="rounded-md bg-danger/15 px-2 py-0.5 text-xs font-semibold text-danger active:opacity-80 disabled:opacity-60">
+                        Delete?
+                      </button>
+                    ) : (
+                      <button type="button" aria-label="Remove set" onClick={() => setConfirmId(r.id)}
+                        className="flex h-8 w-8 items-center justify-center rounded-md text-muted active:bg-surface-2">
+                        ✕
+                      </button>
+                    )}
+                  </li>
                 );
               })}
             </ul>

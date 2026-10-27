@@ -69,7 +69,7 @@ describe("isLowerBody", () => {
     expect(isLowerBody("Nonexistent Lift")).toBe(false);
   });
   it("custom quads exercise via merged library true", () => {
-    const lib = mergeLibrary(EXERCISES, [{ id: "c1", name: "Zercher Hold Thing", primary_muscles: ["quads"] as never, secondary_muscles: [] }]);
+    const lib = mergeLibrary(EXERCISES, [{ id: "c1", name: "Zercher Hold Thing", primary_muscles: ["quads"], secondary_muscles: [] }]);
     expect(isLowerBody("Zercher Hold Thing", lib)).toBe(true);
     expect(isLowerBody("Zercher Hold Thing")).toBe(false);
   });
@@ -95,10 +95,27 @@ describe("suggestNext", () => {
     const rows = [...hist([225], 3), row({ logged_at: "2026-10-01T15:00:00.000Z", workout_id: "last", weight: 185, reps: 8, sets: 3 })];
     expect(suggestNext("DB Chest Press", rows)).toMatchObject({ kind: "up", weight: 190, lastWeight: 185 });
   });
-  it("weight snaps to 2.5 multiples", () => {
-    const rows = [...hist([175, 180], 6), row({ logged_at: "2026-09-10T15:00:00.000Z", workout_id: "x", weight: 190, reps: 9 })];
-    // deltas 5, 10 -> median 7.5
-    expect(suggestNext("DB Chest Press", rows)!.weight).toBe(197.5);
+  it("up weight is a 2.5 multiple: median of deltas 2.5 and 5 (3.75) rounds to 5", () => {
+    const rows = [...hist([175, 177.5], 6), row({ logged_at: "2026-09-10T15:00:00.000Z", workout_id: "x", weight: 182.5, reps: 9 })];
+    expect(suggestNext("DB Chest Press", rows)!.weight).toBe(187.5);
+  });
+  it("up caps at the wheel maximum (497.5x9 -> 500, 495x8 with +10 jump -> 500)", () => {
+    expect(suggestNext("DB Chest Press", hist([497.5], 9))!.weight).toBe(500);
+    expect(suggestNext("Back Squat", hist([495], 8, "Back Squat"))!.weight).toBe(500);
+  });
+  it("stay/build snap an off-wheel weight to 2.5", () => {
+    expect(suggestNext("DB Chest Press", hist([132.3], 6))!.weight).toBe(132.5);
+    expect(suggestNext("DB Chest Press", hist([132.3], 3))!.weight).toBe(132.5);
+  });
+  it("bodyweight top set (weight 0) -> null", () => {
+    expect(suggestNext("DB Chest Press", hist([0], 9))).toBeNull();
+    expect(suggestNext("DB Chest Press", hist([0], 6))).toBeNull();
+  });
+  it("custom lower-body exercise passed via lib gets the +10 fallback", () => {
+    const lib = mergeLibrary(EXERCISES, [{ id: "c1", name: "Zercher Hold Thing", primary_muscles: ["quads"], secondary_muscles: [] }]);
+    const rows = hist([100], 8, "Zercher Hold Thing");
+    expect(suggestNext("Zercher Hold Thing", rows, lib)!.weight).toBe(110);
+    expect(suggestNext("Zercher Hold Thing", rows)!.weight).toBe(105);
   });
 });
 

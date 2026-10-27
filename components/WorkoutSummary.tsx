@@ -6,8 +6,8 @@ import { isPr } from "@/lib/progression";
 import { beatLastTime, formatElapsed, groupByExercise, lastSession, totalSets, totalVolume, workoutTitle,
   type LiftRow, type WorkoutRow } from "@/lib/workouts";
 
-export default function WorkoutSummary({ workout, logged, history, library }: {
-  workout: WorkoutRow; logged: LiftRow[]; history: LiftRow[]; library: Library;
+export default function WorkoutSummary({ workout, logged, history, library, showPr }: {
+  workout: WorkoutRow; logged: LiftRow[]; history: LiftRow[]; library: Library; showPr: boolean;
 }) {
   const started = new Date(workout.started_at);
   const ended = new Date(workout.ended_at ?? workout.started_at);
@@ -62,7 +62,7 @@ export default function WorkoutSummary({ workout, logged, history, library }: {
                 </div>
                 <ul className="flex flex-col gap-1">
                   {g.rows.map((r, i) => {
-                    const pr = isPr(r, [...before, ...g.rows.slice(0, i)]);
+                    const pr = showPr && isPr(r, [...before, ...g.rows.slice(0, i)]);
                     return (
                       <li key={r.id} className="flex items-center gap-3">
                         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-2 text-xs text-muted">{i + 1}</span>
