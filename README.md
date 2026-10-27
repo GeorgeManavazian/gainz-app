@@ -85,7 +85,7 @@ Each sub-project follows the same loop, and the artifacts are in the repo:
 3. **Plan** — bite-sized tasks with the exact code and tests (`docs/superpowers/plans/`).
 4. **Build with review** — each task is implemented, then reviewed for spec compliance and code quality, then a whole-branch review before it ships. Findings are fixed or explicitly parked with a written ruling.
 
-Result so far: 207 unit tests across 18 files, typed end to end, zero hex colours outside the token sheet.
+Result so far: 230 unit tests across 19 files, typed end to end, zero hex colours outside the token sheet.
 
 ## Running locally
 
@@ -106,10 +106,9 @@ npm run build
 
 ## Roadmap
 
-Shipped: macro targets → weigh-ins and stall detection → workout flow → HUB / Diet / Performance tabs → curated food search → saved meals → meal builder → next-meal advice (time-aware) → wearable activity bonus (server side) → custom exercises, set delete and weekly 2× muscle frequency.
+Shipped: macro targets → weigh-ins and stall detection → workout flow → HUB / Diet / Performance tabs → curated food search → saved meals → meal builder → next-meal advice (time-aware) → wearable activity bonus (server side) → custom exercises, set delete and weekly 2× muscle frequency → lift PRs and suggested loads.
 
 Next:
-- **Lift PRs and progression** — per-exercise records and suggested loads.
 - **Multi-user** — the schema is already per-user with RLS; a public release needs onboarding and a service worker for cold-start offline.
 - **Wearable integration, phone side** — the sync route is live; the on-device feed (Health Auto Export or native HealthKit) is parked until the App Store push.
 
