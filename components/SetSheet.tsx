@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Wheel, { range } from "@/components/Wheel";
 import { muscleShort, type MuscleGroup } from "@/lib/exercises";
+import { isPr, suggestionLabel, type Suggestion } from "@/lib/progression";
 import { formatSession, localDateOf, type LiftRow } from "@/lib/workouts";
 
 export type SheetState = { sets: number; reps: number; weight: number };
@@ -16,8 +17,8 @@ function shortDate(iso: string): string {
   return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export default function SetSheet({ exercise, muscle, previous, logged, state, onState, onAdd, onDelete, onClose }: {
-  exercise: string; muscle?: MuscleGroup; previous: LiftRow[]; logged: LiftRow[];
+export default function SetSheet({ exercise, muscle, previous, logged, history, best, suggestion, state, onState, onAdd, onDelete, onClose }: {
+  exercise: string; muscle?: MuscleGroup; previous: LiftRow[]; logged: LiftRow[]; history: LiftRow[]; best: LiftRow | null; suggestion: Suggestion | null;
   state: SheetState; onState: (s: SheetState) => void; onAdd: () => Promise<void>; onDelete: (id: string) => Promise<void>; onClose: () => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -61,12 +62,26 @@ export default function SetSheet({ exercise, muscle, previous, logged, state, on
           </span>
           <div className="flex-1">
             <h2 id="set-sheet-title" className="text-[22px] font-bold leading-tight">{exercise}</h2>
-            <p className="text-sm text-muted">
-              {previous.length ? `Last: ${formatSession(previous)} · ${shortDate(previous[0].logged_at)}` : "First time"}
-            </p>
+            {(previous.length > 0 || !best) && (
+              <p className="text-sm text-muted">
+                {previous.length ? `Last: ${formatSession(previous)} · ${shortDate(previous[0].logged_at)}` : "First time"}
+              </p>
+            )}
+            {best && <p className="text-sm text-muted">Best: <span className="font-semibold text-accent">{best.weight}×{best.reps}</span> · {shortDate(best.logged_at)}</p>}
           </div>
           <button type="button" onClick={onClose} className="rounded-xl border border-border px-3 py-1.5 text-sm text-muted">Close</button>
         </div>
+
+        {suggestion && (
+          <div className="mt-3 flex">
+            <button type="button" onClick={() => onState({ ...state, weight: suggestion.weight })}
+              aria-pressed={state.weight === suggestion.weight}
+              className={`rounded-full px-3 py-1 text-[13px] font-semibold ${
+                state.weight === suggestion.weight ? "bg-accent/20 text-accent" : "border border-border text-muted active:text-foreground"}`}>
+              {suggestionLabel(suggestion)}
+            </button>
+          </div>
+        )}
 
         <div className="mt-4 flex items-end justify-center gap-1">
           <Wheel label="Sets" values={SETS} value={state.sets} onChange={(v) => onState({ ...state, sets: v })} />
@@ -86,10 +101,13 @@ export default function SetSheet({ exercise, muscle, previous, logged, state, on
           <section className="mt-4 flex flex-col gap-2">
             <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted">Sets logged this workout</h3>
             <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-background">
-              {logged.map((r, i) => (
+              {logged.map((r, i) => {
+                const pr = isPr(r, [...history, ...logged.slice(0, i)]);
+                return (
                 <li key={r.id} className="flex items-center gap-3 px-3 py-2.5">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-2 text-xs text-muted">{i + 1}</span>
                   <span className="flex-1 text-base tabular-nums">{r.weight} × {r.reps}{r.sets > 1 ? ` ×${r.sets}` : ""}</span>
+                  {pr && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-semibold text-accent">PR</span>}
                   {confirmId === r.id ? (
                     <button type="button" onClick={() => remove(r.id)} disabled={deletingId === r.id}
                       className="rounded-md bg-danger/15 px-2 py-0.5 text-xs font-semibold text-danger active:opacity-80 disabled:opacity-60">
@@ -102,7 +120,8 @@ export default function SetSheet({ exercise, muscle, previous, logged, state, on
                     </button>
                   )}
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </section>
         )}

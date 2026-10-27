@@ -14,6 +14,7 @@ import { mergeLibrary, type CustomExerciseRow } from "@/lib/custom-exercises";
 import { createCustomExercise, listCustomExercises } from "@/lib/custom-exercises-db";
 import { behindThisWeek, hasCompletedWorkoutThisWeek, muscleWeek, musclesHit, splitByRegion, weekStartOf } from "@/lib/muscle-week";
 import { muscleName, targetOf, type Muscle } from "@/lib/muscles";
+import { bestByWeight, suggestNext } from "@/lib/progression";
 import { formatElapsed, groupByExercise, lastSession, recentExercises, workoutTitle, type LiftRow, type WorkoutRow } from "@/lib/workouts";
 import { deleteWorkout, endWorkout, getWorkout, listLiftsForWorkout, deleteSet, listRecentLifts, logSet } from "@/lib/workouts-db";
 
@@ -60,6 +61,10 @@ export default function WorkoutPage() {
   const week = useMemo(() => muscleWeek(previousRows, library, weekStart), [previousRows, library, weekStart]);
   const hitNow = useMemo(() => musclesHit(logged, library), [logged, library]);
   const behind = useMemo(() => behindThisWeek(week).filter((m) => !hitNow.has(m)), [week, hitNow]);
+  const openRows = useMemo(() => open ? previousRows.filter((r) => normalizeName(r.exercise) === normalizeName(open)) : [], [open, previousRows]);
+  const openLogged = useMemo(() => open ? logged.filter((r) => normalizeName(r.exercise) === normalizeName(open)) : [], [open, logged]);
+  const openSuggestion = useMemo(() => open ? suggestNext(open, previousRows, library) : null, [open, previousRows, library]);
+  const openBest = useMemo(() => bestByWeight([...openRows, ...openLogged]), [openRows, openLogged]);
   const showStrip = hasCompletedWorkoutThisWeek(history, weekStart, id);
   const { inRegion, other } = splitByRegion(behind, groups);
   const toChip = (m: Muscle): StripChip => ({ muscle: m, hits: week[m].hits, target: targetOf(m)! });
@@ -83,7 +88,9 @@ export default function WorkoutPage() {
       const prev = lastSession(name, previousRows);
       const seed = prev[0]
         ? { sets: snap(prev[0].sets, SETS), reps: snap(prev[0].reps, REPS), weight: snap(prev[0].weight, WEIGHT) }
-        : DEFAULT_STATE;
+        : { ...DEFAULT_STATE };
+      const suggestion = suggestNext(name, previousRows, library);
+      if (suggestion) seed.weight = snap(suggestion.weight, WEIGHT);
       setWheel((w) => ({ ...w, [name]: seed }));
     }
     setOpen(name);
@@ -247,7 +254,7 @@ export default function WorkoutPage() {
         {open && (
           <SetSheet exercise={open} muscle={openMuscle}
             previous={lastSession(open, previousRows)}
-            logged={logged.filter((r) => normalizeName(r.exercise) === normalizeName(open))}
+            logged={openLogged} history={openRows} best={openBest} suggestion={openSuggestion}
             state={wheel[open] ?? DEFAULT_STATE}
             onState={(s) => setWheel((w) => ({ ...w, [open]: s }))}
             onAdd={addSet} onDelete={removeSet} onClose={() => setOpen(null)} />
