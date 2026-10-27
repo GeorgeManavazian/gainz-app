@@ -3,5 +3,5 @@ import path from "node:path";
 
 export default defineConfig({
   resolve: { alias: { "@": path.resolve(import.meta.dirname) } },
-  test: { environment: "node" },
+  test: { environment: "node", exclude: ["**/node_modules/**", ".claude/**", ".superpowers/**"] },
 });
