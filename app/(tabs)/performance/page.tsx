@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
 import LineChart from "@/components/LineChart";
-import { INDICATORS, bestSet, indexAdvice, indicatorStatus, sessionsFor, strengthIndex } from "@/lib/progress";
+import { INDICATORS, indexAdvice, indicatorStatus, sessionsFor, strengthIndex } from "@/lib/progress";
 import { bestByWeight } from "@/lib/progression";
 import { listCompletedWorkouts, listRecentLifts } from "@/lib/workouts-db";
 import { formatElapsed, localDateOf, recentExercises, workoutTitle,
@@ -224,7 +224,7 @@ export default function Performance() {
                 <p className="mb-1 text-[11px] font-medium text-muted">Recent sessions</p>
                 <ul className="flex flex-col gap-1">
                   {[...sessions].slice(-5).reverse().map((s) => {
-                    const b = bestSet(s.rows);
+                    const b = bestByWeight(s.rows);
                     return (
                       <li key={s.key} className="flex justify-between rounded-lg bg-surface-2/60 px-2.5 py-1.5 text-[12px]">
                         <span className="text-muted">{fmtDay(s.date)}</span>
@@ -255,7 +255,7 @@ export default function Performance() {
                 <span className="pb-1 text-[11px] font-medium text-muted">Exercise</span>
                 <span className="pb-1 text-right text-[11px] font-medium text-muted">Top set</span>
                 {latestByExercise.map((g) => {
-                  const b = bestSet(g)!;
+                  const b = bestByWeight(g)!;
                   const isSel = exercise !== null && normalizeName(g[0].exercise) === normalizeName(exercise);
                   return (
                     <button key={g[0].exercise} type="button" onClick={() => setSelected(g[0].exercise)}
