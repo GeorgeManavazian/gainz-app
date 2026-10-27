@@ -4,6 +4,7 @@ import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
 import LineChart from "@/components/LineChart";
 import { INDICATORS, bestSet, indexAdvice, indicatorStatus, sessionsFor, strengthIndex } from "@/lib/progress";
+import { bestByWeight } from "@/lib/progression";
 import { listCompletedWorkouts, listRecentLifts } from "@/lib/workouts-db";
 import { formatElapsed, localDateOf, recentExercises, workoutTitle,
   type LiftRow, type WorkoutRow } from "@/lib/workouts";
@@ -54,7 +55,7 @@ export default function Performance() {
   const sessions = useMemo(() => (exercise ? sessionsFor(exercise, rows) : []), [exercise, rows]);
   const recent12 = sessions.slice(-12);
   const allRows = sessions.flatMap((s) => s.rows);
-  const best = bestSet(allRows);
+  const best = bestByWeight(allRows);
   const prev = sessions.length > 1 ? sessions[sessions.length - 2] : null;
   const latestTop = sessions.length ? bestSet(sessions[sessions.length - 1].rows) : null;
   const prevTop = prev ? bestSet(prev.rows) : null;
