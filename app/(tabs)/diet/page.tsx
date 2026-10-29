@@ -116,6 +116,7 @@ export default function DietPage() {
       listHealthActivity(addDays(localDateKey(), -ACTIVITY_BASELINE_WINDOW_DAYS)),
     ]);
     if (w.status === "fulfilled") { setRows(w.value); setErr(""); }
+    if (m.status === "fulfilled" && !m.value.error) setMealErr("");
     else { setErr("Couldn't load weigh-ins."); }
     setProfile(p.status === "fulfilled" ? p.value : null);
     setActivity(a.status === "fulfilled" ? a.value : []);

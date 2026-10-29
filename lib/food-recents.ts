@@ -11,6 +11,7 @@ export type RecentFood = {
 export type RankOpts = { windowDays?: number; bandMinutes?: number; limit?: number };
 
 const MS_DAY = 86_400_000;
+const numId = (v: unknown): number | undefined => { const n = Number(v); return v != null && v !== "" && Number.isFinite(n) ? n : undefined; };
 
 /** Minutes since local midnight. */
 function minuteOfDay(d: Date): number { return d.getHours() * 60 + d.getMinutes(); }
@@ -32,15 +33,15 @@ export function rankRecentFoods(meals: MealLike[], now: Date, opts: RankOpts = {
     const sameTime = minuteGap(minuteOfDay(t), nowMin) <= band ? 1 : 0;
     if (!cur) {
       byName.set(key, {
-        name: m.food_name.trim(), fdcId: m.fdc_id ? Number(m.fdc_id) : undefined,
+        name: m.food_name.trim(), fdcId: numId(m.fdc_id),
         per100g: { kcal: Number(m.calories) * s, protein: Number(m.protein_g) * s, carbs: Number(m.carbs_g) * s, fat: Number(m.fat_g) * s },
         count: 1, sameTimeCount: sameTime, lastAt: m.logged_at, score: 0,
       });
     } else {
       cur.count += 1; cur.sameTimeCount += sameTime;
-      if (m.logged_at > cur.lastAt) { // keep the most recent log's values and name casing
+      if (t.getTime() > new Date(cur.lastAt).getTime()) { // keep the most recent log's values and name casing
         cur.lastAt = m.logged_at; cur.name = m.food_name.trim();
-        cur.fdcId = m.fdc_id ? Number(m.fdc_id) : undefined;
+        cur.fdcId = numId(m.fdc_id);
         cur.per100g = { kcal: Number(m.calories) * s, protein: Number(m.protein_g) * s, carbs: Number(m.carbs_g) * s, fat: Number(m.fat_g) * s };
       }
     }
@@ -50,5 +51,5 @@ export function rankRecentFoods(meals: MealLike[], now: Date, opts: RankOpts = {
     const recent = now.getTime() - new Date(f.lastAt).getTime() <= 2 * MS_DAY ? 2 : 0;
     f.score = f.sameTimeCount * 3 + f.count + recent;
   }
-  return out.sort((a, b) => b.score - a.score || (a.lastAt < b.lastAt ? 1 : a.lastAt > b.lastAt ? -1 : 0)).slice(0, limit);
+  return out.sort((a, b) => b.score - a.score || new Date(b.lastAt).getTime() - new Date(a.lastAt).getTime()).slice(0, limit);
 }

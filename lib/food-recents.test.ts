@@ -45,6 +45,11 @@ describe("rankRecentFoods", () => {
     ];
     expect(rankRecentFoods(meals, now).map((f) => f.name)).toEqual(["Keep"]);
   });
+  it("non-numeric fdc_id is dropped rather than becoming NaN", () => {
+    const r = rankRecentFoods([meal({ food_name: "X", logged_at: at(1, 8), fdc_id: "abc" }), meal({ food_name: "Y", logged_at: at(1, 8), fdc_id: "123" })], now);
+    expect(r.find((f) => f.name === "X")?.fdcId).toBeUndefined();
+    expect(r.find((f) => f.name === "Y")?.fdcId).toBe(123);
+  });
   it("time-of-day band wraps across midnight", () => {
     const late = new Date(2026, 9, 29, 23, 30);
     const meals = [meal({ food_name: "Casein", logged_at: at(1, 0, 30) })]; // 00:30 vs 23:30 = 60 min apart
