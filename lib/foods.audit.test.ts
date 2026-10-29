@@ -16,7 +16,7 @@ describe("alias audit", () => {
     if (misses.length || weak.length) console.log(["MISSES:", ...misses, "WEAK:", ...weak].join("\n"));
     expect(misses).toEqual([]);
     expect(weak).toEqual([]);
-  });
+  }, 30_000); // brute-force over every alias; ~3 s idle, >5 s when the Mac is under load
   it("shared aliases: a word used by several foods lands on the sensible one first", () => {
     const shared = new Map<string, string[]>();
     for (const f of FOODS) for (const a of f.aliases) shared.set(a, [...(shared.get(a) ?? []), f.name]);
