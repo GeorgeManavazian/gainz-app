@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
 import WeightChart from "@/components/WeightChart";
+import ConfirmDelete from "@/components/ConfirmDelete";
+import { deleteMeal } from "@/lib/meals-db";
 import ProgressCard from "@/components/ProgressCard";
 import { supabase } from "@/lib/supabase";
 import { getProfile, applyAdjustment, type ProfileRow } from "@/lib/profile";
@@ -101,6 +103,7 @@ export default function DietPage() {
   const [days, setDays] = useState<DayMeals[]>([]);
   const [activity, setActivity] = useState<HealthActivityRow[]>([]);
   const [openDay, setOpenDay] = useState<string | null>(localDateKey());
+  const [mealErr, setMealErr] = useState("");
 
   const load = useCallback(async () => {
     const start = new Date();
@@ -133,6 +136,19 @@ export default function DietPage() {
     }
   }, []);
   useEffect(() => { load(); }, [load]);
+
+  async function removeMeal(date: string, id: string) {
+    setMealErr("");
+    // Optimistic: drop the row and its share of the day's totals; reload on failure.
+    setDays((ds) => ds.map((d) => {
+      if (d.date !== date) return d;
+      const m = d.meals.find((x) => x.id === id);
+      if (!m) return d;
+      return { ...d, kcal: d.kcal - Number(m.calories), protein: d.protein - Number(m.protein_g), meals: d.meals.filter((x) => x.id !== id) };
+    }).filter((d) => d.meals.length > 0));
+    try { await deleteMeal(id); }
+    catch { setMealErr("Couldn't delete. Please try again."); await load(); }
+  }
   useEffect(() => {
     function onVisible() {
       if (document.visibilityState === "visible") load();
@@ -295,6 +311,7 @@ export default function DietPage() {
                     </span>
                     <span className="flex-1">{m.food_name} <span className="text-muted">· {m.unit === "serving" ? `${m.grams} serving${Number(m.grams) === 1 ? "" : "s"}` : `${m.grams}g`}</span></span>
                     <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
+                    <ConfirmDelete label={m.food_name} resetKey={d.meals.length} onConfirm={() => removeMeal(d.date, m.id)} />
                   </div>
                 ))}
               </li>
@@ -302,6 +319,7 @@ export default function DietPage() {
             })}
             {days.length === 0 && <li className="px-4 py-3 text-muted">No meals in the last 7 days</li>}
           </ul>
+          {mealErr && <p className="px-1 text-sm text-danger">{mealErr}</p>}
         </section>
 
         <section className="card-grad rounded-3xl border border-border p-5">

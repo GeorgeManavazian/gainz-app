@@ -16,6 +16,8 @@ import { getActiveWorkout, getTodayCompletedWorkout, listLiftsForWorkout } from 
 import { formatElapsed, totalSets, workoutTitle, type WorkoutRow } from "@/lib/workouts";
 import { nextMeal, remaining } from "@/lib/hub";
 import SavePatternSheet from "@/components/SavePatternSheet";
+import ConfirmDelete from "@/components/ConfirmDelete";
+import { deleteMeal } from "@/lib/meals-db";
 
 type Meal = { id: string; food_name: string; grams: number; calories: number;
   protein_g: number; carbs_g: number; fat_g: number; logged_at: string; fdc_id?: string | null;
@@ -51,6 +53,12 @@ function HubInner() {
       .gte("logged_at", start.toISOString()).order("logged_at");
     setMeals((data as Meal[]) ?? []);
   }, []);
+
+  async function removeMeal(id: string) {
+    setMeals((ms) => ms.filter((m) => m.id !== id));
+    try { await deleteMeal(id); }
+    catch { setToast("Couldn't delete — try again"); await load(); }
+  }
 
   const loadWorkouts = useCallback(async () => {
     getActiveWorkout().then(setActive).catch(() => setActive(null));
@@ -245,9 +253,10 @@ function HubInner() {
           </div>
           <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface text-sm">
             {meals.map((m) => (
-              <li key={m.id} className="flex justify-between px-4 py-3">
-                <span>{m.food_name} · {m.unit === "serving" ? `${m.grams} serving${Number(m.grams) === 1 ? "" : "s"}` : `${m.grams}g`}</span>
+              <li key={m.id} className="flex items-center gap-3 px-4 py-2.5">
+                <span className="flex-1">{m.food_name} · {m.unit === "serving" ? `${m.grams} serving${Number(m.grams) === 1 ? "" : "s"}` : `${m.grams}g`}</span>
                 <span className="tabular-nums text-muted">{Math.round(m.calories)} kcal</span>
+                <ConfirmDelete label={m.food_name} resetKey={meals.length} onConfirm={() => removeMeal(m.id)} />
               </li>
             ))}
             {meals.length === 0 && <li className="px-4 py-3 text-muted">Nothing logged yet</li>}

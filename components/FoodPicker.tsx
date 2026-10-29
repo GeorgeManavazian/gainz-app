@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { MealEntry } from "@/lib/log";
+import { rankRecentFoods, type MealLike } from "@/lib/food-recents";
 
 export type PickedEntry = MealEntry;
 
@@ -39,31 +40,14 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   const [err, setErr] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Foods you've logged before — instant, same values as last time.
+  // Foods you've logged before, ranked by time-of-day fit + frequency + recency (lib/food-recents).
   useEffect(() => {
     // select("*") — not a named column list — so this stays safe once `unit` lands without a client change.
     supabase.from("meals").select("*")
       .order("logged_at", { ascending: false }).limit(300)
       .then(({ data }) => {
-        const seen = new Set<string>();
-        const out: Picked[] = [];
-        for (const m of (data ?? []) as Array<Record<string, unknown> & { food_name: string; grams: number }>) {
-          // Manual macro lines log servings, not grams — they don't belong in "Recent foods" per-100g.
-          if (m.unit === "serving") continue;
-          const key = m.food_name.trim().toLowerCase();
-          if (seen.has(key) || !(Number(m.grams) > 0)) continue;
-          seen.add(key);
-          const s = 100 / Number(m.grams);
-          out.push({
-            name: m.food_name,
-            fdcId: m.fdc_id ? Number(m.fdc_id) : undefined,
-            fromHistory: true,
-            per100g: { kcal: Number(m.calories) * s, protein: Number(m.protein_g) * s,
-              carbs: Number(m.carbs_g) * s, fat: Number(m.fat_g) * s },
-          });
-          if (out.length >= 30) break;
-        }
-        setHistory(out);
+        const ranked = rankRecentFoods((data ?? []) as MealLike[], new Date(), { limit: 30 });
+        setHistory(ranked.map((f) => ({ name: f.name, fdcId: f.fdcId, fromHistory: true, per100g: f.per100g })));
       });
   }, []);
 
@@ -84,7 +68,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
 
   const historyHits = useMemo(() => {
     const nq = q.trim().toLowerCase();
-    if (nq.length < 2) return history.slice(0, 8);
+    if (nq.length < 2) return history.slice(0, 10);
     return history.filter((h) => h.name.toLowerCase().includes(nq)).slice(0, 4);
   }, [history, q]);
 
@@ -285,7 +269,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
           {historyHits.length > 0 && (
             <section className="flex flex-col gap-1.5">
               <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">
-                {q.trim().length < 2 ? "Recent foods" : "Your foods"}
+                Your foods
               </h2>
               <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border">
                 {historyHits.map((h) => (
