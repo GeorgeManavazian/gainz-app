@@ -15,6 +15,13 @@ describe("yScale", () => {
       expect(min).toBeLessThanOrEqual(lo); expect(max).toBeGreaterThanOrEqual(hi);
     }
   });
+  it("steps up from 1 to 2 exactly when a 1-lb axis would need a sixth tick", () => {
+    expect(yScale(0, 4).step).toBe(1);
+    expect(yScale(0, 4.1).step).toBe(2);
+  });
+  it("a span sitting exactly on step boundaries keeps them", () => {
+    expect(yScale(198, 206)).toEqual({ min: 198, max: 206, step: 2 });
+  });
   it("a flat series still gets a non-zero range", () => {
     const { min, max } = yScale(200, 200);
     expect(max).toBeGreaterThan(min);
@@ -32,8 +39,7 @@ describe("dateTicks", () => {
   it("a short span on a wide plot still gets up to four ticks", () => {
     expect(dateTicks("2026-10-25", "2026-10-29", 310 / 4)).toHaveLength(4);
   });
-  it("never repeats a date", () => {
-    const t = dateTicks("2026-10-28", "2026-10-29", 310);
-    expect(new Set(t).size).toBe(t.length);
+  it("a one-day span on a wide plot collapses to exactly its two dates", () => {
+    expect(dateTicks("2026-10-28", "2026-10-29", 310)).toEqual(["2026-10-28", "2026-10-29"]);
   });
 });

@@ -70,6 +70,7 @@ export default function WeightChart({ points }: { points: TrendPoint[] }) {
   const pillW = Math.round(label.length * 6.2) + 16, pillH = 22;
   const pillX = Math.min(W - PAD.right - pillW, Math.max(PAD.left, fx - pillW / 2));
   const pillY = Math.max(2, Math.min(fy, y(focus.weight_lb)) - pillH - 10);
+  const arrowX = Math.min(pillX + pillW - 9, Math.max(pillX + 9, fx)); // keep the pointer inside the rounded pill
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Body weight: daily weigh-ins with trend line"
@@ -117,7 +118,7 @@ export default function WeightChart({ points }: { points: TrendPoint[] }) {
       <g>
         <rect x={pillX} y={pillY} width={pillW} height={pillH} rx={7}
           fill="var(--surface-2)" stroke="var(--border)" strokeWidth={1} />
-        <path d={`M${fx - 4},${pillY + pillH} L${fx},${pillY + pillH + 4} L${fx + 4},${pillY + pillH} Z`}
+        <path d={`M${arrowX - 4},${pillY + pillH} L${arrowX},${pillY + pillH + 4} L${arrowX + 4},${pillY + pillH} Z`}
           fill="var(--surface-2)" stroke="none" />
         <text x={pillX + pillW / 2} y={pillY + 14.5} textAnchor="middle" fontSize={11} fontWeight={600}
           fill="var(--foreground)" style={{ fontVariantNumeric: "tabular-nums" }}>{label}</text>
