@@ -85,7 +85,7 @@ Each sub-project follows the same loop, and the artifacts are in the repo:
 3. **Plan** — bite-sized tasks with the exact code and tests (`docs/superpowers/plans/`).
 4. **Build with review** — each task is implemented, then reviewed for spec compliance and code quality, then a whole-branch review before it ships. Findings are fixed or explicitly parked with a written ruling.
 
-Result so far: 230 unit tests across 19 files, typed end to end, zero hex colours outside the token sheet.
+Result so far: 239 unit tests across 20 files, typed end to end, zero hex colours outside the token sheet.
 
 ## Running locally
 

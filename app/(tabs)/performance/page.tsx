@@ -11,8 +11,8 @@ import { formatElapsed, localDateOf, recentExercises, workoutTitle,
 import { EXERCISES, MUSCLE_GROUPS, normalizeName } from "@/lib/exercises";
 import { mergeLibrary, type CustomExerciseRow } from "@/lib/custom-exercises";
 import { listCustomExercises } from "@/lib/custom-exercises-db";
-import { recentWeeks } from "@/lib/muscle-week";
-import WeeklyMuscles from "@/components/WeeklyMuscles";
+import { muscleWeek, weekStartOf } from "@/lib/muscle-week";
+import BodyMap from "@/components/BodyMap";
 import { getProfile } from "@/lib/profile";
 
 function fmtDay(iso: string): string {
@@ -45,7 +45,7 @@ export default function Performance() {
   }, []);
 
   const library = useMemo(() => mergeLibrary(EXERCISES, customs), [customs]);
-  const weeks = useMemo(() => recentWeeks(rows, library, 4, new Date()), [rows, library]);
+  const week = useMemo(() => muscleWeek(rows, library, weekStartOf(new Date())), [rows, library]);
   const recents = useMemo(
     () => recentExercises(rows, MUSCLE_GROUPS.map((m) => m.id), 20, library), [rows, library]);
   const indicatorNames = INDICATORS.map((i) => normalizeName(i.name));
@@ -103,7 +103,7 @@ export default function Performance() {
           <p className="text-[13px] text-muted">Track strength. Beat your best.</p>
         </div>
 
-        <WeeklyMuscles weeks={weeks} />
+        <BodyMap week={week} />
 
         <section className="flex flex-col gap-2">
           <h2 className="text-[15px] font-semibold">Indicator lifts</h2>

@@ -4,6 +4,7 @@
   --background: #1e1e2e;
   --surface: #2a2b3d;
   --surface-2: #34354a;
+  --surface-3: #4b4e68;
   --border: #3b3c52;
   --foreground: #cdd6f4;
   --muted: #8b8fa8;
@@ -11,6 +12,7 @@
   --accent-foreground: #1e1e2e;
   --danger: #f38ba8;
   --success: #a6e3a1;
+  --warning: #fab387;
   --surface-hi: #2c2d49;
   --surface-lo: #1f2038;
 }
@@ -19,6 +21,7 @@
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
   --color-border: var(--border);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
@@ -26,6 +29,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-danger: var(--danger);
   --color-success: var(--success);
+  --color-warning: var(--warning);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
