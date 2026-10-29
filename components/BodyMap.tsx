@@ -22,10 +22,11 @@ const DOT: Record<HitTier, string> = {
 function Figure({ view, week, selected, onSelect }: {
   view: "front" | "back"; week: MuscleWeek; selected: BodyPart | null; onSelect: (p: BodyPart) => void;
 }) {
-  const shapes = SHAPES.filter((s) => s.view === view);
+  // Paint the selected part last so its highlight stroke is never covered by a neighbour.
+  const shapes = SHAPES.filter((s) => s.view === view).sort((a, b) => (a.part === selected ? 1 : 0) - (b.part === selected ? 1 : 0));
   return (
     <div className="flex flex-1 flex-col items-center gap-1">
-      <svg viewBox="0 0 100 200" role="group" aria-label={`${view} view`} className="h-auto w-full max-w-[160px]">
+      <svg viewBox="0 0 100 220" role="group" aria-label={`${view} view`} className="h-auto w-full max-w-[160px]">
         {shapes.map((s) => {
           const hits = partHits(s.part, week);
           const neutral = hits === null;

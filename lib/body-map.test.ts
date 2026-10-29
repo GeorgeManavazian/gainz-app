@@ -29,11 +29,16 @@ describe("body shapes", () => {
     for (const p of Object.keys(PART_MUSCLES) as BodyPart[])
       expect(PART_LABEL[p].length > 0, p).toBe(PART_MUSCLES[p].length > 0);
   });
-  it("polygon point lists are non-empty numeric pairs", () => {
-    for (const s of SHAPES) for (const pts of s.points) {
-      const nums = pts.trim().split(/\s+/).map(Number);
-      expect(nums.length % 2, `${s.part}`).toBe(0);
-      expect(nums.every((n) => Number.isFinite(n)), `${s.part}`).toBe(true);
+  it("polygon point lists are non-empty numeric pairs inside the 100×220 drawing area", () => {
+    for (const s of SHAPES) {
+      expect(s.points.length, s.part).toBeGreaterThan(0);
+      for (const pts of s.points) {
+        const nums = pts.trim().split(/\s+/).map(Number);
+        expect(nums.length % 2, s.part).toBe(0);
+        expect(nums.length, s.part).toBeGreaterThanOrEqual(6);
+        nums.forEach((n, i) => { expect(Number.isFinite(n), s.part).toBe(true);
+          expect(n >= 0 && n <= (i % 2 === 0 ? 100 : 220), `${s.part} ${n}`).toBe(true); });
+      }
     }
   });
   it("both views are present", () => {

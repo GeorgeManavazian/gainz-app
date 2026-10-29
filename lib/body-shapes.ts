@@ -1,7 +1,7 @@
 // lib/body-shapes.ts
-// Polygon outlines for the weekly body map. Data: react-body-highlighter v2.0.5 (MIT).
-// Copyright (c) 2020 GV79
-// Coordinates live in a 100×200 viewBox; "front" = anterior view, "back" = posterior view.
+// Polygon outlines for the weekly body map. Data: react-body-highlighter v2.0.5, MIT License,
+// Copyright (c) 2020 GV79. Full licence text: THIRD_PARTY_LICENSES.md at the repo root.
+// Coordinates span x 0–100, y 0–220 (the upstream feet overrun its nominal 200; render in a 100×220 viewBox); "front" = anterior view, "back" = posterior view.
 import type { Muscle } from "./muscles";
 
 export type BodyPart =
