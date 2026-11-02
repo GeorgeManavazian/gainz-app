@@ -15,7 +15,7 @@ import { listHealthActivity, type HealthActivityRow } from "@/lib/health-activit
 import { getActiveWorkout, getTodayCompletedWorkout, listLiftsForWorkout, listCompletedWorkouts } from "@/lib/workouts-db";
 import { formatElapsed, totalSets, workoutTitle, type WorkoutRow } from "@/lib/workouts";
 import { remaining } from "@/lib/hub";
-import { atTime, bedtimeFor, lateHeavyMeal, planLine, planNextMeal, proteinHits, usualTrainingStart, PROTEIN_HITS_TARGET } from "@/lib/meal-timing";
+import { bedtimeFor, wakeFor, lateHeavyMeal, planLine, planNextMeal, proteinHits, usualTrainingStart, PROTEIN_HITS_TARGET } from "@/lib/meal-timing";
 import MealTimeline from "@/components/MealTimeline";
 import SavePatternSheet from "@/components/SavePatternSheet";
 import ConfirmDelete from "@/components/ConfirmDelete";
@@ -37,6 +37,12 @@ function HubInner() {
   const router = useRouter();
   const [toast, setToast] = useState("");
   const [saveOpen, setSaveOpen] = useState(false);
+  // Clock tick so the meal-timing line and elapsed times stay current while the app stays open.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
   useEffect(() => {
     const n = Number(params.get("logged"));
     if (n > 0) {
@@ -123,7 +129,6 @@ function HubInner() {
   const totals = { calories: sum("calories"), protein_g: sum("protein_g"), carbs_g: sum("carbs_g"), fat_g: sum("fat_g") };
   const t = typeof targets === "object" && targets !== null ? targets : null;
   // Meal timing: fuel model + next window from today's meals, training and sleep clock.
-  const now = new Date();
   const prof = typeof profile === "object" && profile !== null ? profile : null;
   const clock = { wake: prof?.wake_time ?? "07:00", bed: prof?.bed_time ?? "23:00" };
   const todayWorkout = active ? { started_at: active.started_at, ended_at: null }
@@ -225,7 +230,7 @@ function HubInner() {
           {active ? (
             <Link href={`/workout/${active.id}`}
               className="flex-1 rounded-xl border border-accent/60 bg-surface px-4 py-4 text-center text-base font-semibold text-accent active:bg-surface-2">
-              Resume · {formatElapsed(Date.now() - new Date(active.started_at).getTime()).replace(/:\d\d$/, "")} min
+              Resume · {formatElapsed(now.getTime() - new Date(active.started_at).getTime()).replace(/:\d\d$/, "")} min
             </Link>
           ) : (
             <Link href="/workout/new"
@@ -243,7 +248,7 @@ function HubInner() {
                 Protein hits {hits} / {PROTEIN_HITS_TARGET}
               </span>
             </div>
-            <MealTimeline wake={atTime(now, clock.wake)} bed={bedtimeFor(now, clock)} now={now} meals={meals} workout={todayWorkout} plan={plan} />
+            <MealTimeline wake={wakeFor(now, clock)} bed={bedtimeFor(now, clock)} now={now} meals={meals} workout={todayWorkout} plan={plan} />
             <p className="text-[14px] font-semibold leading-snug">{planLine(plan, now)}</p>
             {late && (
               <p className="text-[12px] text-danger">
@@ -285,7 +290,7 @@ function HubInner() {
               <li>
                 <Link href={`/workout/${active.id}`} className="flex items-center gap-3 px-4 py-3 active:bg-surface-2">
                   <span className="flex-1 font-medium text-muted">
-                    Resume workout · {formatElapsed(Date.now() - new Date(active.started_at).getTime()).replace(/:\d\d$/, "")} min
+                    Resume workout · {formatElapsed(now.getTime() - new Date(active.started_at).getTime()).replace(/:\d\d$/, "")} min
                   </span>
                   <span className="text-muted">›</span>
                 </Link>

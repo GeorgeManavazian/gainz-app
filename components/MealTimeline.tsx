@@ -1,8 +1,8 @@
 // components/MealTimeline.tsx
 "use client";
-import type { Plan, TimingMeal, TimingWorkout } from "@/lib/meal-timing";
+import { feedings, type Plan, type TimingMeal, type TimingWorkout } from "@/lib/meal-timing";
 
-/** Today from wake to bed: meals as dots sized by kcal, the workout as a block, the next window shaded, a now marker. */
+/** Today from wake to bed: feedings (food rows within 60 min merged) as dots sized by kcal, the workout as a block, the next window shaded, a now marker. */
 export default function MealTimeline({ wake, bed, now, meals, workout, plan }: {
   wake: Date; bed: Date; now: Date; meals: TimingMeal[]; workout: TimingWorkout | null; plan: Plan | null;
 }) {
@@ -24,9 +24,9 @@ export default function MealTimeline({ wake, bed, now, meals, workout, plan }: {
       {/* workout block */}
       {wStart !== null && wEnd !== null && <rect x={x(wStart)} y={17} width={Math.max(3, x(wEnd) - x(wStart))} height={10} rx={3}
         fill="var(--success)" fillOpacity={0.55} />}
-      {/* meals */}
-      {meals.map((m, i) => (
-        <circle key={m.logged_at + i} cx={x(new Date(m.logged_at).getTime())} cy={22} r={r(Number(m.calories))}
+      {/* feedings */}
+      {feedings(meals).map((f, i) => (
+        <circle key={f.at + i} cx={x(new Date(f.at).getTime())} cy={22} r={r(f.calories)}
           fill="var(--accent)" stroke="var(--surface)" strokeWidth={1.5} />
       ))}
       {/* now */}
