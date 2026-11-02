@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AuthGuard from "@/components/AuthGuard";
-import WeightChart from "@/components/WeightChart";
+import LineChart from "@/components/LineChart";
 import ConfirmDelete from "@/components/ConfirmDelete";
 import { deleteMeal } from "@/lib/meals-db";
 import ProgressCard from "@/components/ProgressCard";
@@ -243,7 +243,8 @@ export default function DietPage() {
               {chip(30, "1M")}{chip(90, "3M")}{chip("all", "All")}
             </div>
           </div>
-          <WeightChart points={visible} />
+          <LineChart data={visible.map((p) => ({ date: p.date, value: p.weight_lb }))} height={190} unit="lb" decimals={1}
+            label="Body weight over weigh-ins" emptyText="No weigh-ins yet — log this morning's weight below." />
         </section>
 
         <section className="card-grad grid grid-cols-2 divide-x divide-border rounded-3xl border border-border">

@@ -19,8 +19,8 @@ function smoothPath(pts: { x: number; y: number }[]): string {
   return d;
 }
 
-export default function LineChart({ data, height = 150, unit = "lb" }: {
-  data: { date: string; value: number }[]; height?: number; unit?: string;
+export default function LineChart({ data, height = 150, unit = "lb", label = "e1RM over sessions", emptyText, decimals = 0 }: {
+  data: { date: string; value: number }[]; height?: number; unit?: string; label?: string; emptyText?: string; decimals?: number;
 }) {
   const H = height;
   const geo = useMemo(() => {
@@ -42,7 +42,7 @@ export default function LineChart({ data, height = 150, unit = "lb" }: {
   }, [data, H]);
   if (!geo || data.length < 2) return (
     <p className="rounded-xl bg-surface-2/60 px-4 py-8 text-center text-sm text-muted">
-      Not enough data yet — a couple more workouts and your progress line shows up here.
+      {emptyText ?? "Not enough data yet — a couple more workouts and your progress line shows up here."}
     </p>
   );
 
@@ -52,7 +52,7 @@ export default function LineChart({ data, height = 150, unit = "lb" }: {
   const pillY = Math.max(2, geo.y(last.value) - pillH - 8);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`e1RM over sessions`} className="block">
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={label} className="block">
       <defs>
         <linearGradient id="line-fill" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="var(--accent)" stopOpacity="0.45" />
@@ -71,7 +71,7 @@ export default function LineChart({ data, height = 150, unit = "lb" }: {
         <rect x={pillX} y={pillY} width={pillW} height={pillH} rx={8}
           fill="var(--surface-2)" stroke="var(--border)" strokeWidth={1} />
         <text x={pillX + pillW / 2} y={pillY + 13} textAnchor="middle" fontSize="11" fontWeight={700}
-          fill="var(--foreground)">{Math.round(last.value)} {unit}</text>
+          fill="var(--foreground)">{last.value.toFixed(decimals)} {unit}</text>
         <text x={pillX + pillW / 2} y={pillY + 25} textAnchor="middle" fontSize="9"
           fill="var(--muted)">{fmtDate(last.date)}</text>
       </g>
