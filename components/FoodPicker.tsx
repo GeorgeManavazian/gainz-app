@@ -65,17 +65,18 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header,
     if (q.length < 2) { setItems([]); setSearching(false); return; }
     clearTimeout(timer.current);
     // Curated table answers instantly (and offline); USDA fills in behind and replaces the list.
-    setItems(curatedSearchItems(q) as Item[]);
+    setItems(curatedSearchItems(q));
     setSearching(true);
+    let stale = false; // a response for an older query must not overwrite newer results
     timer.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/food-search?q=${encodeURIComponent(q)}`);
         const data = await res.json();
-        setItems(data.items ?? []);
-      } catch { setItems([]); }
-      setSearching(false);
+        if (!stale && Array.isArray(data.items) && data.items.length > 0) setItems(data.items);
+      } catch { /* offline or USDA down: keep the curated rows already showing */ }
+      if (!stale) setSearching(false);
     }, 300);
-    return () => clearTimeout(timer.current);
+    return () => { stale = true; clearTimeout(timer.current); };
   }, [q]);
 
   const historyHits = useMemo(() => {
@@ -188,7 +189,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header,
         carbs_g: scale(picked.per100g.carbs), fat_g: scale(picked.per100g.fat),
         fdc_id: picked.fdcId ? String(picked.fdcId) : undefined,
       });
-      setPicked(null); setQ(""); setAmount("");
+      setPicked(null); setQ(""); setAmount(""); setUndo(null);
       if (successLabel) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
     } catch {
       setErr("Couldn't save. Please try again.");

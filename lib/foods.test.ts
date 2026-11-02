@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { FOODS, searchFoods, matchScore, foodByFdcId, defaultHalf, type CuratedFood } from "./foods";
+import { FOODS, searchFoods, matchScore, foodByFdcId, defaultHalf, curatedSearchItems, type CuratedFood } from "./foods";
 
 const both = FOODS.filter((f) => f.raw && f.cooked);
 
@@ -95,8 +95,7 @@ describe("search", () => {
 });
 
 describe("curatedSearchItems", () => {
-  it("builds picker rows with both halves and the default badge", async () => {
-    const { curatedSearchItems } = await import("./foods");
+  it("builds picker rows with both halves and the default badge", () => {
     const [chicken] = curatedSearchItems("chicken breast");
     expect(chicken.name).toBe("Chicken breast");
     expect(chicken.curated).toBe(true);
@@ -105,8 +104,7 @@ describe("curatedSearchItems", () => {
     expect(chicken.pair?.cooked?.fdcId).toBe(chicken.fdcId);
     expect(chicken.per100g.kcal).toBeGreaterThan(0);
   });
-  it("returns nothing for junk", async () => {
-    const { curatedSearchItems } = await import("./foods");
+  it("returns nothing for junk", () => {
     expect(curatedSearchItems("zzqx")).toEqual([]);
   });
 });
