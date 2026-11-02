@@ -14,7 +14,7 @@ export default function LogMeal() {
   const [showAll, setShowAll] = useState(false);
   useEffect(() => { listPatterns().then((p) => setPatterns(sortPatterns(p))).catch(() => setPatterns([])); }, []);
 
-  const yourMeals = (scanButton: React.ReactNode) => (
+  const yourMeals = (
     <section className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
         <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Your meals</h2>
@@ -24,7 +24,6 @@ export default function LogMeal() {
               {showAll ? "Less" : `All ${patterns.length} ›`}
             </button>
           )}
-          {scanButton}
           <Link href="/log/meal/new" className="text-[12px] font-semibold text-accent active:opacity-80">New meal</Link>
         </span>
       </div>

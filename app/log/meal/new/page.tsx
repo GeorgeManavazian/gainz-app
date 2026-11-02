@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import FoodPicker from "@/components/FoodPicker";
 import MacroSheet from "@/components/MacroSheet";
+import LabelScanner from "@/components/LabelScanner";
+import NewFoodSheet from "@/components/NewFoodSheet";
+import { createCustomFood, listCustomFoods } from "@/lib/custom-foods-db";
+import { normName, type CustomFoodRow } from "@/lib/custom-foods";
+import type { ParsedLabel } from "@/lib/label-parse";
 import { createPattern } from "@/lib/patterns-db";
 import { itemsFromMeals, scaleItem, totals, unitOf, type PatternItem } from "@/lib/patterns";
 import type { MealEntry } from "@/lib/log";
@@ -63,6 +68,9 @@ export default function NewMeal() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [offline, setOffline] = useState(() => typeof navigator !== "undefined" && !navigator.onLine);
+  const [customs, setCustoms] = useState<CustomFoodRow[]>([]);
+  const [scan, setScan] = useState<ParsedLabel | null | undefined>(undefined); // undefined = sheet closed
+  useEffect(() => { listCustomFoods().then(setCustoms).catch(() => setCustoms([])); }, []);
 
   useEffect(() => {
     const goOnline = () => setOffline(false);
@@ -83,6 +91,14 @@ export default function NewMeal() {
     const [item] = itemsFromMeals([entry]);
     if (item) setLines((ls) => [...ls, { key: ls.length ? Math.max(...ls.map((l) => l.key)) + 1 : 0, item }]);
     setMode("list");
+  }
+  /** Scanned label → saved as your food → one serving added to the meal. */
+  async function addScanned(f: Omit<CustomFoodRow, "id">) {
+    const row = await createCustomFood(f);
+    setCustoms((cs) => [...cs, row]);
+    setScan(undefined);
+    const g = row.serving_g ?? 100, k = g / 100, r = (v: number) => Math.round(v * k * 10) / 10;
+    addFood({ food_name: row.name, grams: g, calories: r(row.kcal), protein_g: r(row.protein_g), carbs_g: r(row.carbs_g), fat_g: r(row.fat_g) });
   }
   function addMacros(item: PatternItem) {
     setLines((ls) => [...ls, { key: ls.length ? Math.max(...ls.map((l) => l.key)) + 1 : 0, item }]);
@@ -158,6 +174,8 @@ export default function NewMeal() {
                 className="flex items-center justify-center gap-2 rounded-2xl border border-accent px-4 py-3.5 text-base font-semibold text-accent active:bg-accent/10">
                 <BarsIcon /> Add macros
               </button>
+              <LabelScanner onParsed={(p) => setScan(p)} label="Scan label"
+                className="col-span-2 flex items-center justify-center gap-2 rounded-2xl border border-accent px-4 py-3.5 text-base font-semibold text-accent active:bg-accent/10 disabled:opacity-60" />
             </div>
 
             <div className="card-grad flex items-stretch divide-x divide-border rounded-2xl border border-border px-2 py-3.5 text-center">
@@ -179,6 +197,10 @@ export default function NewMeal() {
         )}
 
         {mode === "macros" && <MacroSheet onAdd={addMacros} onClose={() => setMode("list")} />}
+        {scan !== undefined && (
+          <NewFoodSheet parsed={scan} existingNames={new Set(customs.map((c) => normName(c.name)))}
+            onSave={addScanned} onClose={() => setScan(undefined)} />
+        )}
       </main>
     </AuthGuard>
   );
