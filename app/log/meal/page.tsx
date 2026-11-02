@@ -7,19 +7,29 @@ import { logMeal } from "@/lib/log";
 import { listPatterns } from "@/lib/patterns-db";
 import { scaleItem, sortPatterns, totals, type PatternRow } from "@/lib/patterns";
 
+const MEAL_PREVIEW = 4;
+
 export default function LogMeal() {
   const [patterns, setPatterns] = useState<PatternRow[]>([]);
+  const [showAll, setShowAll] = useState(false);
   useEffect(() => { listPatterns().then((p) => setPatterns(sortPatterns(p))).catch(() => setPatterns([])); }, []);
 
   const yourMeals = (
     <section className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
         <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Your meals</h2>
-        <Link href="/log/meal/new" className="text-[12px] font-semibold text-accent active:opacity-80">New meal</Link>
+        <span className="flex items-center gap-3">
+          {patterns.length > MEAL_PREVIEW && (
+            <button type="button" onClick={() => setShowAll((v) => !v)} className="text-[12px] font-semibold text-accent active:opacity-80">
+              {showAll ? "Less" : `All ${patterns.length} ›`}
+            </button>
+          )}
+          <Link href="/log/meal/new" className="text-[12px] font-semibold text-accent active:opacity-80">New meal</Link>
+        </span>
       </div>
       {patterns.length > 0 && (
         <ul className="grid grid-cols-2 gap-2">
-          {patterns.map((p) => {
+          {(showAll ? patterns : patterns.slice(0, MEAL_PREVIEW)).map((p) => {
             const t = totals(p.items.map((it) => scaleItem(it, it.grams)));
             return (
               <li key={p.id}>
