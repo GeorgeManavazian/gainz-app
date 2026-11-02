@@ -148,6 +148,26 @@ describe("planNextMeal", () => {
     expect(p.kcal).toBeLessThanOrEqual(200); expect(p.end.getTime()).toBeLessThanOrEqual(day(17).getTime());
     expect(planLine(p, day(16, 30))).toBe("Training at 5pm. Small carb snack now (≤200 kcal), main meal after ~6:30pm.");
   });
+  it("pre window shorter than 45 min → snack, not a full meal (15:59 and 15:30, training 5pm)", () => {
+    for (const now of [day(15, 59), day(15, 30)]) {
+      const p = planNextMeal({ ...base, meals: [meal(12, 0, 600)], totals: { calories: 600, protein_g: 40 }, now, usualTraining: day(17) });
+      expect(p.kind).toBe("pre"); expect(p.snack).toBe(true); expect(p.kcal).toBeLessThanOrEqual(200);
+      expect(planLine(p, now)).toBe("Training at 5pm. Small carb snack now (≤200 kcal), main meal after ~6:30pm.");
+    }
+    // 45 min exactly is still a meal
+    const p = planNextMeal({ ...base, meals: [meal(12, 0, 600)], totals: { calories: 600, protein_g: 40 }, now: day(15, 15), usualTraining: day(17) });
+    expect(p.snack).toBe(false); expect(planLine(p, day(15, 15))).toMatch(/^Pre-workout meal 3:15pm–4pm/);
+  });
+  it("late training: after-training meal past the heavy cutoff → light meal ≤300 kcal", () => {
+    const p = planNextMeal({ ...base, meals: [meal(18, 0, 900)], totals: { calories: 900, protein_g: 50 }, now: day(19, 30), usualTraining: day(20) });
+    expect(p.kind).toBe("fuelled-through"); expect(p.light).toBe(true); expect(p.kcal).toBe(300);
+    expect(p.end.getTime()).toBeLessThanOrEqual(day(22).getTime());
+    expect(planLine(p, day(19, 30))).toBe("Light meal after training, ~9:30pm · ≤300 kcal · 36 P.");
+  });
+  it("very late training: after-training meal past bed − 1 h → closed", () => {
+    const p = planNextMeal({ ...base, meals: [meal(18, 0, 900)], totals: { calories: 900, protein_g: 50 }, now: day(20), usualTraining: day(20, 30) });
+    expect(p.kind).toBe("closed");
+  });
   it("active workout → training, no meal window", () => {
     const p = planNextMeal({ ...base, meals: [meal(12, 0, 600)], totals: { calories: 600, protein_g: 40 }, now: day(17, 30),
       todayWorkout: { started_at: iso(17), ended_at: null } });
