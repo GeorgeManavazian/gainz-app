@@ -1,7 +1,7 @@
 import { get, update } from "idb-keyval";
 import { supabase } from "@/lib/supabase";
 
-export type QueueTable = "meals" | "lifts" | "workouts" | "custom_exercises";
+export type QueueTable = "meals" | "lifts" | "workouts" | "custom_exercises" | "custom_foods";
 export type QueueOp = "insert" | "update" | "delete";
 export type Queued = { id: string; table: QueueTable; op: QueueOp; entry: Record<string, unknown>; queued_at: string };
 

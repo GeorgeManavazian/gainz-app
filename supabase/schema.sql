@@ -137,3 +137,22 @@ create unique index if not exists custom_exercises_user_name_idx
 alter table custom_exercises enable row level security;
 create policy "own custom_exercises" on custom_exercises for all
   using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- Sub-project 9: custom foods from scanned labels (2026-11-02). Paste this block once.
+create table if not exists custom_foods (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) default auth.uid(),
+  name text not null,
+  serving_g numeric,
+  kcal numeric not null,
+  protein_g numeric not null default 0,
+  carbs_g numeric not null default 0,
+  fat_g numeric not null default 0,
+  source text not null default 'label',
+  created_at timestamptz not null default now()
+);
+create unique index if not exists custom_foods_user_name_idx
+  on custom_foods (user_id, lower(name));
+alter table custom_foods enable row level security;
+create policy "own custom_foods" on custom_foods for all
+  using (user_id = auth.uid()) with check (user_id = auth.uid());

@@ -5,6 +5,11 @@ import type { MealEntry } from "@/lib/log";
 import { rankRecentFoods, type MealLike } from "@/lib/food-recents";
 import { curatedSearchItems } from "@/lib/foods";
 import { deleteMeal } from "@/lib/meals-db";
+import { createCustomFood, listCustomFoods } from "@/lib/custom-foods-db";
+import { normName, type CustomFoodRow } from "@/lib/custom-foods";
+import type { ParsedLabel } from "@/lib/label-parse";
+import LabelScanner from "@/components/LabelScanner";
+import NewFoodSheet from "@/components/NewFoodSheet";
 
 export type PickedEntry = MealEntry;
 
@@ -13,7 +18,9 @@ type Item = { fdcId: number; name: string; description: string; group: string; b
   curated?: true; rawLabel?: "Raw" | "Dry"; pair?: { raw: Item | null; cooked: Item | null } };
 type Picked = { name: string; description?: string; fdcId?: number; badge?: "raw" | "cooked" | null; pairable?: boolean; rawLabel?: "Raw" | "Dry"; per100g: Per100; fromHistory?: boolean;
   /** Last logged amount: shown on the row and as the amount field's placeholder. */
-  lastGrams?: number; lastCalories?: number };
+  lastGrams?: number; lastCalories?: number;
+  /** A food you created (scanned label); macros per 100 g, lastGrams = one serving. */
+  fromCustom?: boolean };
 type Weighing = "raw" | "cooked";
 // undefined = still looking, null = USDA has no such version.
 type PairCache = Record<Weighing, Item | null | undefined>;
@@ -39,6 +46,8 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   const [items, setItems] = useState<Item[]>([]);
   const [searching, setSearching] = useState(false);
   const [history, setHistory] = useState<Picked[]>([]);
+  const [customs, setCustoms] = useState<CustomFoodRow[]>([]);
+  const [scan, setScan] = useState<ParsedLabel | null | undefined>(undefined); // undefined = sheet closed
   const [picked, setPicked] = useState<Picked | null>(null);
   const [pairs, setPairs] = useState<PairCache>({ raw: undefined, cooked: undefined });
   const [units, setUnits] = useState<Unit[]>(BASE_UNITS);
@@ -65,6 +74,10 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   }, []);
 
   useEffect(() => {
+    listCustomFoods().then(setCustoms).catch(() => setCustoms([]));
+  }, []);
+
+  useEffect(() => {
     if (q.trim().length < 2) { setItems([]); setSearching(false); return; }
     clearTimeout(timer.current);
     // Curated table answers instantly (and offline); USDA fills in behind and replaces the list.
@@ -82,11 +95,20 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
     return () => { stale = true; clearTimeout(timer.current); };
   }, [q]);
 
+  const customPicked = (c: CustomFoodRow): Picked => ({
+    name: c.name, per100g: { kcal: c.kcal, protein: c.protein_g, carbs: c.carbs_g, fat: c.fat_g },
+    lastGrams: c.serving_g ?? undefined, fromCustom: true,
+  });
+  /** Ranked recents first, then custom foods you haven't logged yet (A–Z). */
+  const yourFoods = useMemo(() => {
+    const seen = new Set(history.map((h) => normName(h.name)));
+    return [...history, ...customs.filter((c) => !seen.has(normName(c.name))).map(customPicked)];
+  }, [history, customs]);
   const historyHits = useMemo(() => {
     const nq = q.trim().toLowerCase();
-    if (nq.length < 2) return showAll ? history : history.slice(0, HISTORY_PREVIEW);
-    return history.filter((h) => h.name.toLowerCase().includes(nq)).slice(0, 4);
-  }, [history, q, showAll]);
+    if (nq.length < 2) return showAll ? yourFoods : yourFoods.slice(0, HISTORY_PREVIEW);
+    return yourFoods.filter((h) => h.name.toLowerCase().includes(nq)).slice(0, 4);
+  }, [yourFoods, q, showAll]);
 
   const weighingOf = (v: { badge?: "raw" | "cooked" | null }): Weighing => (v.badge === "raw" ? "raw" : "cooked");
 
@@ -254,7 +276,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
           )}
           {!showSwitch && (
             <p className="rounded-xl bg-surface-2/60 px-3 py-2 text-[12px] leading-snug text-muted">
-              {picked.fromHistory ? "From your log: same values as last time you ate this. " : ""}
+              {picked.fromHistory ? "From your log: same values as last time you ate this. " : picked.fromCustom ? "Your food from a scanned label. " : ""}
               {Math.round(picked.per100g.kcal)} kcal and {Math.round(picked.per100g.protein)} g protein per 100 g.
             </p>
           )}
@@ -298,10 +320,23 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
       ) : (
         /* ——— search ——— */
         <>
-          <input
-            className="w-full rounded-2xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
-            placeholder="Search food… e.g. grilled chicken breast"
-            value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
+          <div className="flex gap-2">
+            <input
+              className="min-w-0 flex-1 rounded-2xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+              placeholder="Search food… e.g. grilled chicken breast"
+              value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
+            <LabelScanner onParsed={(p) => setScan(p)} className="flex shrink-0 items-center gap-1.5 rounded-2xl border border-border bg-surface px-3 text-[13px] font-semibold text-muted active:text-foreground disabled:opacity-60" />
+          </div>
+
+          {scan !== undefined && (
+            <NewFoodSheet parsed={scan} onClose={() => setScan(undefined)}
+              onSave={async (f) => {
+                const row = await createCustomFood(f);
+                setCustoms((cs) => [...cs.filter((c) => normName(c.name) !== normName(row.name)), row]);
+                setScan(undefined);
+                pickHistory(customPicked(row)); // straight to "how much did you eat"
+              }} />
+          )}
 
           {searchErr && <p className="text-sm text-danger">{searchErr}</p>}
           {q.trim().length < 2 && header}
@@ -310,17 +345,17 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
             <section className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Your foods</h2>
-                {q.trim().length < 2 && history.length > HISTORY_PREVIEW && (
+                {q.trim().length < 2 && yourFoods.length > HISTORY_PREVIEW && (
                   <button type="button" onClick={() => setShowAll((v) => !v)}
                     className="text-[12px] font-semibold text-accent active:opacity-80">
-                    {showAll ? "Less" : `All ${history.length} ›`}
+                    {showAll ? "Less" : `All ${yourFoods.length} ›`}
                   </button>
                 )}
               </div>
               <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border">
                 {historyHits.map((h) => (
                   <Row key={`h-${h.name}`} name={h.name}
-                    sub={h.lastGrams ? `${fmtG(h.lastGrams)} g · ${Math.round(h.lastCalories ?? 0)} kcal` : macroLine(h.per100g)}
+                    sub={h.lastCalories !== undefined && h.lastGrams ? `${fmtG(h.lastGrams)} g · ${Math.round(h.lastCalories)} kcal` : macroLine(h.per100g)}
                     onClick={() => pickHistory(h)} />
                 ))}
               </ul>
