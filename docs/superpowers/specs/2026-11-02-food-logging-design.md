@@ -1,4 +1,4 @@
-# Food logging — one-tap re-log, instant results, undo
+# Food logging — tighter Log meal layout, instant results, undo
 
 Date: 2026-11-02 · Status: George: "i just genuinely hate everything about it… just guess" → builder's design, approved by that instruction.
 

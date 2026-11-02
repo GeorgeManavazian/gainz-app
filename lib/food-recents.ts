@@ -6,7 +6,7 @@ export type MealLike = {
 export type Per100 = { kcal: number; protein: number; carbs: number; fat: number };
 export type RecentFood = {
   name: string; fdcId?: number; per100g: Per100;
-  /** Amount and kcal of the most recent log, for one-tap re-logging. */
+  /** Amount and kcal of the most recent log (row subtitle, amount placeholder). */
   lastGrams: number; lastCalories: number;
   count: number; sameTimeCount: number; lastAt: string; score: number;
 };

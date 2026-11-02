@@ -12,7 +12,7 @@ type Per100 = { kcal: number; protein: number; carbs: number; fat: number };
 type Item = { fdcId: number; name: string; description: string; group: string; badge: "raw" | "cooked" | null; pairable: boolean; per100g: Per100;
   curated?: true; rawLabel?: "Raw" | "Dry"; pair?: { raw: Item | null; cooked: Item | null } };
 type Picked = { name: string; description?: string; fdcId?: number; badge?: "raw" | "cooked" | null; pairable?: boolean; rawLabel?: "Raw" | "Dry"; per100g: Per100; fromHistory?: boolean;
-  /** Last logged amount, for one-tap re-log and amount-screen prefill. */
+  /** Last logged amount: shown on the row and as the amount field's placeholder. */
   lastGrams?: number; lastCalories?: number };
 type Weighing = "raw" | "cooked";
 // undefined = still looking, null = USDA has no such version.
@@ -26,6 +26,7 @@ const BASE_UNITS: Unit[] = [
 ];
 
 const HISTORY_PREVIEW = 5;
+const fmtG = (g: number) => String(Math.round(g * 10) / 10);
 
 export default function FoodPicker({ onPick, confirmLabel, successLabel, header }: {
   /** Returns the new row id when the pick was logged (enables Undo); void when it was only added to a draft. */
@@ -44,7 +45,9 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   const [unit, setUnit] = useState<Unit>(BASE_UNITS[0]);
   const [amount, setAmount] = useState("");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [undo, setUndo] = useState<{ id: string; text: string } | null>(null);
+  const [searchErr, setSearchErr] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [err, setErr] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -62,7 +65,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   }, []);
 
   useEffect(() => {
-    if (q.length < 2) { setItems([]); setSearching(false); return; }
+    if (q.trim().length < 2) { setItems([]); setSearching(false); return; }
     clearTimeout(timer.current);
     // Curated table answers instantly (and offline); USDA fills in behind and replaces the list.
     setItems(curatedSearchItems(q));
@@ -149,7 +152,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
     if (!undo) return;
     const { id } = undo;
     setUndo(null);
-    try { await deleteMeal(id); } catch { setErr("Couldn't undo. Delete it from the Diet tab."); }
+    try { await deleteMeal(id); } catch { setSearchErr("Couldn't undo. Delete it from the Diet tab."); }
   }
 
   // Show the Raw / Cooked switch while the other version is loading or once it exists; hide if USDA has none.
@@ -161,8 +164,8 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   const scale = (v: number) => Math.round(v * grams / 100 * 10) / 10;
 
   async function save() {
-    if (!picked || grams <= 0) return;
-    setErr("");
+    if (!picked || grams <= 0 || saving) return;
+    setErr(""); setSaving(true);
     try {
       const id = await onPick({
         food_name: picked.name, grams,
@@ -172,11 +175,11 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
       });
       const name = picked.name;
       setPicked(null); setQ(""); setAmount("");
-      if (typeof id === "string") { setSaved(false); setUndo({ id, text: `Logged ${name} · ${grams} g ✓` }); }
+      if (typeof id === "string") { setSaved(false); setSearchErr(""); setUndo({ id, text: `Logged ${name} · ${grams} g ✓` }); }
       else if (successLabel) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
     } catch {
       setErr("Couldn't save. Please try again.");
-    }
+    } finally { setSaving(false); }
   }
 
   const Badge = ({ badge }: { badge?: "raw" | "cooked" | null }) => badge ? (
@@ -269,7 +272,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
           <label className="relative">
             <input
               className="w-full rounded-2xl border border-border bg-surface px-4 py-3.5 pr-24 text-2xl font-bold tabular-nums text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
-              inputMode="decimal" placeholder={picked.lastGrams ? String(picked.lastGrams) : "0"} autoFocus
+              inputMode="decimal" placeholder={picked.lastGrams ? fmtG(picked.lastGrams) : "0"} autoFocus
               value={amount} onChange={(e) => setAmount(e.target.value)} />
             <span className="pointer-events-none absolute right-4 top-1/2 max-w-[40%] -translate-y-1/2 truncate text-sm text-muted">
               {unit.label}{unit.grams !== 1 && n > 0 ? ` = ${grams} g` : ""}
@@ -286,7 +289,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
           <div className="flex gap-3">
             <button
               className="flex-1 rounded-xl bg-accent px-4 py-3.5 text-base font-semibold text-accent-foreground active:opacity-80 disabled:opacity-40"
-              onClick={save} disabled={grams <= 0}>{confirmLabel}</button>
+              onClick={save} disabled={grams <= 0 || saving}>{saving ? "Saving…" : confirmLabel}</button>
             <button
               className="rounded-xl border border-border bg-surface px-4 py-3.5 text-base font-semibold text-foreground active:bg-surface-2"
               onClick={() => { setErr(""); setPicked(null); }}>Back</button>
@@ -300,6 +303,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
             placeholder="Search food… e.g. grilled chicken breast"
             value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
 
+          {searchErr && <p className="text-sm text-danger">{searchErr}</p>}
           {q.trim().length < 2 && header}
 
           {historyHits.length > 0 && (
@@ -316,7 +320,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
               <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border">
                 {historyHits.map((h) => (
                   <Row key={`h-${h.name}`} name={h.name}
-                    sub={h.lastGrams ? `${h.lastGrams} g · ${Math.round(h.lastCalories ?? 0)} kcal` : macroLine(h.per100g)}
+                    sub={h.lastGrams ? `${fmtG(h.lastGrams)} g · ${Math.round(h.lastCalories ?? 0)} kcal` : macroLine(h.per100g)}
                     onClick={() => pickHistory(h)} />
                 ))}
               </ul>
