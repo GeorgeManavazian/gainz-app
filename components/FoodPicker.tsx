@@ -40,7 +40,8 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   onPick: (entry: MealEntry) => Promise<string | void> | string | void;
   confirmLabel: string;
   successLabel?: string;
-  header?: React.ReactNode;
+  /** Content above "Your foods" before typing; as a function it also receives a second "Scan label" control to place. */
+  header?: React.ReactNode | ((scanButton: React.ReactNode) => React.ReactNode);
 }) {
   const [q, setQ] = useState("");
   const [items, setItems] = useState<Item[]>([]);
@@ -340,7 +341,9 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
           )}
 
           {searchErr && <p className="text-sm text-danger">{searchErr}</p>}
-          {q.trim().length < 2 && header}
+          {q.trim().length < 2 && (typeof header === "function"
+            ? header(<LabelScanner onParsed={(p) => setScan(p)} label="Scan label" className="text-[12px] font-semibold text-accent active:opacity-80 disabled:opacity-60" />)
+            : header)}
 
           {historyHits.length > 0 && (
             <section className="flex flex-col gap-1.5">
