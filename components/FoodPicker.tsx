@@ -235,6 +235,19 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
           </button>
         </p>
       )}
+      {scan !== undefined && (
+        <NewFoodSheet parsed={scan} onClose={() => setScan(undefined)}
+          existingNames={new Set(customs.map((c) => normName(c.name)))}
+          initialName={picked?.name ?? ""}
+          onSave={async (f) => {
+            const row = await createCustomFood(f);
+            setCustoms((cs) => [...cs.filter((c) => normName(c.name) !== normName(row.name)), row]);
+            setScan(undefined);
+            const keep = amount;
+            pickHistory(customPicked(row)); // the exact numbers from the label, now your food
+            if (keep) setAmount(keep);     // keep an amount already typed on the USDA pick
+          }} />
+      )}
       {saved && !undo && (
         <p className="rounded-xl border border-success/30 bg-success/10 px-4 py-2.5 text-sm font-medium text-success">
           {successLabel}
@@ -307,6 +320,11 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
             <span className="flex-1"><span className="block text-xl font-bold tabular-nums text-foreground">{scale(picked.per100g.carbs)}</span><span className="text-muted">C</span></span>
             <span className="flex-1"><span className="block text-xl font-bold tabular-nums text-foreground">{scale(picked.per100g.fat)}</span><span className="text-muted">F</span></span>
           </div>
+          {!picked.fromCustom && (
+            <LabelScanner onParsed={(p) => setScan(p)}
+              className="self-start text-[12px] font-semibold text-accent active:opacity-80 disabled:opacity-60"
+              label="Scan the label for exact numbers" />
+          )}
           {err && <p className="text-sm text-danger">{err}</p>}
           <div className="flex gap-3">
             <button
@@ -320,24 +338,10 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
       ) : (
         /* ——— search ——— */
         <>
-          <div className="flex gap-2">
-            <input
-              className="min-w-0 flex-1 rounded-2xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
-              placeholder="Search food… e.g. grilled chicken breast"
-              value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
-            <LabelScanner onParsed={(p) => setScan(p)} className="flex shrink-0 items-center gap-1.5 rounded-2xl border border-border bg-surface px-3 text-[13px] font-semibold text-muted active:text-foreground disabled:opacity-60" />
-          </div>
-
-          {scan !== undefined && (
-            <NewFoodSheet parsed={scan} onClose={() => setScan(undefined)}
-              existingNames={new Set(customs.map((c) => normName(c.name)))}
-              onSave={async (f) => {
-                const row = await createCustomFood(f);
-                setCustoms((cs) => [...cs.filter((c) => normName(c.name) !== normName(row.name)), row]);
-                setScan(undefined);
-                pickHistory(customPicked(row)); // straight to "how much did you eat"
-              }} />
-          )}
+          <input
+            className="w-full rounded-2xl border border-border bg-surface px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+            placeholder="Search food… e.g. grilled chicken breast"
+            value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
 
           {searchErr && <p className="text-sm text-danger">{searchErr}</p>}
           {q.trim().length < 2 && header}
@@ -363,7 +367,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
             </section>
           )}
 
-          {q.trim().length >= 2 && (items.length > 0 || searching) && (
+          {q.trim().length >= 2 && (
             <section className="flex flex-col gap-1.5">
               <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Foods</h2>
               {items.length > 0 ? (
@@ -372,8 +376,15 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
                     <Row key={v.fdcId} name={v.name} sub={macroLine(v.per100g)} badge={v.badge} onClick={() => pickItem(v)} />
                   ))}
                 </ul>
-              ) : (
+              ) : searching ? (
                 <p className="px-1 text-[13px] text-muted">Searching…</p>
+              ) : (
+                <p className="px-1 text-[13px] text-muted">Nothing matched.</p>
+              )}
+              {!searching && (
+                <LabelScanner onParsed={(p) => setScan(p)}
+                  className="mt-1 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-border px-4 py-3 text-[13px] font-semibold text-accent active:opacity-80 disabled:opacity-60"
+                  label={items.length > 0 ? "Can't find it? Scan the label" : "Scan the label instead"} />
               )}
             </section>
           )}
