@@ -5,7 +5,7 @@ import { parseNutritionLabel, type ParsedLabel } from "@/lib/label-parse";
 
 /** Downscale + grayscale + mild contrast so Tesseract gets a clean, small image. */
 async function prepare(file: File): Promise<HTMLCanvasElement> {
-  const bmp = await createImageBitmap(file);
+  const bmp = await createImageBitmap(file, { imageOrientation: "from-image" }); // honour the phone's EXIF rotation
   const max = 1800, scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
   const c = document.createElement("canvas");
   c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
@@ -25,12 +25,12 @@ async function prepare(file: File): Promise<HTMLCanvasElement> {
 /** Runs OCR on the device (tesseract.js, lazy-loaded). Nothing leaves the phone. */
 export async function readLabel(file: File, onProgress?: (pct: number) => void): Promise<{ text: string; parsed: ParsedLabel }> {
   const canvas = await prepare(file);
-  const { createWorker } = await import("tesseract.js");
+  const { createWorker, PSM } = await import("tesseract.js");
   const worker = await createWorker("eng", 1, {
     logger: (m: { status: string; progress: number }) => { if (m.status === "recognizing text" && onProgress) onProgress(Math.round(m.progress * 100)); },
   });
   try {
-    await worker.setParameters({ tessedit_pageseg_mode: "4" as never }); // single column, variable sizes: label layout
+    await worker.setParameters({ tessedit_pageseg_mode: PSM.SINGLE_COLUMN }); // label = one column of mixed sizes
     const { data } = await worker.recognize(canvas);
     return { text: data.text, parsed: parseNutritionLabel(data.text) };
   } finally {

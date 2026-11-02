@@ -330,6 +330,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
 
           {scan !== undefined && (
             <NewFoodSheet parsed={scan} onClose={() => setScan(undefined)}
+              existingNames={new Set(customs.map((c) => normName(c.name)))}
               onSave={async (f) => {
                 const row = await createCustomFood(f);
                 setCustoms((cs) => [...cs.filter((c) => normName(c.name) !== normName(row.name)), row]);

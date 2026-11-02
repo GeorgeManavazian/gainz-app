@@ -19,4 +19,6 @@ George wants to photograph a food's nutrition label and get a new food with thos
 
 ## Decisions
 - Tesseract over a cloud OCR or Claude vision: zero marginal cost and private, at the price of worse accuracy on blurry photos; the confirm sheet is the safety net.
+- **Dependency on tesseract's CDN** (jsdelivr) for its worker, core wasm and `eng` data on first use: the photo and text never leave the phone, but the fetch reveals the user's IP to jsdelivr and the first scan needs a connection. Follow-up if offline-first or stricter privacy matters: self-host under `public/tesseract/` and pass `workerPath`/`corePath`/`langPath`.
+- Duplicate names are checked client-side (the queue treats Postgres 23505 as "already landed", so a server-side duplicate is silently dropped).
 - Values stored per 100 g (matches every other food) with `serving_g` kept so the amount placeholder can suggest one serving.

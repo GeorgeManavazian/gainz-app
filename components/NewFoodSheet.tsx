@@ -8,8 +8,11 @@ const FIELD = "w-full rounded-xl border border-border bg-background px-3 py-2.5 
 const LABEL = "text-[11px] font-medium uppercase tracking-wider text-muted";
 
 /** Confirm/edit what the label scan read, then save it as a custom food (stored per 100 g). */
-export default function NewFoodSheet({ parsed, onSave, onClose }: {
+export default function NewFoodSheet({ parsed, existingNames, onSave, onClose }: {
+  /** null = the scan itself failed; undefined values inside = fields the parser couldn't read. */
   parsed: ParsedLabel | null;
+  /** Lower-cased names already taken (the server swallows duplicate inserts, so we must check here). */
+  existingNames: Set<string>;
   onSave: (food: Omit<CustomFoodRow, "id">) => Promise<void>;
   onClose: () => void;
 }) {
@@ -30,8 +33,10 @@ export default function NewFoodSheet({ parsed, onSave, onClose }: {
   const servingG = num(serving);
   const perServing = { kcal: num(v.kcal), protein: num(v.protein), carbs: num(v.carbs), fat: num(v.fat) };
   const p100 = servingG > 0 ? per100g(perServing, servingG) : null;
-  const canSave = !busy && name.trim().length > 0 && servingG > 0 && perServing.kcal > 0;
-  const weak = parsed !== null && parsed.found < 2;
+  const taken = existingNames.has(name.trim().toLowerCase());
+  const canSave = !busy && name.trim().length > 0 && !taken && servingG > 0 && perServing.kcal > 0;
+  const hint = parsed === null ? "Couldn't read the photo — type the numbers from the label."
+    : parsed.found < 2 ? "Couldn't read much from the photo — check the numbers." : null;
 
   async function save() {
     if (!canSave || !p100) return;
@@ -39,7 +44,8 @@ export default function NewFoodSheet({ parsed, onSave, onClose }: {
     try {
       await onSave({ name: name.trim(), serving_g: servingG, kcal: p100.kcal, protein_g: p100.protein, carbs_g: p100.carbs, fat_g: p100.fat });
     } catch (e) {
-      setErr(e instanceof Error && /duplicate|23505|already/i.test(e.message) ? "You already have a food with that name." : "Couldn't save. Please try again.");
+      console.warn("gainz custom food save failed", e);
+      setErr("Couldn't save. Please try again.");
       setBusy(false);
     }
   }
@@ -58,9 +64,10 @@ export default function NewFoodSheet({ parsed, onSave, onClose }: {
         className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md rounded-t-3xl border-t border-border bg-surface px-4 pb-6 pt-3 shadow-2xl">
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
         <h2 id="new-food-title" className="text-2xl font-bold">New food</h2>
-        {weak && <p className="mt-1 text-[12px] text-accent">Couldn&apos;t read much from the photo — check the numbers.</p>}
+        {hint && <p className="mt-1 text-[12px] text-accent">{hint}</p>}
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name, e.g. Oikos Triple Zero" autoFocus aria-label="Food name"
           className="mt-3 w-full rounded-2xl border border-border bg-background px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none" />
+        {taken && <p className="mt-1 text-[12px] text-danger">You already have a food with that name.</p>}
         <label className="mt-3 flex flex-col gap-1">
           <span className={LABEL}>Serving size (g){parsed?.servingText ? ` · label says ${parsed.servingText}` : ""}</span>
           <input inputMode="decimal" placeholder="e.g. 55" value={serving} onChange={(e) => setServing(e.target.value)} className={FIELD} />
