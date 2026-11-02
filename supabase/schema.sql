@@ -156,3 +156,7 @@ create unique index if not exists custom_foods_user_name_idx
 alter table custom_foods enable row level security;
 create policy "own custom_foods" on custom_foods for all
   using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- Sub-project 10: meal timing (2026-11-02). Paste this block once.
+alter table profiles add column if not exists wake_time time not null default '07:00';
+alter table profiles add column if not exists bed_time time not null default '23:00';

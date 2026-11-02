@@ -46,7 +46,7 @@ describe("computeTargets", () => {
   const athlete: Profile = {
     sex: "male", birth_date: "2007-06-01", height_in: 70, weight_lb: 170,
     activity: "moderate", phase: "cut", rate_lb_per_wk: 1.0,
-    protein_g_per_lb: 1.02, tdee_override: 3100,
+    protein_g_per_lb: 1.02, tdee_override: 3100, wake_time: "07:00", bed_time: "23:00",
   };
 
   it("reference: Cut Protocol week 1 → 2600 / 173P / 351C / 56F", () => {

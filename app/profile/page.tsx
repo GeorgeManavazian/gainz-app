@@ -27,12 +27,14 @@ type Form = {
   sex: Sex; birth_date: string; height_in: string; weight_lb: string;
   activity: Activity; phase: Phase; rate_lb_per_wk: string;
   protein_g_per_lb: string; tdee_override: string;
+  wake_time: string; bed_time: string;
 };
 
 const EMPTY: Form = {
   sex: "male", birth_date: "", height_in: "", weight_lb: "",
   activity: "moderate", phase: "cut", rate_lb_per_wk: String(defaultRate("cut")),
   protein_g_per_lb: "", tdee_override: "",
+  wake_time: "07:00", bed_time: "23:00",
 };
 
 function toProfile(f: Form): Profile | null {
@@ -45,10 +47,12 @@ function toProfile(f: Form): Profile | null {
   if (protein !== null && !(protein >= 0.8 && protein <= 1.5)) return null;
   const tdee = f.tdee_override === "" ? null : parseInt(f.tdee_override, 10);
   if (tdee !== null && !(tdee > 0)) return null;
+  if (!/^\d{2}:\d{2}$/.test(f.wake_time) || !/^\d{2}:\d{2}$/.test(f.bed_time)) return null;
   return {
     sex: f.sex, birth_date: f.birth_date, height_in, weight_lb,
     activity: f.activity, phase: f.phase, rate_lb_per_wk: rate,
     protein_g_per_lb: protein, tdee_override: tdee,
+    wake_time: f.wake_time, bed_time: f.bed_time,
   };
 }
 
@@ -70,6 +74,7 @@ export default function ProfilePage() {
           rate_lb_per_wk: String(p.rate_lb_per_wk),
           protein_g_per_lb: p.protein_g_per_lb === null ? "" : String(p.protein_g_per_lb),
           tdee_override: p.tdee_override === null ? "" : String(p.tdee_override),
+          wake_time: p.wake_time, bed_time: p.bed_time,
         });
       })
       .catch(() => setErr("Couldn't load profile."))
@@ -183,6 +188,17 @@ export default function ProfilePage() {
                   placeholder={`${defaultProteinPerLb(form.phase)} (default)`}
                   value={form.protein_g_per_lb}
                   onChange={(e) => { set("protein_g_per_lb")(e.target.value); setTouched((t) => ({ ...t, protein: true })); }} />
+              </label>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1">
+                <span className={labelCls}>Usual wake</span>
+                <input className={inputCls} type="time" value={form.wake_time} onChange={(e) => set("wake_time")(e.target.value)} />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelCls}>Usual bedtime</span>
+                <input className={inputCls} type="time" value={form.bed_time} onChange={(e) => set("bed_time")(e.target.value)} />
               </label>
             </div>
 

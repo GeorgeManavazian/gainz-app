@@ -12,9 +12,11 @@ import { listWeighIns, localDateKey, upsertWeighIn, type WeighInRow } from "@/li
 import { addDays, slopeLbPerWk, trendWeight } from "@/lib/trend";
 import { computeActivityBonus, ACTIVITY_BASELINE_WINDOW_DAYS } from "@/lib/activity-adjustment";
 import { listHealthActivity, type HealthActivityRow } from "@/lib/health-activity";
-import { getActiveWorkout, getTodayCompletedWorkout, listLiftsForWorkout } from "@/lib/workouts-db";
+import { getActiveWorkout, getTodayCompletedWorkout, listLiftsForWorkout, listCompletedWorkouts } from "@/lib/workouts-db";
 import { formatElapsed, totalSets, workoutTitle, type WorkoutRow } from "@/lib/workouts";
-import { nextMeal, remaining } from "@/lib/hub";
+import { remaining } from "@/lib/hub";
+import { atTime, bedtimeFor, lateHeavyMeal, planLine, planNextMeal, proteinHits, usualTrainingStart, PROTEIN_HITS_TARGET } from "@/lib/meal-timing";
+import MealTimeline from "@/components/MealTimeline";
 import SavePatternSheet from "@/components/SavePatternSheet";
 import ConfirmDelete from "@/components/ConfirmDelete";
 import { deleteMeal } from "@/lib/meals-db";
@@ -30,6 +32,7 @@ function HubInner() {
   const [activity, setActivity] = useState<HealthActivityRow[]>([]);
   const [active, setActive] = useState<WorkoutRow | null>(null);
   const [done, setDone] = useState<{ w: WorkoutRow; sets: number } | null>(null);
+  const [recentWorkouts, setRecentWorkouts] = useState<WorkoutRow[]>([]);
   const params = useSearchParams();
   const router = useRouter();
   const [toast, setToast] = useState("");
@@ -62,6 +65,7 @@ function HubInner() {
 
   const loadWorkouts = useCallback(async () => {
     getActiveWorkout().then(setActive).catch(() => setActive(null));
+    listCompletedWorkouts(60).then(setRecentWorkouts).catch(() => setRecentWorkouts([]));
     getTodayCompletedWorkout().then(async (w) => {
       if (!w) return setDone(null);
       const rows = await listLiftsForWorkout(w.id).catch(() => []);
@@ -118,7 +122,18 @@ function HubInner() {
     Math.round(meals.reduce((a, m) => a + Number(m[k]), 0));
   const totals = { calories: sum("calories"), protein_g: sum("protein_g"), carbs_g: sum("carbs_g"), fat_g: sum("fat_g") };
   const t = typeof targets === "object" && targets !== null ? targets : null;
-  const meal = t ? nextMeal(totals, { kcal: t.kcal, protein_g: t.protein_g, carbs_g: t.carbs_g, fat_g: t.fat_g }, meals) : null;
+  // Meal timing: fuel model + next window from today's meals, training and sleep clock.
+  const now = new Date();
+  const prof = typeof profile === "object" && profile !== null ? profile : null;
+  const clock = { wake: prof?.wake_time ?? "07:00", bed: prof?.bed_time ?? "23:00" };
+  const todayWorkout = active ? { started_at: active.started_at, ended_at: null }
+    : done ? { started_at: done.w.started_at, ended_at: done.w.ended_at } : null;
+  const plan = t && prof ? planNextMeal({
+    meals, todayWorkout, usualTraining: usualTrainingStart(recentWorkouts, now),
+    totals, targets: { kcal: t.kcal, protein_g: t.protein_g }, weight_lb: trend ?? prof.weight_lb, now, clock,
+  }) : null;
+  const hits = proteinHits(meals);
+  const late = lateHeavyMeal(meals, now, clock);
 
   async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); await loadTargets(true); }
 
@@ -220,25 +235,21 @@ function HubInner() {
           )}
         </div>
 
-        {t && (
-          <Link href="/log/meal" className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 active:bg-surface-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-accent" aria-hidden>
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"
-                strokeLinecap="round"><path d="M4 12 A8 5 0 0 0 20 12 Z" /><path d="M9 8 C9 6 11 6 11 8 M14 8 C14 5 17 5 17 8" /></svg>
-            </span>
-            <span className="flex-1">
-              {meal ? (
-                <>
-                  <span className="block text-base font-semibold">
-                    Next meal · ~{meal.kcal} kcal · {meal.protein_g} P · {meal.carbs_g} C · {meal.fat_g} F
-                  </span>
-                  <span className="block text-[13px] text-muted">{Math.min(meals.length, 4)} of 4 meals logged</span>
-                </>
-              ) : (
-                <span className="block text-base text-muted">Target hit for today</span>
-              )}
-            </span>
-            <span className="text-muted">›</span>
+        {t && plan && (
+          <Link href="/log/meal" className="card-grad flex flex-col gap-2 rounded-2xl border border-border px-4 py-3 active:opacity-90">
+            <div className="flex items-baseline justify-between">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-muted">Meal timing</span>
+              <span className={`text-[12px] font-semibold tabular-nums ${hits >= PROTEIN_HITS_TARGET ? "text-success" : "text-muted"}`}>
+                Protein hits {hits} / {PROTEIN_HITS_TARGET}
+              </span>
+            </div>
+            <MealTimeline wake={atTime(now, clock.wake)} bed={bedtimeFor(now, clock)} now={now} meals={meals} workout={todayWorkout} plan={plan} />
+            <p className="text-[14px] font-semibold leading-snug">{planLine(plan, now)}</p>
+            {late && (
+              <p className="text-[12px] text-danger">
+                Heavy meal {late.hoursBeforeBed <= 0 ? "after bedtime" : `${Math.round(late.hoursBeforeBed * 10) / 10} h before bed`} — expect worse sleep.
+              </p>
+            )}
           </Link>
         )}
 

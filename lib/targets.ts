@@ -51,6 +51,9 @@ export type Profile = {
   rate_lb_per_wk: number;
   protein_g_per_lb: number | null;
   tdee_override: number | null;
+  /** Usual wake / bed clock, "HH:MM" local. Meal timing anchors. */
+  wake_time: string;
+  bed_time: string;
 };
 
 export type Targets = {

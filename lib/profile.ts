@@ -14,6 +14,8 @@ export async function getProfile(): Promise<ProfileRow | null> {
     rate_lb_per_wk: Number(data.rate_lb_per_wk),
     protein_g_per_lb: data.protein_g_per_lb === null ? null : Number(data.protein_g_per_lb),
     tdee_override: data.tdee_override === null ? null : Number(data.tdee_override),
+    wake_time: String(data.wake_time ?? "07:00").slice(0, 5),
+    bed_time: String(data.bed_time ?? "23:00").slice(0, 5),
   } as ProfileRow;
 }
 
