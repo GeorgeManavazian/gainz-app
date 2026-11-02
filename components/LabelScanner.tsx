@@ -39,8 +39,8 @@ export async function readLabel(file: File, onProgress?: (pct: number) => void):
 }
 
 /** Camera button; hands the parsed label (or a failure) to the parent. */
-export default function LabelScanner({ onParsed, className, label = "Scan label" }: {
-  onParsed: (parsed: ParsedLabel | null) => void; className?: string; label?: string;
+export default function LabelScanner({ onParsed, className }: {
+  onParsed: (parsed: ParsedLabel | null) => void; className?: string;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -67,7 +67,7 @@ export default function LabelScanner({ onParsed, className, label = "Scan label"
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" /><rect x="8" y="9" width="8" height="6" rx="1" />
         </svg>
-        {busy ?? label}
+        {busy ?? "Scan label"}
       </button>
     </>
   );

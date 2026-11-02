@@ -8,18 +8,16 @@ const FIELD = "w-full rounded-xl border border-border bg-background px-3 py-2.5 
 const LABEL = "text-[11px] font-medium uppercase tracking-wider text-muted";
 
 /** Confirm/edit what the label scan read, then save it as a custom food (stored per 100 g). */
-export default function NewFoodSheet({ parsed, existingNames, initialName = "", onSave, onClose }: {
+export default function NewFoodSheet({ parsed, existingNames, onSave, onClose }: {
   /** null = the scan itself failed; undefined values inside = fields the parser couldn't read. */
   parsed: ParsedLabel | null;
   /** Lower-cased names already taken (the server swallows duplicate inserts, so we must check here). */
   existingNames: Set<string>;
-  /** Pre-filled name when scanning from an already-picked food. */
-  initialName?: string;
   onSave: (food: Omit<CustomFoodRow, "id">) => Promise<void>;
   onClose: () => void;
 }) {
   const s = (v: number | null) => (v === null ? "" : String(v));
-  const [name, setName] = useState(initialName);
+  const [name, setName] = useState("");
   const [serving, setServing] = useState(s(parsed?.servingG ?? null));
   const [v, setV] = useState({ kcal: s(parsed?.kcal ?? null), protein: s(parsed?.protein ?? null), carbs: s(parsed?.carbs ?? null), fat: s(parsed?.fat ?? null) });
   const [busy, setBusy] = useState(false);
@@ -67,7 +65,7 @@ export default function NewFoodSheet({ parsed, existingNames, initialName = "", 
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
         <h2 id="new-food-title" className="text-2xl font-bold">New food</h2>
         {hint && <p className="mt-1 text-[12px] text-accent">{hint}</p>}
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name, e.g. Oikos Triple Zero" autoFocus={!initialName} aria-label="Food name"
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name, e.g. Oikos Triple Zero" autoFocus aria-label="Food name"
           className="mt-3 w-full rounded-2xl border border-border bg-background px-4 py-3.5 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none" />
         {taken && <p className="mt-1 text-[12px] text-danger">You already have a food with that name.</p>}
         <label className="mt-3 flex flex-col gap-1">
