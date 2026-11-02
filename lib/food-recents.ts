@@ -6,6 +6,8 @@ export type MealLike = {
 export type Per100 = { kcal: number; protein: number; carbs: number; fat: number };
 export type RecentFood = {
   name: string; fdcId?: number; per100g: Per100;
+  /** Amount and kcal of the most recent log, for one-tap re-logging. */
+  lastGrams: number; lastCalories: number;
   count: number; sameTimeCount: number; lastAt: string; score: number;
 };
 export type RankOpts = { windowDays?: number; bandMinutes?: number; limit?: number };
@@ -35,13 +37,14 @@ export function rankRecentFoods(meals: MealLike[], now: Date, opts: RankOpts = {
       byName.set(key, {
         name: m.food_name.trim(), fdcId: numId(m.fdc_id),
         per100g: { kcal: Number(m.calories) * s, protein: Number(m.protein_g) * s, carbs: Number(m.carbs_g) * s, fat: Number(m.fat_g) * s },
+        lastGrams: Number(m.grams), lastCalories: Number(m.calories),
         count: 1, sameTimeCount: sameTime, lastAt: m.logged_at, score: 0,
       });
     } else {
       cur.count += 1; cur.sameTimeCount += sameTime;
       if (t.getTime() > new Date(cur.lastAt).getTime()) { // keep the most recent log's values and name casing
         cur.lastAt = m.logged_at; cur.name = m.food_name.trim();
-        cur.fdcId = numId(m.fdc_id);
+        cur.fdcId = numId(m.fdc_id); cur.lastGrams = Number(m.grams); cur.lastCalories = Number(m.calories);
         cur.per100g = { kcal: Number(m.calories) * s, protein: Number(m.protein_g) * s, carbs: Number(m.carbs_g) * s, fat: Number(m.fat_g) * s };
       }
     }

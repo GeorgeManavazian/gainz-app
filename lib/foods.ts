@@ -65,3 +65,38 @@ export function defaultHalf(f: CuratedFood): "raw" | "cooked" {
   if (f.default) return f.default;
   return f.cooked ? "cooked" : "raw";
 }
+
+/** A search row the picker understands (same shape the API returns). */
+export type SearchItem = {
+  fdcId: number; name: string; description: string; group: string;
+  badge: "raw" | "cooked" | null; strict: boolean; pairable: boolean;
+  per100g: { kcal: number; protein: number; carbs: number; fat: number };
+  curated?: true; rawLabel?: "Raw" | "Dry";
+  pair?: { raw: SearchItem | null; cooked: SearchItem | null };
+};
+
+export function halfItem(food: CuratedFood, half: "raw" | "cooked", h: FoodHalf): SearchItem {
+  return {
+    fdcId: h.fdcId, name: food.name, description: h.description, group: food.name,
+    badge: food.raw && food.cooked ? half : null, strict: true, pairable: !!(food.raw && food.cooked),
+    per100g: { kcal: h.kcal, protein: h.protein, carbs: h.carbs, fat: h.fat },
+    curated: true, rawLabel: food.rawLabel,
+  };
+}
+
+/** A curated food as a search row: lands on its default half, carries both halves for the switch. */
+export function curatedItem(food: CuratedFood): SearchItem {
+  const half = defaultHalf(food);
+  const h = (half === "raw" ? food.raw : food.cooked) ?? food.cooked ?? food.raw!;
+  const item = halfItem(food, half, h);
+  item.pair = {
+    raw: food.raw ? halfItem(food, "raw", food.raw) : null,
+    cooked: food.cooked ? halfItem(food, "cooked", food.cooked) : null,
+  };
+  return item;
+}
+
+/** Instant, offline-capable results from the curated table for a query. */
+export function curatedSearchItems(q: string, limit = 12): SearchItem[] {
+  return searchFoods(q, limit).map(curatedItem);
+}

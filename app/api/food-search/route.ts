@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { aliasSuggestions } from "@/lib/foodAliases";
-import { searchFoods, foodByFdcId, defaultHalf, normFood, FOODS, type CuratedFood, type FoodHalf } from "@/lib/foods";
+import { searchFoods, foodByFdcId, normFood, FOODS, halfItem, curatedItem, type SearchItem } from "@/lib/foods";
 
 const NUTRIENTS = { kcal: 1008, protein: 1003, carbs: 1005, fat: 1004 } as const;
 
@@ -17,43 +17,10 @@ const PREP_SEG_RE = /\b(cooked|raw|roasted|grilled|braised|boiled|baked|broiled|
 // Foods whose weight changes when cooked — only these get the Raw / Cooked switch.
 const PAIRABLE_RE = /chicken|beef|pork|turkey|lamb|veal|steak|ground|salmon|tuna|cod|tilapia|shrimp|fish|halibut|egg|rice|pasta|spaghetti|penne|macaroni|noodle|oat|potato|quinoa|lentil|bean|broccoli|spinach|vegetable|asparagus|carrot|cauliflower|zucchini|mushroom|sausage|bacon/i;
 
-export type Item = {
-  fdcId: number;
-  name: string;         // clean display name: "Chicken breast, grilled"
-  description: string;  // full USDA description
-  group: string;        // first segment, used for raw↔cooked pairing
-  badge: "raw" | "cooked" | null;
-  strict: boolean;      // every word of the query appears in the USDA name
-  pairable: boolean;    // meat/eggs/grains/veg: offer Raw / Cooked weighing switch
-  per100g: { kcal: number; protein: number; carbs: number; fat: number };
-  curated?: true;       // from lib/foods — verified pair, no guessing
-  rawLabel?: "Raw" | "Dry";
-  pair?: { raw: Item | null; cooked: Item | null };   // both halves, ready for the switch
-};
+export type Item = SearchItem;
 
 const CURATED_IDS = new Set<number>();
 for (const f of FOODS) for (const h of [f.cooked, f.raw]) if (h) CURATED_IDS.add(h.fdcId);
-
-function halfItem(food: CuratedFood, half: "raw" | "cooked", h: FoodHalf): Item {
-  return {
-    fdcId: h.fdcId, name: food.name, description: h.description, group: food.name,
-    badge: food.raw && food.cooked ? half : null, strict: true, pairable: !!(food.raw && food.cooked),
-    per100g: { kcal: h.kcal, protein: h.protein, carbs: h.carbs, fat: h.fat },
-    curated: true, rawLabel: food.rawLabel,
-  };
-}
-
-/** A curated food as a search row: lands on its default half, carries both halves for the switch. */
-function curatedItem(food: CuratedFood): Item {
-  const half = defaultHalf(food);
-  const h = (half === "raw" ? food.raw : food.cooked) ?? food.cooked ?? food.raw!;
-  const item = halfItem(food, half, h);
-  item.pair = {
-    raw: food.raw ? halfItem(food, "raw", food.raw) : null,
-    cooked: food.cooked ? halfItem(food, "cooked", food.cooked) : null,
-  };
-  return item;
-}
 
 function badgeFor(description: string): "raw" | "cooked" | null {
   if (COOKED_RE.test(description)) return "cooked";   // "fried, coated, from raw" is cooked

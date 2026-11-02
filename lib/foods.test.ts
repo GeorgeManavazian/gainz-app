@@ -93,3 +93,20 @@ describe("search", () => {
     expect(defaultHalf({ name: "x", aliases: [], cooked: { fdcId: 1, description: "", kcal: 1, protein: 0, carbs: 0, fat: 0 }, raw: null })).toBe("cooked");
   });
 });
+
+describe("curatedSearchItems", () => {
+  it("builds picker rows with both halves and the default badge", async () => {
+    const { curatedSearchItems } = await import("./foods");
+    const [chicken] = curatedSearchItems("chicken breast");
+    expect(chicken.name).toBe("Chicken breast");
+    expect(chicken.curated).toBe(true);
+    expect(chicken.badge).toBe("cooked");
+    expect(chicken.pair?.raw?.badge).toBe("raw");
+    expect(chicken.pair?.cooked?.fdcId).toBe(chicken.fdcId);
+    expect(chicken.per100g.kcal).toBeGreaterThan(0);
+  });
+  it("returns nothing for junk", async () => {
+    const { curatedSearchItems } = await import("./foods");
+    expect(curatedSearchItems("zzqx")).toEqual([]);
+  });
+});

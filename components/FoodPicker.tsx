@@ -3,13 +3,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { MealEntry } from "@/lib/log";
 import { rankRecentFoods, type MealLike } from "@/lib/food-recents";
+import { curatedSearchItems } from "@/lib/foods";
+import { deleteMeal } from "@/lib/meals-db";
 
 export type PickedEntry = MealEntry;
 
 type Per100 = { kcal: number; protein: number; carbs: number; fat: number };
 type Item = { fdcId: number; name: string; description: string; group: string; badge: "raw" | "cooked" | null; pairable: boolean; per100g: Per100;
   curated?: true; rawLabel?: "Raw" | "Dry"; pair?: { raw: Item | null; cooked: Item | null } };
-type Picked = { name: string; description?: string; fdcId?: number; badge?: "raw" | "cooked" | null; pairable?: boolean; rawLabel?: "Raw" | "Dry"; per100g: Per100; fromHistory?: boolean };
+type Picked = { name: string; description?: string; fdcId?: number; badge?: "raw" | "cooked" | null; pairable?: boolean; rawLabel?: "Raw" | "Dry"; per100g: Per100; fromHistory?: boolean;
+  /** Last logged amount, for one-tap re-log and amount-screen prefill. */
+  lastGrams?: number; lastCalories?: number };
 type Weighing = "raw" | "cooked";
 // undefined = still looking, null = USDA has no such version.
 type PairCache = Record<Weighing, Item | null | undefined>;
@@ -21,11 +25,14 @@ const BASE_UNITS: Unit[] = [
   { label: "lb", grams: 453.6 },
 ];
 
-export default function FoodPicker({ onPick, confirmLabel, successLabel, header }: {
-  onPick: (entry: MealEntry) => Promise<void> | void;
+export default function FoodPicker({ onPick, confirmLabel, successLabel, header, quickLabel = "+ Log" }: {
+  /** Returns the new row id when the pick was logged (enables Undo); void when it was only added to a draft. */
+  onPick: (entry: MealEntry) => Promise<string | void> | string | void;
   confirmLabel: string;
   successLabel?: string;
   header?: React.ReactNode;
+  /** Label of the one-tap button on "Your foods" rows. */
+  quickLabel?: string;
 }) {
   const [q, setQ] = useState("");
   const [items, setItems] = useState<Item[]>([]);
@@ -37,6 +44,8 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
   const [unit, setUnit] = useState<Unit>(BASE_UNITS[0]);
   const [amount, setAmount] = useState("");
   const [saved, setSaved] = useState(false);
+  const [undo, setUndo] = useState<{ id: string; text: string } | null>(null);
+  const [quickBusy, setQuickBusy] = useState<string | null>(null);
   const [err, setErr] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -47,13 +56,16 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
       .order("logged_at", { ascending: false }).limit(300)
       .then(({ data }) => {
         const ranked = rankRecentFoods((data ?? []) as MealLike[], new Date(), { limit: 30 });
-        setHistory(ranked.map((f) => ({ name: f.name, fdcId: f.fdcId, fromHistory: true, per100g: f.per100g })));
+        setHistory(ranked.map((f) => ({ name: f.name, fdcId: f.fdcId, fromHistory: true, per100g: f.per100g,
+          lastGrams: f.lastGrams, lastCalories: f.lastCalories })));
       });
   }, []);
 
   useEffect(() => {
     if (q.length < 2) { setItems([]); setSearching(false); return; }
     clearTimeout(timer.current);
+    // Curated table answers instantly (and offline); USDA fills in behind and replaces the list.
+    setItems(curatedSearchItems(q) as Item[]);
     setSearching(true);
     timer.current = setTimeout(async () => {
       try {
@@ -123,7 +135,39 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
     setPairs({ raw: null, cooked: null });
     setUnits(BASE_UNITS);
     setUnit(BASE_UNITS[0]);
-    setAmount("");
+    setAmount(h.lastGrams ? String(h.lastGrams) : "");
+  }
+
+  useEffect(() => {
+    if (!undo) return;
+    const t = setTimeout(() => setUndo(null), 6000);
+    return () => clearTimeout(t);
+  }, [undo]);
+
+  /** One tap: log a known food again with the same amount as last time. */
+  async function quickLog(h: Picked) {
+    const g = h.lastGrams ?? 0;
+    if (quickBusy || g <= 0) return;
+    setErr(""); setQuickBusy(h.name);
+    const sc = (v: number) => Math.round(v * g / 100 * 10) / 10;
+    try {
+      const id = await onPick({
+        food_name: h.name, grams: g,
+        calories: sc(h.per100g.kcal), protein_g: sc(h.per100g.protein), carbs_g: sc(h.per100g.carbs), fat_g: sc(h.per100g.fat),
+        fdc_id: h.fdcId ? String(h.fdcId) : undefined,
+      });
+      if (typeof id === "string") setUndo({ id, text: `Logged ${h.name} · ${g} g ✓` });
+      else if (successLabel) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
+    } catch {
+      setErr("Couldn't save. Please try again.");
+    } finally { setQuickBusy(null); }
+  }
+
+  async function undoLast() {
+    if (!undo) return;
+    const { id } = undo;
+    setUndo(null);
+    try { await deleteMeal(id); } catch { setErr("Couldn't undo. Delete it from the Diet tab."); }
   }
 
   // Show the Raw / Cooked switch while the other version is loading or once it exists; hide if USDA has none.
@@ -174,7 +218,15 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
 
   return (
     <>
-      {saved && (
+      {undo && (
+        <p className="flex items-center gap-3 rounded-xl border border-success/30 bg-success/10 px-4 py-2.5 text-sm font-medium text-success" role="status">
+          <span className="min-w-0 flex-1 truncate">{undo.text}</span>
+          <button type="button" onClick={undoLast} className="shrink-0 rounded-md px-2 py-1 text-[13px] font-semibold text-foreground underline underline-offset-2 active:opacity-80">
+            Undo
+          </button>
+        </p>
+      )}
+      {saved && !undo && (
         <p className="rounded-xl border border-success/30 bg-success/10 px-4 py-2.5 text-sm font-medium text-success">
           {successLabel}
         </p>
@@ -273,7 +325,25 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
               </h2>
               <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border">
                 {historyHits.map((h) => (
-                  <Row key={`h-${h.name}`} name={h.name} sub={macroLine(h.per100g)} onClick={() => pickHistory(h)} />
+                  <li key={`h-${h.name}`} className="flex items-center gap-2 pl-4 pr-2">
+                    <button type="button" onClick={() => pickHistory(h)} aria-label={`${h.name}, change amount`}
+                      className="flex min-w-0 flex-1 items-center gap-3 py-3 text-left active:opacity-80">
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[15px] text-foreground">{h.name}</span>
+                        <span className="mt-0.5 block text-[12px] tabular-nums text-muted">
+                          {h.lastGrams ? `${h.lastGrams} g · ${Math.round(h.lastCalories ?? 0)} kcal` : macroLine(h.per100g)}
+                        </span>
+                      </span>
+                      <span className="text-muted">›</span>
+                    </button>
+                    {h.lastGrams ? (
+                      <button type="button" onClick={() => quickLog(h)} disabled={quickBusy !== null}
+                        aria-label={`${quickLabel} ${h.name}, ${h.lastGrams} g`}
+                        className="h-9 shrink-0 rounded-full bg-accent/20 px-3 text-[13px] font-semibold text-accent active:opacity-80 disabled:opacity-50">
+                        {quickBusy === h.name ? "…" : quickLabel}
+                      </button>
+                    ) : null}
+                  </li>
                 ))}
               </ul>
             </section>

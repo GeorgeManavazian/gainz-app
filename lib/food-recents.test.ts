@@ -35,6 +35,8 @@ describe("rankRecentFoods", () => {
     expect(r[0].name).toBe("Greek Yogurt");
     expect(r[0].count).toBe(2);
     expect(r[0].per100g.kcal).toBeCloseTo(100);
+    expect(r[0].lastGrams).toBe(150);
+    expect(r[0].lastCalories).toBe(150);
   });
   it("excludes serving-unit lines, zero grams, and logs outside the window", () => {
     const meals = [
