@@ -18,20 +18,17 @@ export default function LogMeal() {
         <Link href="/log/meal/new" className="text-[12px] font-semibold text-accent active:opacity-80">New meal</Link>
       </div>
       {patterns.length > 0 && (
-        <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border">
+        <ul className="grid grid-cols-2 gap-2">
           {patterns.map((p) => {
             const t = totals(p.items.map((it) => scaleItem(it, it.grams)));
             return (
               <li key={p.id}>
                 <Link href={`/log/meal/pattern/${p.id}`}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-surface-2">
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[15px] font-semibold text-foreground">{p.name}</span>
-                    <span className="mt-0.5 block text-[12px] tabular-nums text-muted">
-                      {p.items.length} food{p.items.length === 1 ? "" : "s"} · {t.kcal} kcal · {t.protein_g} P
-                    </span>
+                  className="card-grad flex h-full flex-col rounded-2xl border border-accent/30 px-3.5 py-3 active:opacity-80">
+                  <span className="truncate text-[14px] font-semibold text-foreground">{p.name}</span>
+                  <span className="mt-0.5 text-[11px] tabular-nums text-muted">
+                    {p.items.length} food{p.items.length === 1 ? "" : "s"} · {t.kcal} kcal
                   </span>
-                  <span className="text-muted">›</span>
                 </Link>
               </li>
             );

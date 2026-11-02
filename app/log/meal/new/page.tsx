@@ -119,7 +119,7 @@ export default function NewMeal() {
           <h1 className="text-2xl font-bold leading-tight">{mode === "food" ? "Add food" : "New meal"}</h1>
         </div>
 
-        {mode === "food" && <FoodPicker confirmLabel="Add to meal" quickLabel="+ Add" onPick={addFood} />}
+        {mode === "food" && <FoodPicker confirmLabel="Add to meal" onPick={addFood} />}
 
         {mode !== "food" && (
           <>

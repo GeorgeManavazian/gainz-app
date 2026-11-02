@@ -25,14 +25,14 @@ const BASE_UNITS: Unit[] = [
   { label: "lb", grams: 453.6 },
 ];
 
-export default function FoodPicker({ onPick, confirmLabel, successLabel, header, quickLabel = "+ Log" }: {
+const HISTORY_PREVIEW = 5;
+
+export default function FoodPicker({ onPick, confirmLabel, successLabel, header }: {
   /** Returns the new row id when the pick was logged (enables Undo); void when it was only added to a draft. */
   onPick: (entry: MealEntry) => Promise<string | void> | string | void;
   confirmLabel: string;
   successLabel?: string;
   header?: React.ReactNode;
-  /** Label of the one-tap button on "Your foods" rows. */
-  quickLabel?: string;
 }) {
   const [q, setQ] = useState("");
   const [items, setItems] = useState<Item[]>([]);
@@ -45,7 +45,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header,
   const [amount, setAmount] = useState("");
   const [saved, setSaved] = useState(false);
   const [undo, setUndo] = useState<{ id: string; text: string } | null>(null);
-  const [quickBusy, setQuickBusy] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const [err, setErr] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -81,9 +81,9 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header,
 
   const historyHits = useMemo(() => {
     const nq = q.trim().toLowerCase();
-    if (nq.length < 2) return history.slice(0, 10);
+    if (nq.length < 2) return showAll ? history : history.slice(0, HISTORY_PREVIEW);
     return history.filter((h) => h.name.toLowerCase().includes(nq)).slice(0, 4);
-  }, [history, q]);
+  }, [history, q, showAll]);
 
   const weighingOf = (v: { badge?: "raw" | "cooked" | null }): Weighing => (v.badge === "raw" ? "raw" : "cooked");
 
@@ -136,7 +136,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header,
     setPairs({ raw: null, cooked: null });
     setUnits(BASE_UNITS);
     setUnit(BASE_UNITS[0]);
-    setAmount(h.lastGrams ? String(h.lastGrams) : "");
+    setAmount(""); // last amount shows as the placeholder, so typing starts clean
   }
 
   useEffect(() => {
@@ -144,25 +144,6 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header,
     const t = setTimeout(() => setUndo(null), 6000);
     return () => clearTimeout(t);
   }, [undo]);
-
-  /** One tap: log a known food again with the same amount as last time. */
-  async function quickLog(h: Picked) {
-    const g = h.lastGrams ?? 0;
-    if (quickBusy || g <= 0) return;
-    setErr(""); setQuickBusy(h.name);
-    const sc = (v: number) => Math.round(v * g / 100 * 10) / 10;
-    try {
-      const id = await onPick({
-        food_name: h.name, grams: g,
-        calories: sc(h.per100g.kcal), protein_g: sc(h.per100g.protein), carbs_g: sc(h.per100g.carbs), fat_g: sc(h.per100g.fat),
-        fdc_id: h.fdcId ? String(h.fdcId) : undefined,
-      });
-      if (typeof id === "string") setUndo({ id, text: `Logged ${h.name} · ${g} g ✓` });
-      else if (successLabel) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
-    } catch {
-      setErr("Couldn't save. Please try again.");
-    } finally { setQuickBusy(null); }
-  }
 
   async function undoLast() {
     if (!undo) return;
@@ -183,14 +164,16 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header,
     if (!picked || grams <= 0) return;
     setErr("");
     try {
-      await onPick({
+      const id = await onPick({
         food_name: picked.name, grams,
         calories: scale(picked.per100g.kcal), protein_g: scale(picked.per100g.protein),
         carbs_g: scale(picked.per100g.carbs), fat_g: scale(picked.per100g.fat),
         fdc_id: picked.fdcId ? String(picked.fdcId) : undefined,
       });
-      setPicked(null); setQ(""); setAmount(""); setUndo(null);
-      if (successLabel) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
+      const name = picked.name;
+      setPicked(null); setQ(""); setAmount("");
+      if (typeof id === "string") { setSaved(false); setUndo({ id, text: `Logged ${name} · ${grams} g ✓` }); }
+      else if (successLabel) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
     } catch {
       setErr("Couldn't save. Please try again.");
     }
@@ -286,7 +269,7 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header,
           <label className="relative">
             <input
               className="w-full rounded-2xl border border-border bg-surface px-4 py-3.5 pr-24 text-2xl font-bold tabular-nums text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
-              inputMode="decimal" placeholder="0" autoFocus
+              inputMode="decimal" placeholder={picked.lastGrams ? String(picked.lastGrams) : "0"} autoFocus
               value={amount} onChange={(e) => setAmount(e.target.value)} />
             <span className="pointer-events-none absolute right-4 top-1/2 max-w-[40%] -translate-y-1/2 truncate text-sm text-muted">
               {unit.label}{unit.grams !== 1 && n > 0 ? ` = ${grams} g` : ""}
@@ -321,30 +304,20 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header,
 
           {historyHits.length > 0 && (
             <section className="flex flex-col gap-1.5">
-              <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">
-                Your foods
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Your foods</h2>
+                {q.trim().length < 2 && history.length > HISTORY_PREVIEW && (
+                  <button type="button" onClick={() => setShowAll((v) => !v)}
+                    className="text-[12px] font-semibold text-accent active:opacity-80">
+                    {showAll ? "Less" : `All ${history.length} ›`}
+                  </button>
+                )}
+              </div>
               <ul className="card-grad divide-y divide-border overflow-hidden rounded-2xl border border-border">
                 {historyHits.map((h) => (
-                  <li key={`h-${h.name}`} className="flex items-center gap-2 pl-4 pr-2">
-                    <button type="button" onClick={() => pickHistory(h)} aria-label={`${h.name}, change amount`}
-                      className="flex min-w-0 flex-1 items-center gap-3 py-3 text-left active:opacity-80">
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[15px] text-foreground">{h.name}</span>
-                        <span className="mt-0.5 block text-[12px] tabular-nums text-muted">
-                          {h.lastGrams ? `${h.lastGrams} g · ${Math.round(h.lastCalories ?? 0)} kcal` : macroLine(h.per100g)}
-                        </span>
-                      </span>
-                      <span className="text-muted">›</span>
-                    </button>
-                    {h.lastGrams ? (
-                      <button type="button" onClick={() => quickLog(h)} disabled={quickBusy !== null}
-                        aria-label={`${quickLabel} ${h.name}, ${h.lastGrams} g`}
-                        className="h-9 shrink-0 rounded-full bg-accent/20 px-3 text-[13px] font-semibold text-accent active:opacity-80 disabled:opacity-50">
-                        {quickBusy === h.name ? "…" : quickLabel}
-                      </button>
-                    ) : null}
-                  </li>
+                  <Row key={`h-${h.name}`} name={h.name}
+                    sub={h.lastGrams ? `${h.lastGrams} g · ${Math.round(h.lastCalories ?? 0)} kcal` : macroLine(h.per100g)}
+                    onClick={() => pickHistory(h)} />
                 ))}
               </ul>
             </section>

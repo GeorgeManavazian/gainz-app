@@ -6,13 +6,16 @@ Date: 2026-11-02 · Status: George: "i just genuinely hate everything about it�
 
 Logging a food today: open Log meal → type → wait ~300 ms + a USDA round-trip → pick a row → second screen → type grams → Save. For a lifter who eats the same 15 foods, that's five steps for something that should be one tap. Guessing at the hate: slow, repetitive, and the second screen makes you retype numbers you typed last week.
 
-## Binding
+## Binding (revised after George saw a first cut and four layout mockups; picked "D · Today's layout, tightened")
 
-1. **One-tap re-log.** "Your foods" rows (ranked by `rankRecentFoods`) show `name` and `350 g · 207 kcal` (the amount and kcal of your last log of it). A `+ Log` button on the row logs it again with that amount instantly, no second screen. A `›` on the row opens the amount screen **pre-filled with the last amount**.
-2. **Undo.** After a one-tap log, a banner `Logged Greek yogurt · 350 g ✓ · Undo` sits above the list for 6 s. Undo deletes that row (`deleteMeal`, queue-ordered behind the insert, offline-safe). `logMeal` returns the new row's client id to make this possible.
-3. **Instant results.** Typing ≥ 2 chars shows curated matches (`lib/foods.ts`, 262 foods, client-side) **immediately**; the USDA search fills in behind on the existing 300 ms debounce and replaces the list (server already puts curated first). "Searching…" shows only while the list is empty.
-4. **Amount screen defaults.** From history: last amount in grams. From search: empty as today.
-5. Everything else unchanged: raw/cooked switch, units, saved meals section, manual lines, the `/log/meal/new` builder (its `+ Add` quick button adds to the meal instead of logging).
+George rejected one-tap re-log: "it assumes you have exactly 350g of greek yogurt whenever you tap log meal." His complaint is the **look and the layout**: "its all just one big list stretching far down."
+
+1. **Saved meals as tiles.** The "Your meals" section on Log meal renders patterns as a 2-column grid of compact tiles (`name` / `4 foods · 612 kcal`), accent-tinted border, `New meal` link kept.
+2. **Your foods capped.** Before typing, the ranked list (`rankRecentFoods`) shows **5** rows with an `All N ›` link that expands in place (`Less` collapses). Rows read `name` / `350 g · 207 kcal` (last amount and kcal). Tap → amount screen.
+3. **Last amount as placeholder.** The amount field opens empty with the last amount as its placeholder, so typing starts clean. Nothing is assumed.
+4. **Undo after every logged save.** Banner `Logged Greek yogurt · 350 g ✓ · Undo` for 6 s (`logMeal` returns the row id; Undo → `deleteMeal`). The new-meal builder's `onPick` returns void → no banner.
+5. **Instant results.** Typing ≥ 2 chars shows curated matches immediately; USDA replaces them when it lands; a failed/offline USDA call keeps the curated rows; stale responses are ignored.
+6. No one-tap `+ Log` button.
 
 ## Non-goals
 Barcode scan. Editing a logged amount. Changing USDA ranking. Favourites/pinning.
