@@ -21,6 +21,8 @@ export const POST_MEAL_DELAY_HOURS = 1.5; // main meal after training starts + 1
 export const MIN_PRE_WINDOW_MIN = 45;    // a shorter pre-meal window becomes the snack
 export const LIGHT_MEAL_KCAL = 300;      // after-training meal past the heavy-meal cutoff
 export const SLOT_HALF_WIDTH = 30;       // a usual meal slot's window: usual time ± 30 min
+export const SLOT_EATEN_MIN = 90;        // a feeding within ± 90 min of a slot counts as that slot eaten
+export const PATTERN_MIN_DAYS_NEEDED = 10; // mirrors lib/meal-slots PATTERN_MIN_DAYS for the learning copy
 
 const H = 3_600_000;
 const DAY = 24 * H;
@@ -132,7 +134,7 @@ export function lateHeavyMeal(meals: TimingMeal[], now: Date, clock: DayClock): 
 
 export type PlanKind = "done" | "learning" | "training" | "post" | "pre" | "fuelled" | "fuelled-through" | "closed" | "eat";
 /** Learned eating pattern (lib/meal-slots). Not ready → the planner only reports progress. */
-export type PatternLike = { ready: boolean; daysWithMeals: number; windowDays: number; slots: { minute: number }[] };
+export type PatternLike = { ready: boolean; daysWithMeals: number; windowDays: number; slots: { minute: number }[]; scope?: "weekday" | "all" };
 export type Plan = {
   kind: PlanKind; start: Date; end: Date;
   kcal: number; protein_g: number; mealsLeft: number;
@@ -143,8 +145,12 @@ export type Plan = {
   light: boolean;
   /** Window comes from a learned usual meal slot rather than the fuel model. */
   usual: boolean;
-  /** `learning`: eating days seen so far / window. */
+  /** The slot pattern is this weekday's own. */
+  weekdayScoped: boolean;
+  /** `learning`: eating days seen so far / needed. */
   progress: { days: number; of: number } | null;
+  /** Past the day's last usual slot (copy says so). */
+  pastUsual: boolean;
 };
 
 /** Priority: done → training (active workout) → post → closed (incl. before wake) → pre (training − 3 h … start)
@@ -168,9 +174,19 @@ export function planNextMeal(a: {
   const training = a.todayWorkout ? new Date(a.todayWorkout.started_at) : a.usualTraining;
   const perMealP = Math.max(PROTEIN_HIT_G, Math.round(PROTEIN_PER_LB * a.weight_lb));
 
-  const slotsLeft = (from: number) => a.pattern?.ready
-    ? a.pattern.slots.filter((sl) => { const d = new Date(now); d.setHours(0, sl.minute + SLOT_HALF_WIDTH, 0, 0); return d.getTime() >= from && d.getTime() - SLOT_HALF_WIDTH * 60_000 < cutoff.getTime(); }).length
-    : 0;
+  const slotAt = (m: number) => { const d = new Date(now); d.setHours(0, m, 0, 0); return d.getTime(); };
+  // Each feeding today claims its nearest slot (within 90 min); claimed slots are "eaten".
+  const eaten = new Set<number>();
+  if (a.pattern?.ready) for (const f of feedings(a.meals)) {
+    const ft = new Date(f.at).getTime();
+    let best: { m: number; d: number } | null = null;
+    for (const sl of a.pattern.slots) { const d = Math.abs(ft - slotAt(sl.minute)); if (!best || d < best.d) best = { m: sl.minute, d }; }
+    if (best && best.d <= SLOT_EATEN_MIN * 60_000) eaten.add(best.m);
+  }
+  const openSlots = a.pattern?.ready ? a.pattern.slots.filter((sl) => !eaten.has(sl.minute)) : [];
+  const slotsLeft = (from: number) =>
+    openSlots.filter((sl) => slotAt(sl.minute + SLOT_HALF_WIDTH) >= from && slotAt(sl.minute - SLOT_HALF_WIDTH) < cutoff.getTime()).length;
+  let pastUsual = false;
   const build = (kind: PlanKind, start: Date | number, end: Date | number, minP = 0, snack = false, light = false, usual = false): Plan => {
     const s = new Date(start), e = new Date(end);
     const mealsLeft = Math.max(1, usual ? slotsLeft(s.getTime()) : Math.ceil((cutoff.getTime() - s.getTime()) / (MEAL_SPACING_HOURS * H)));
@@ -179,12 +195,11 @@ export function planNextMeal(a: {
     if (snack) { kcal = Math.min(PRE_SNACK_KCAL, kcal); protein_g = 0; }
     if (light) kcal = Math.min(LIGHT_MEAL_KCAL, kcal);
     return { kind, start: s, end: e, kcal, protein_g, mealsLeft, cutoff, bed, training, fuel, snack, light, usual,
-      progress: a.pattern && !a.pattern.ready ? { days: a.pattern.daysWithMeals, of: a.pattern.windowDays } : null };
+      weekdayScoped: usual && a.pattern?.scope === "weekday", pastUsual,
+      progress: a.pattern && !a.pattern.ready ? { days: a.pattern.daysWithMeals, of: PATTERN_MIN_DAYS_NEEDED } : null };
   };
 
   if (remainingKcal <= 0) return build("done", now, now);
-  // Predictable beats clever: until two weeks of eating days are in, only learn.
-  if (a.pattern && !a.pattern.ready) return build("learning", now, now);
 
   // Training right now: no meal, just the post-workout dose.
   if (a.todayWorkout && !a.todayWorkout.ended_at) return build("training", now, now, 30);
@@ -196,6 +211,9 @@ export function planNextMeal(a: {
     const postEnd = Math.min(end + POST_WINDOW_HOURS * H, lightEnd.getTime());
     if (t >= end && t - end <= POST_WINDOW_HOURS * H && !ateAfter && postEnd > t) return build("post", now, postEnd, 30);
   }
+
+  // Predictable beats clever: until the pattern is learned, only the training prompts above show; no next-meal guesses.
+  if (a.pattern && !a.pattern.ready) return build("learning", now, now);
 
   // Asleep (before wake on a normal schedule) or past the heavy-meal cutoff.
   const wake = atTime(now, a.clock.wake);
@@ -228,14 +246,17 @@ export function planNextMeal(a: {
   // Usual slot in progress or next up today → that's the window; the fuel model is only the fallback.
   if (a.pattern?.ready) {
     const nowMin = now.getHours() * 60 + now.getMinutes();
-    const slot = a.pattern.slots.find((sl) => sl.minute + SLOT_HALF_WIDTH >= nowMin);
+    const slot = openSlots.find((sl) => sl.minute + SLOT_HALF_WIDTH >= nowMin);
     if (slot) {
-      const at = (m: number) => { const d = new Date(now); d.setHours(0, m, 0, 0); return d.getTime(); };
-      const start = Math.max(t, at(slot.minute - SLOT_HALF_WIDTH)), end = Math.min(at(slot.minute + SLOT_HALF_WIDTH), cutoff.getTime());
+      // Today adapts: a late previous meal pushes the slot back until the tank is nearly empty.
+      const slotStart = slotAt(slot.minute - SLOT_HALF_WIDTH), slotEnd = slotAt(slot.minute + SLOT_HALF_WIDTH);
+      const start = Math.max(t, slotStart, fuelAt - 0.5 * H);
+      const end = Math.min(start < slotEnd ? slotEnd : start + H, cutoff.getTime());
       if (start >= cutoff.getTime()) return build("closed", now, lightEnd);
       return build(start > t ? "fuelled" : "eat", start, Math.max(start, end), 0, false, false, true);
     }
-    // Past the last usual slot: nothing more unless kcal are well short — then a light top-up before the cutoff.
+    // Past the day's usual slots: a little left is optional; a lot left falls back to the fuel model, labelled.
+    pastUsual = true;
     if (remainingKcal < LIGHT_MEAL_KCAL) return build("done", now, now);
   }
 
@@ -253,8 +274,8 @@ export function planLine(p: Plan, now: Date): string {
   const P = p.protein_g > 0 ? ` · ${p.protein_g} P` : "";
   const macros = `~${p.kcal} kcal${P}`;
   switch (p.kind) {
-    case "done": return "Target hit for today.";
-    case "learning": return `Learning your meal times · ${p.progress?.days ?? 0} / ${p.progress?.of ?? 14} days.`;
+    case "done": return p.pastUsual && p.kcal > 0 ? `Past your usual meals · ~${p.kcal} kcal left, optional.` : "Target hit for today.";
+    case "learning": return `Learning your usual meal times · ${p.progress?.days ?? 0} of ${p.progress?.of ?? 10} eating days logged (2+ meals a day).`;
     case "training": return `Training now. Eat within 2 h after · ~${p.kcal} kcal${p.protein_g > 0 ? ` · ≥${p.protein_g} P` : ""}.`;
     case "post": return `Post-workout: eat by ${fmtT(p.end)}${P}.`;
     case "pre": {
@@ -267,7 +288,10 @@ export function planLine(p: Plan, now: Date): string {
     case "fuelled-through": if (p.light) return `Light meal after training, ~${fmtT(p.start)} · ≤${p.kcal} kcal${P}.`;
       return `Fuelled through training. Next meal after, ~${fmtT(p.start)} · ${macros}.`;
     case "fuelled": {
-      if (p.usual) return `Next meal usually ~${fmtT(new Date((p.start.getTime() + p.end.getTime()) / 2))} (${fmtT(p.start)}–${fmtT(p.end)}) · ${macros}.`;
+      if (p.usual) {
+        const on = p.weekdayScoped ? ` on ${now.toLocaleDateString("en-US", { weekday: "long" })}s` : "";
+        return `Next meal usually ~${fmtT(new Date((p.start.getTime() + p.end.getTime()) / 2))}${on} (${fmtT(p.start)}–${fmtT(p.end)}) · ${macros}.`;
+      }
       return `Fuelled till ~${fmtT(p.fuel?.until ?? p.start)}. Next meal ${fmtT(p.start)}–${fmtT(p.end)} · ${macros}.`;
     }
     case "closed":
@@ -276,7 +300,7 @@ export function planLine(p: Plan, now: Date): string {
     case "eat": {
       if (p.usual) return `Usual meal time · eat by ${fmtT(p.end)} · ${macros}.`;
       const gap = p.fuel ? now.getTime() - p.fuel.lastAt.getTime() : 0;
-      const since = p.fuel ? `${hrs(gap)} since your last meal. ` : "";
+      const since = p.pastUsual ? "Past your usual meal times · " : p.fuel ? `${hrs(gap)} since your last meal. ` : "";
       return `${since}Eat by ${fmtT(p.end)} · ${macros}.`;
     }
   }

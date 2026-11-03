@@ -224,7 +224,7 @@ describe("planNextMeal with a learned pattern", () => {
     const p = planNextMeal({ ...base, meals: [], totals: { calories: 0, protein_g: 0 }, now: day(9),
       pattern: { ready: false, daysWithMeals: 6, windowDays: 14, slots: [] } });
     expect(p.kind).toBe("learning");
-    expect(planLine(p, day(9))).toBe("Learning your meal times · 6 / 14 days.");
+    expect(planLine(p, day(9))).toBe("Learning your usual meal times · 6 of 10 eating days logged (2+ meals a day).");
   });
   it("next usual slot becomes the window; macros split across the slots left before the cutoff", () => {
     const p = planNextMeal({ ...base, meals: [meal(12, 30, 600)], totals: { calories: 1100, protein_g: 70 }, now: day(14),
@@ -246,12 +246,46 @@ describe("planNextMeal with a learned pattern", () => {
       pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots } });
     expect(p.kind).toBe("pre"); expect(p.snack).toBe(true);
   });
+  it("a meal logged inside a slot marks it eaten: no 'eat now', and it drops out of the split", () => {
+    const p = planNextMeal({ ...base, meals: [meal(12, 20, 600)], totals: { calories: 600, protein_g: 40 }, now: day(12, 40),
+      pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots } });
+    expect(p.kind).toBe("fuelled"); expect(p.start.getHours()).toBe(15); // next open slot is 16:00 (3:30–4:30)
+    expect(p.mealsLeft).toBe(2);
+  });
+  it("a slot straddling the cutoff is clamped to it", () => {
+    const p = planNextMeal({ ...base, meals: [meal(16, 0, 500)], totals: { calories: 1500, protein_g: 120 }, now: day(19, 50),
+      pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots: [{ minute: 20 * 60 + 15 }] } });
+    expect(p.kind).toBe("eat"); expect(p.end.getHours()).toBe(20); expect(p.end.getMinutes()).toBe(30);
+  });
+  it("learning still lets the post-workout prompt through", () => {
+    const p = planNextMeal({ ...base, meals: [], totals: { calories: 600, protein_g: 40 }, now: day(18, 15),
+      todayWorkout: { started_at: iso(17), ended_at: iso(18) }, pattern: { ready: false, daysWithMeals: 3, windowDays: 14, slots: [] } });
+    expect(p.kind).toBe("post");
+  });
   it("after the last slot with little left → done; a slot inside the sleep cutoff → closed", () => {
     const late = planNextMeal({ ...base, meals: [meal(19, 30, 700)], totals: { calories: 2050, protein_g: 170 }, now: day(20, 15),
       pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots } });
-    expect(late.kind).toBe("done");
+    expect(late.kind).toBe("done"); expect(planLine(late, day(20, 15))).toMatch(/^Past your usual meals · ~150 kcal left, optional/);
     const lateSlot = planNextMeal({ ...base, meals: [], totals: { calories: 1000, protein_g: 80 }, now: day(20, 15),
       pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots: [{ minute: 21 * 60 }] } });
     expect(lateSlot.kind).toBe("closed");
+  });
+});
+
+describe("today adapts the usual slot", () => {
+  const base = { targets, weight_lb: 200, clock, usualTraining: null as Date | null, todayWorkout: null };
+  const slots = [{ minute: 8 * 60 }, { minute: 12 * 60 + 30 }, { minute: 16 * 60 }, { minute: 19 * 60 + 30 }];
+  it("a late lunch pushes the 4pm slot back until the tank is nearly empty", () => {
+    // 700 kcal lunch at 14:00 (claims the 12:30 slot) → fuelled till 17:00; at 15:45 the 16:00 slot waits till ~16:30.
+    const p = planNextMeal({ ...base, meals: [meal(14, 0, 700)], totals: { calories: 1200, protein_g: 80 }, now: day(15, 45),
+      pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots, scope: "all" } });
+    expect(p.kind).toBe("fuelled"); expect(p.usual).toBe(true);
+    expect(p.start.getHours()).toBe(16); expect(p.start.getMinutes()).toBe(30);
+    expect(p.end.getHours()).toBe(17); expect(p.end.getMinutes()).toBe(30);
+  });
+  it("names the weekday when the pattern is weekday-scoped", () => {
+    const p = planNextMeal({ ...base, meals: [meal(12, 30, 600)], totals: { calories: 1100, protein_g: 70 }, now: day(14),
+      pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots, scope: "weekday" } });
+    expect(planLine(p, day(14))).toMatch(/^Next meal usually ~4pm on Mondays/);
   });
 });

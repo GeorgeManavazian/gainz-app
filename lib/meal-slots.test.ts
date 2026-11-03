@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { usualMealSlots, nextSlot, feedingDays } from "./meal-slots";
+import { usualMealSlots, feedingDays } from "./meal-slots";
 import type { TimingMeal } from "./meal-timing";
 
 const now = new Date(2026, 10, 3, 14, 0); // Tue 3 Nov 2026 2pm
@@ -42,14 +42,28 @@ describe("usualMealSlots", () => {
   });
 });
 
-describe("nextSlot", () => {
-  const slots = usualMealSlots(regular(14), now).slots;
-  it("the slot in progress when now is inside ±30 min", () => {
-    const n = nextSlot(slots, new Date(2026, 10, 3, 12, 40))!;
-    expect(n.slot.minute).toBeCloseTo(750, -1); expect(n.start.getHours()).toBe(12); expect(n.end.getHours()).toBe(13);
+describe("per-weekday patterns", () => {
+  // Weekdays: 8:00/12:30/16:00/19:30. Saturdays: 10:00/14:00/19:30. Six weeks of history.
+  const sixWeeks = (): TimingMeal[] => {
+    const out: TimingMeal[] = [];
+    for (let i = 1; i <= 42; i++) {
+      const d = new Date(now); d.setDate(d.getDate() - i);
+      const sat = d.getDay() === 6;
+      const times = sat ? [[10, 0], [14, 0], [19, 30]] : [[8, 0], [12, 30], [16, 0], [19, 30]];
+      for (const [h, m] of times) out.push(meal(at(i, h, m)));
+    }
+    return out;
+  };
+  it("uses Saturday's own slots on a Saturday once three Saturdays are in", () => {
+    const sat = new Date(2026, 10, 7, 9, 0); // Sat 7 Nov 2026
+    const p = usualMealSlots(sixWeeks(), sat);
+    expect(p.ready).toBe(true); expect(p.scope).toBe("weekday"); expect(p.weekdayDays).toBeGreaterThanOrEqual(3);
+    expect(p.slots.map((s) => s.minute)).toEqual([600, 840, 1170]);
   });
-  it("the next slot later today otherwise; null after the last", () => {
-    expect(nextSlot(slots, new Date(2026, 10, 3, 14, 0))!.slot.minute).toBeCloseTo(960, -1);
-    expect(nextSlot(slots, new Date(2026, 10, 3, 21, 0))).toBeNull();
+  it("falls back to the overall pattern when that weekday is thin", () => {
+    const twoWeeks = sixWeeks().filter((m) => new Date(m.logged_at).getTime() > now.getTime() - 14 * 86_400_000);
+    const sat = new Date(2026, 10, 7, 9, 0);
+    const p = usualMealSlots(twoWeeks, sat);
+    expect(p.scope).toBe("all");
   });
 });

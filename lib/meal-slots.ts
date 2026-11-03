@@ -3,39 +3,42 @@ import { feedings, type TimingMeal } from "./meal-timing";
 
 export const PATTERN_WINDOW_DAYS = 14;
 export const PATTERN_MIN_DAYS = 10;        // days with ≥ 2 feedings before we trust the pattern
+export const WEEKDAY_WINDOW_DAYS = 42;     // per-weekday pattern looks back six weeks…
+export const WEEKDAY_MIN_DAYS = 3;         // …and needs three of that weekday to be used
 export const SLOT_MIN_SHARE = 0.5;         // a slot must show up on ≥ half the eating days
 export const SLOT_BUCKET_MIN = 90;         // feedings within 90 min of a slot centre belong to it
-export const SLOT_HALF_WIDTH_MIN = 30;     // suggested window = usual time ± 30 min
 
 export type MealSlot = { minute: number; share: number; days: number };
-export type MealPattern = { ready: boolean; daysWithMeals: number; windowDays: number; slots: MealSlot[] };
+export type MealPattern = {
+  ready: boolean; daysWithMeals: number; windowDays: number; slots: MealSlot[];
+  /** "weekday": slots learned from the same weekday (schedules differ by day); "all": the two-week overall pattern. */
+  scope: "weekday" | "all"; weekdayDays: number;
+};
 
 const H = 3_600_000, DAY = 24 * H;
 const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 const minuteOfDay = (d: Date) => d.getHours() * 60 + d.getMinutes();
 const median = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
 
-/** Feeding minutes-of-day per day over the window (today excluded: it's still being written). */
-export function feedingDays(meals: TimingMeal[], now: Date, windowDays = PATTERN_WINDOW_DAYS): Map<string, number[]> {
+/** Feeding minutes-of-day per day over the window (today excluded: it's still being written). `weekday` keeps only that weekday. */
+export function feedingDays(meals: TimingMeal[], now: Date, windowDays = PATTERN_WINDOW_DAYS, weekday?: number): Map<string, number[]> {
   const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
   const since = todayStart.getTime() - windowDays * DAY;
   const byDay = new Map<string, number[]>();
   for (const f of feedings(meals)) {
     const d = new Date(f.at);
     if (d.getTime() < since || d.getTime() >= todayStart.getTime()) continue;
+    if (weekday !== undefined && d.getDay() !== weekday) continue;
     const k = dayKey(d);
     byDay.set(k, [...(byDay.get(k) ?? []), minuteOfDay(d)]);
   }
   return byDay;
 }
 
-/** Usual eating slots: greedy clustering of feeding times across days; slots kept when they recur on ≥ half the days. */
-export function usualMealSlots(meals: TimingMeal[], now: Date): MealPattern {
-  const byDay = feedingDays(meals, now);
-  const days = [...byDay.values()].filter((mins) => mins.length >= 2);
+/** Greedy clustering of feeding minutes across days; slots kept when they recur on ≥ half the days. */
+export function clusterSlots(days: number[][]): MealSlot[] {
   const daysWithMeals = days.length;
-  const ready = daysWithMeals >= PATTERN_MIN_DAYS;
-  if (daysWithMeals === 0) return { ready: false, daysWithMeals, windowDays: PATTERN_WINDOW_DAYS, slots: [] };
+  if (daysWithMeals === 0) return [];
 
   // Each day contributes each feeding minute once; cluster greedily around the densest centres.
   const all = days.flatMap((mins, i) => mins.map((m) => ({ m, day: i })));
@@ -57,16 +60,21 @@ export function usualMealSlots(meals: TimingMeal[], now: Date): MealPattern {
     if (used.size >= all.length) break;
   }
   slots.sort((a, b) => a.minute - b.minute);
-  return { ready, daysWithMeals, windowDays: PATTERN_WINDOW_DAYS, slots };
+  return slots;
 }
 
-/** The usual slot in progress (now within ± half-width) or the next one later today; null when the day's slots are done. */
-export function nextSlot(slots: MealSlot[], now: Date): { slot: MealSlot; start: Date; end: Date } | null {
-  const nowMin = minuteOfDay(now);
-  for (const s of slots) {
-    if (s.minute + SLOT_HALF_WIDTH_MIN < nowMin) continue;
-    const at = (m: number) => { const d = new Date(now); d.setHours(0, m, 0, 0); return d; };
-    return { slot: s, start: at(s.minute - SLOT_HALF_WIDTH_MIN), end: at(s.minute + SLOT_HALF_WIDTH_MIN) };
-  }
-  return null;
+/** Usual eating slots. Ready after ≥ 10 eating days in two weeks; once there are ≥ 3 of today's weekday
+ *  in the last six weeks, that weekday's own pattern is used (schedules differ by day). */
+export function usualMealSlots(meals: TimingMeal[], now: Date): MealPattern {
+  const eatingDays = (m: Map<string, number[]>) => [...m.values()].filter((mins) => mins.length >= 2);
+  const overall = eatingDays(feedingDays(meals, now));
+  const daysWithMeals = overall.length;
+  const ready = daysWithMeals >= PATTERN_MIN_DAYS;
+  const sameWeekday = eatingDays(feedingDays(meals, now, WEEKDAY_WINDOW_DAYS, now.getDay()));
+  const useWeekday = ready && sameWeekday.length >= WEEKDAY_MIN_DAYS;
+  return {
+    ready, daysWithMeals, windowDays: PATTERN_WINDOW_DAYS,
+    slots: ready ? clusterSlots(useWeekday ? sameWeekday : overall) : [],
+    scope: useWeekday ? "weekday" : "all", weekdayDays: sameWeekday.length,
+  };
 }
