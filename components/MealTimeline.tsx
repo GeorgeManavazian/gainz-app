@@ -3,8 +3,10 @@
 import { feedings, type Plan, type TimingMeal, type TimingWorkout } from "@/lib/meal-timing";
 
 /** Today from wake to bed: feedings (food rows within 60 min merged) as dots sized by kcal, the workout as a block, the next window shaded, a now marker. */
-export default function MealTimeline({ wake, bed, now, meals, workout, plan }: {
+export default function MealTimeline({ wake, bed, now, meals, workout, plan, usualMinutes = [] }: {
   wake: Date; bed: Date; now: Date; meals: TimingMeal[]; workout: TimingWorkout | null; plan: Plan | null;
+  /** Learned usual meal times (minutes of day) drawn as faint ticks. */
+  usualMinutes?: number[];
 }) {
   const W = 360, H = 44, PAD = 6;
   const t0 = wake.getTime(), t1 = bed.getTime();
@@ -18,6 +20,9 @@ export default function MealTimeline({ wake, bed, now, meals, workout, plan }: {
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Today's meal timeline" className="block">
       {/* track */}
       <line x1={PAD} x2={W - PAD} y1={22} y2={22} stroke="var(--border)" strokeWidth={2} strokeLinecap="round" />
+      {/* usual meal times */}
+      {usualMinutes.map((m) => { const d = new Date(now); d.setHours(0, m, 0, 0); const px = x(d.getTime());
+        return <line key={m} x1={px} x2={px} y1={12} y2={32} stroke="var(--muted)" strokeWidth={1} opacity={0.35} />; })}
       {/* next window */}
       {win && <rect x={x(win.start.getTime())} y={14} width={Math.max(4, x(win.end.getTime()) - x(win.start.getTime()))} height={16} rx={4}
         fill="var(--accent)" fillOpacity={win.kind === "closed" ? 0.08 : 0.22} />}

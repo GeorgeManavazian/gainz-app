@@ -28,6 +28,12 @@ Replace the HUB's "Next meal" card (remaining macros ÷ 4) with a timing model t
 - **HUB card** replaces the Next meal link: timeline, one context line from the plan, `Protein hits N / 4`, taps through to Log meal. The HUB keeps `now` in state with a 60 s tick so the line stays current while the app is open.
 - Old `nextMeal` in `lib/hub.ts` stays (tested) but is no longer used by the HUB.
 
+## Learned meal times (added 2026-11-03)
+George: "i kind of want it to be SOMEWHAT realistic and predictable meal timings. maybe we start the meal timing after like 2 weeks of meal timing data… see the times that these people NORMALLY eat, and then give suggestions based off of that."
+- `lib/meal-slots.ts` `usualMealSlots(meals, now)`: feedings over the last 14 days (today excluded), only days with ≥ 2 feedings count; greedy clustering (90-min buckets) of feeding minutes; a slot is kept when it recurs on ≥ 50 % of eating days; slot time = median. `ready` when ≥ 10 eating days.
+- Not ready → the plan is `learning`: card shows the timeline, protein hits and the late-meal warning, and the line `Learning your meal times · N / 14 days.` No suggestions.
+- Ready → the window is the usual slot in progress (now within ±30 min) or the next slot today; kcal = remaining ÷ slots left before the cutoff. Copy: `Next meal usually ~4pm (3:30pm–4:30pm) · ~550 kcal · 36 P.` / `Usual meal time · eat by 4:30pm · …`. Training (`training`/`post`/`pre`/snack/`fuelled-through`) and sleep (`closed`, late-meal) rules keep precedence. Past the last slot with < 300 kcal left → `done`; with more left → the fuel model's fallback. Faint ticks on the timeline mark the usual slots.
+
 ## Non-goals (v2+)
 Caffeine. Weekly "controllables" card. Morning check-in and correlations. Push notifications (needs service worker + scheduler; with the App Store push). Rest-day vs training-day macro plans (v1 only detects rest days to suppress pre-workout).
 

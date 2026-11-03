@@ -17,6 +17,7 @@ import { formatElapsed, totalSets, workoutTitle, type WorkoutRow } from "@/lib/w
 import { remaining } from "@/lib/hub";
 import { bedtimeFor, wakeFor, lateHeavyMeal, planLine, planNextMeal, proteinHits, usualTrainingStart, PROTEIN_HITS_TARGET } from "@/lib/meal-timing";
 import MealTimeline from "@/components/MealTimeline";
+import { usualMealSlots, PATTERN_WINDOW_DAYS } from "@/lib/meal-slots";
 import SavePatternSheet from "@/components/SavePatternSheet";
 import ConfirmDelete from "@/components/ConfirmDelete";
 import { deleteMeal } from "@/lib/meals-db";
@@ -33,6 +34,7 @@ function HubInner() {
   const [active, setActive] = useState<WorkoutRow | null>(null);
   const [done, setDone] = useState<{ w: WorkoutRow; sets: number } | null>(null);
   const [recentWorkouts, setRecentWorkouts] = useState<WorkoutRow[]>([]);
+  const [recentMeals, setRecentMeals] = useState<Meal[]>([]); // last two weeks, for the usual-slot learner
   const params = useSearchParams();
   const router = useRouter();
   const [toast, setToast] = useState("");
@@ -61,6 +63,9 @@ function HubInner() {
     const { data } = await supabase.from("meals").select("*")
       .gte("logged_at", start.toISOString()).order("logged_at");
     setMeals((data as Meal[]) ?? []);
+    const since = new Date(start); since.setDate(since.getDate() - PATTERN_WINDOW_DAYS);
+    supabase.from("meals").select("logged_at,calories,protein_g,fat_g").gte("logged_at", since.toISOString()).lt("logged_at", start.toISOString())
+      .then(({ data: d }) => setRecentMeals((d as Meal[]) ?? []));
   }, []);
 
   async function removeMeal(id: string) {
@@ -133,9 +138,10 @@ function HubInner() {
   const clock = { wake: prof?.wake_time ?? "07:00", bed: prof?.bed_time ?? "23:00" };
   const todayWorkout = active ? { started_at: active.started_at, ended_at: null }
     : done ? { started_at: done.w.started_at, ended_at: done.w.ended_at } : null;
+  const pattern = usualMealSlots(recentMeals, now);
   const plan = t && prof ? planNextMeal({
     meals, todayWorkout, usualTraining: usualTrainingStart(recentWorkouts, now),
-    totals, targets: { kcal: t.kcal, protein_g: t.protein_g }, weight_lb: trend ?? prof.weight_lb, now, clock,
+    totals, targets: { kcal: t.kcal, protein_g: t.protein_g }, weight_lb: trend ?? prof.weight_lb, now, clock, pattern,
   }) : null;
   const hits = proteinHits(meals);
   const late = lateHeavyMeal(meals, now, clock);
@@ -248,7 +254,7 @@ function HubInner() {
                 Protein hits {hits} / {PROTEIN_HITS_TARGET}
               </span>
             </div>
-            <MealTimeline wake={wakeFor(now, clock)} bed={bedtimeFor(now, clock)} now={now} meals={meals} workout={todayWorkout} plan={plan} />
+            <MealTimeline wake={wakeFor(now, clock)} bed={bedtimeFor(now, clock)} now={now} meals={meals} workout={todayWorkout} plan={plan} usualMinutes={pattern.ready ? pattern.slots.map((sl) => sl.minute) : []} />
             <p className="text-[14px] font-semibold leading-snug">{planLine(plan, now)}</p>
             {late && (
               <p className="text-[12px] text-danger">
