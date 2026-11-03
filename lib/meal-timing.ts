@@ -11,6 +11,7 @@ export const LIGHT_CUTOFF_HOURS = 0.75;  // pre-bed protein snack must be done �
 export const PREBED_WINDOW_HOURS = 1.25; // …and opens bed − 75 min
 export const PREBED_KCAL = 300;
 export const PREBED_PROTEIN_G = 35;      // casein / Greek yogurt / cottage cheese: overnight muscle, no sleep cost
+export const PREBED_MIN_PROTEIN_G = 15;  // below this (protein or kcal room) the pre-bed snack isn't worth offering
 export const PRE_CARBS_PER_LB = 0.45;    // ≈ 1 g/kg pre-workout carbs
 export const PRE_FAT_MAX_G = 15;         // pre-workout meal: low fat so it clears the stomach
 export const PRE_SNACK_CARBS = 40;       // < 1 h out: fast carbs, no fat
@@ -128,7 +129,7 @@ export function proteinHits(meals: TimingMeal[]): number {
   return hits;
 }
 
-/** A heavy feeding (≥600 kcal) within 2.5 h before tonight's bedtime, or after it. Most recent wins. */
+/** A heavy feeding (≥600 kcal) within 3 h before tonight's bedtime, or after it. Most recent wins. */
 export function lateHeavyMeal(meals: TimingMeal[], now: Date, clock: DayClock): { meal: Feeding; hoursBeforeBed: number } | null {
   const bed = bedtimeFor(now, clock).getTime();
   const cands = feedings(meals)
@@ -152,7 +153,7 @@ export type Plan = {
   cutoff: Date; bed: Date; training: Date | null; fuel: Fuel | null;
   /** `pre`: too close to training for a meal, small carb snack only. */
   snack: boolean;
-  /** `fuelled-through`: the after-training meal lands past the heavy-meal cutoff → light meal (≤300 kcal). */
+  /** `fuelled-through` / `post`: the after-training meal lands past the heavy-meal cutoff → light meal (≤300 kcal). */
   light: boolean;
   /** Window comes from a learned usual meal slot rather than the fuel model. */
   usual: boolean;
@@ -164,8 +165,9 @@ export type Plan = {
   pastUsual: boolean;
 };
 
-/** Priority: done → training (active workout) → post → closed (incl. before wake) → pre (training − 3 h … start)
- *  → fuelled-through → fuelled / eat. */
+/** Priority: done → training (active workout) → post (light past the cutoff) → closed (before wake) → past the cutoff with
+ *  no session ahead: prebed / done / closed → pre (training − 3 h … start; snack only past the cutoff) → fuelled-through
+ *  → usual slot / fuelled / eat. */
 export function planNextMeal(a: {
   meals: TimingMeal[]; todayWorkout: TimingWorkout | null; usualTraining: Date | null;
   totals: { calories: number; protein_g: number; carbs_g?: number; fat_g?: number };
@@ -184,9 +186,19 @@ export function planNextMeal(a: {
   const remainingKcal = a.targets.kcal - a.totals.calories;
   const remainingP = a.targets.protein_g - a.totals.protein_g;
   const remainingC = a.targets.carbs_g !== undefined ? a.targets.carbs_g - (a.totals.carbs_g ?? 0) : null;
+  const remainingF = a.targets.fat_g !== undefined ? a.targets.fat_g - (a.totals.fat_g ?? 0) : null;
   const prebedStart = new Date(bed.getTime() - PREBED_WINDOW_HOURS * H);
   const training = a.todayWorkout ? new Date(a.todayWorkout.started_at) : a.usualTraining;
   const perMealP = Math.max(PROTEIN_HIT_G, Math.round(PROTEIN_PER_LB * a.weight_lb));
+  const trainingAhead = !!training && !a.todayWorkout && training.getTime() > t;
+  // Carbs per session window (pre / post): ≈ 1 g/kg, or half of the day's 60 % training share, whichever is more.
+  const sessionCarbs = Math.max(Math.round(PRE_CARBS_PER_LB * a.weight_lb),
+    training ? Math.round(TRAINING_DAY_CARB_SHARE * (a.targets.carbs_g ?? 0) / 2) : 0);
+  // Session windows still ahead today: the pre window (unless a feeding already landed in it) + the after-training meal.
+  const preEaten = trainingAhead && feedings(a.meals).some((f) => {
+    const ft = new Date(f.at).getTime(); return ft >= training!.getTime() - PRE_WINDOW_HOURS * H && ft <= training!.getTime();
+  });
+  const sessionWindows = trainingAhead ? (preEaten ? 0 : 1) + 1 : 0;
 
   const slotAt = (m: number) => { const d = new Date(now); d.setHours(0, m, 0, 0); return d.getTime(); };
   // Each feeding today claims its nearest slot (within 90 min); claimed slots are "eaten".
@@ -210,21 +222,28 @@ export function planNextMeal(a: {
     if (light) kcal = Math.min(LIGHT_MEAL_KCAL, kcal);
     // Composition: carbs land around the session, fat stays out of it; the rest spreads flat.
     let carbs_g: number | null = null, fat_max_g: number | null = null;
-    const aroundSession = kind === "pre" || kind === "post" || kind === "training";
+    // The after-training meal (`fuelled-through`) is the post window of a session that hasn't started yet.
+    const aroundSession = kind === "pre" || kind === "post" || kind === "training" || kind === "fuelled-through";
     if (snack) { carbs_g = PRE_SNACK_CARBS; fat_max_g = 0; }
     else if (kind === "prebed") { carbs_g = null; fat_max_g = null; }
     else if (remainingC !== null && kind !== "done" && kind !== "learning" && kind !== "closed") {
       const left = Math.max(0, remainingC);
       if (aroundSession) {
-        const sessionCarbs = training ? Math.round(TRAINING_DAY_CARB_SHARE * (a.targets.carbs_g ?? 0) / 2) : 0;
-        carbs_g = Math.min(left, Math.max(Math.round(PRE_CARBS_PER_LB * a.weight_lb), sessionCarbs));
-        fat_max_g = kind === "pre" ? PRE_FAT_MAX_G : null;
+        carbs_g = Math.min(left, sessionCarbs);
+        fat_max_g = kind === "pre" ? (remainingF !== null ? Math.max(0, Math.min(PRE_FAT_MAX_G, Math.round(remainingF))) : PRE_FAT_MAX_G) : null;
       } else {
-        carbs_g = Math.round(left / mealsLeft / 5) * 5;
+        // Training ahead: the session windows' carbs are set aside first; the rest spreads over the other windows.
+        const pool = Math.max(0, left - sessionCarbs * sessionWindows);
+        carbs_g = Math.round(pool / Math.max(1, mealsLeft - sessionWindows) / 5) * 5;
       }
     }
-    // The last big meal of the day: the window that ends at the cutoff (or is the only one left).
-    const isDinner = kind !== "done" && kind !== "learning" && kind !== "closed" && kind !== "prebed" && !snack
+    // Light meal: protein first, carbs only as far as the kcal cap allows.
+    if (light && carbs_g !== null) carbs_g = Math.min(carbs_g, Math.max(0, Math.floor((kcal - 4 * protein_g) / 4 / 5) * 5));
+    // Pre-workout meal: kcal can't exceed what its composition holds (protein + carbs + the fat ceiling).
+    if (kind === "pre" && !snack && carbs_g !== null) kcal = Math.min(kcal, r10(4 * (protein_g + carbs_g) + 9 * (fat_max_g ?? PRE_FAT_MAX_G)));
+    // The last big meal of the day: the window that ends at the cutoff (or is the only one left). Never a pre-workout
+    // meal, a snack or a light meal.
+    const isDinner = kind !== "done" && kind !== "learning" && kind !== "closed" && kind !== "prebed" && kind !== "pre" && !snack && !light
       && (mealsLeft === 1 || e.getTime() >= cutoff.getTime() - 15 * 60_000);
     return { kind, start: s, end: e, kcal, protein_g, mealsLeft, carbs_g, fat_max_g, isDinner, cutoff, bed, training, fuel, snack, light, usual,
       weekdayScoped: usual && a.pattern?.scope === "weekday", pastUsual,
@@ -241,7 +260,8 @@ export function planNextMeal(a: {
     const end = new Date(a.todayWorkout.ended_at).getTime();
     const ateAfter = a.meals.some((m) => new Date(m.logged_at).getTime() > end);
     const postEnd = Math.min(end + POST_WINDOW_HOURS * H, lightEnd.getTime());
-    if (t >= end && t - end <= POST_WINDOW_HOURS * H && !ateAfter && postEnd > t) return build("post", now, postEnd, 30);
+    // Recovery beats the sleep rule, but past the heavy-meal cutoff the post meal is a light one.
+    if (t >= end && t - end <= POST_WINDOW_HOURS * H && !ateAfter && postEnd > t) return build("post", now, postEnd, 30, false, t >= cutoff.getTime());
   }
 
   // Predictable beats clever: until the pattern is learned, only the training prompts above show; no next-meal guesses.
@@ -251,18 +271,24 @@ export function planNextMeal(a: {
   const wake = atTime(now, a.clock.wake);
   const normalSchedule = atTime(now, a.clock.bed).getTime() > wake.getTime();
   if (normalSchedule && t < wake.getTime()) return build("closed", wake, wake);
-  if (t >= cutoff.getTime()) {
-    // Between the dinner cutoff and bed − 45 min: a small protein snack (casein/yogurt), nothing else.
-    if (t < lightEnd.getTime() && remainingP > 0) {
-      const p = build("prebed", Math.max(t, prebedStart.getTime()), lightEnd);
-      return { ...p, kcal: Math.min(PREBED_KCAL, Math.max(0, r10(remainingKcal))), protein_g: Math.min(PREBED_PROTEIN_G, Math.round(remainingP)) };
+  // Past the heavy-meal cutoff: between it and bed − 45 min a small protein snack (casein/yogurt), only if it fits —
+  // ≥ 15 g protein still wanted and the kcal left can hold it. Else done (kcal all but gone) or closed.
+  const late = (): Plan => {
+    const kcal = Math.min(PREBED_KCAL, Math.max(0, r10(remainingKcal)));
+    const protein = Math.min(PREBED_PROTEIN_G, Math.round(remainingP), Math.floor(kcal / 4));
+    if (t < lightEnd.getTime() && protein >= PREBED_MIN_PROTEIN_G) {
+      return { ...build("prebed", Math.max(t, prebedStart.getTime()), lightEnd), kcal, protein_g: protein };
     }
-    return build("closed", now, lightEnd);
-  }
+    return kcal < 4 * PREBED_MIN_PROTEIN_G ? build("done", now, now) : build("closed", now, lightEnd);
+  };
+  // A session still ahead tonight keeps the training rules (fast carbs / after-training meal) past the cutoff,
+  // up to bed − 45 min; after that nothing is offered.
+  if (t >= cutoff.getTime() && (!trainingAhead || t >= lightEnd.getTime())) return late();
 
   // Training later today (not started, not done).
-  if (training && !a.todayWorkout && training.getTime() > t) {
-    const tr = training.getTime();
+  if (trainingAhead) {
+    const tr = training!.getTime();
+    const pastCutoff = t >= cutoff.getTime();
     const preStart = tr - PRE_WINDOW_HOURS * H, preEnd = tr - H;
     const after = tr + POST_MEAL_DELAY_HOURS * H;
     // After-training meal: past bed − 1 h → closed; past the heavy cutoff → light meal; else a normal window.
@@ -278,8 +304,10 @@ export function planNextMeal(a: {
     const start = Math.max(t, fuelAt - 0.5 * H);
     if (start >= preStart) {
       // A window under 45 min can't hold a real meal: snack instead.
-      return preEnd - start < MIN_PRE_WINDOW_MIN * 60_000 ? build("pre", start, tr, 0, true) : build("pre", start, preEnd);
+      // Past the heavy-meal cutoff only the snack is offered.
+      return pastCutoff || preEnd - start < MIN_PRE_WINDOW_MIN * 60_000 ? build("pre", start, tr, 0, true) : build("pre", start, preEnd);
     }
+    if (pastCutoff) return late();
   }
 
   // Usual slot in progress or next up today → that's the window; the fuel model is only the fallback.
@@ -312,36 +340,41 @@ const hrs = (ms: number) => { const h = ms / H; return h >= 1 ? `${Math.round(h 
 export function planLine(p: Plan, now: Date): string {
   const P = p.protein_g > 0 ? ` · ${p.protein_g} P` : "";
   const macros = `~${p.kcal} kcal${P}`;
+  const C = p.carbs_g ? ` · ~${p.carbs_g} C` : "";
   switch (p.kind) {
     case "done": return p.pastUsual && p.kcal > 0 ? `Past your usual meals · ~${p.kcal} kcal left, optional.` : "Target hit for today.";
     case "learning": return `Learning your usual meal times · ${p.progress?.days ?? 0} of ${p.progress?.of ?? 10} eating days logged (2+ meals a day).`;
     case "training": return `Training now. Eat within 2 h after · ~${p.kcal} kcal${p.protein_g > 0 ? ` · ≥${p.protein_g} P` : ""}.`;
-    case "post": return `Post-workout: eat by ${fmtT(p.end)}${P}${p.carbs_g ? ` · ~${p.carbs_g} C` : ""}${p.isDinner ? " · this is dinner" : ""}.`;
-    case "prebed": return `Pre-bed snack by ${fmtT(p.end)}: ${p.protein_g} g protein, ≤${p.kcal} kcal (yogurt, cottage cheese, casein).`;
+    case "post": return `Post-workout: eat by ${fmtT(p.end)}${p.light ? ` · light: protein + some carbs · ≤${p.kcal} kcal` : ""}${P}${C}${p.isDinner ? " · this is dinner" : ""}.`;
+    case "prebed": {
+      const when = p.start.getTime() > now.getTime() ? `${fmtT(p.start)}–${fmtT(p.end)}` : `by ${fmtT(p.end)}`;
+      return `Pre-bed snack ${when}: ${p.protein_g} g protein, ≤${p.kcal} kcal (yogurt, cottage cheese, casein).`;
+    }
     case "pre": {
       if (p.snack) {
         const t = p.training ?? p.end;
         return `Training at ${fmtT(t)}. Fast carbs ${p.start.getTime() > now.getTime() ? `~${fmtT(p.start)}` : "now"} (~${PRE_SNACK_CARBS} g, no fat), main meal after ~${fmtT(new Date(t.getTime() + POST_MEAL_DELAY_HOURS * H))}.`;
       }
-      return `Pre-workout meal ${fmtT(p.start)}–${fmtT(p.end)} · ${macros}${p.carbs_g ? ` · ~${p.carbs_g} C` : ""} · fat under ${p.fat_max_g ?? PRE_FAT_MAX_G} g.`;
+      const fat = p.fat_max_g === 0 ? "no fat" : `fat under ${p.fat_max_g ?? PRE_FAT_MAX_G} g`;
+      return `Pre-workout meal ${fmtT(p.start)}–${fmtT(p.end)} · ${macros}${C} · ${fat}.`;
     }
-    case "fuelled-through": if (p.light) return `Light meal after training, ~${fmtT(p.start)} · ≤${p.kcal} kcal${P}.`;
-      return `Fuelled through training. Next meal after, ~${fmtT(p.start)} · ${macros}.`;
+    case "fuelled-through": if (p.light) return `Light meal after training, ~${fmtT(p.start)} · ≤${p.kcal} kcal${P}${C}.`;
+      return `Fuelled through training. Next meal after, ~${fmtT(p.start)} · ${macros}${C}.`;
     case "fuelled": {
       if (p.usual) {
         const on = p.weekdayScoped ? ` on ${now.toLocaleDateString("en-US", { weekday: "long" })}s` : "";
-        return `Next meal usually ~${fmtT(new Date((p.start.getTime() + p.end.getTime()) / 2))}${on} (${fmtT(p.start)}–${fmtT(p.end)}) · ${macros}.`;
+        return `Next meal usually ~${fmtT(new Date((p.start.getTime() + p.end.getTime()) / 2))}${on} (${fmtT(p.start)}–${fmtT(p.end)}) · ${macros}${C}.`;
       }
-      return `Fuelled till ~${fmtT(p.fuel?.until ?? p.start)}. Next meal ${fmtT(p.start)}–${fmtT(p.end)} · ${macros}.`;
+      return `Fuelled till ~${fmtT(p.fuel?.until ?? p.start)}. Next meal ${fmtT(p.start)}–${fmtT(p.end)} · ${macros}${C}.`;
     }
     case "closed":
       if (p.start.getTime() > now.getTime()) return `Sleep time. Eating window opens at ${fmtT(p.start)}.`;
       return `Eating window closed for sleep (bed ${fmtT(p.bed)}).${p.kcal > 0 && now.getTime() < p.end.getTime() ? ` Light snack fine till ${fmtT(p.end)}.` : ""}`;
     case "eat": {
-      if (p.usual) return `Usual meal time · eat by ${fmtT(p.end)} · ${macros}${p.carbs_g ? ` · ~${p.carbs_g} C` : ""}${p.isDinner ? " · last big meal" : ""}.`;
+      if (p.usual) return `Usual meal time · eat by ${fmtT(p.end)} · ${macros}${C}${p.isDinner ? " · last big meal" : ""}.`;
       const gap = p.fuel ? now.getTime() - p.fuel.lastAt.getTime() : 0;
       const since = p.pastUsual ? "Past your usual meal times · " : p.fuel ? `${hrs(gap)} since your last meal. ` : "";
-      return `${since}Eat by ${fmtT(p.end)} · ${macros}${p.carbs_g ? ` · ~${p.carbs_g} C` : ""}${p.isDinner ? " · last big meal" : ""}.`;
+      return `${since}Eat by ${fmtT(p.end)} · ${macros}${C}${p.isDinner ? " · last big meal" : ""}.`;
     }
   }
 }

@@ -28,6 +28,29 @@ describe("dailyChecks", () => {
     const c = dailyChecks({ meals, workout: null, clock, slots: null, now: day(10), dayOver: false });
     expect(c.map((x) => x.ok)).toEqual([null, null, null, null, null]);
   });
+  it("on time ignores a small snack (< 300 kcal) far from any slot", () => {
+    const meals = [meal(8, 0, 500), meal(12, 30, 600), meal(15, 0, 450), meal(19, 0, 700), meal(21, 30, 150, 25, 3, 5)];
+    const c = dailyChecks({ meals, workout: null, clock, slots, now: day(23, 30), dayOver: true });
+    expect(c[4].ok).toBe(true); expect(c[4].detail).toBe("4 of 4 meals");
+  });
+  it("dinner early: a big meal within 2 h after a late session is exempt; a late non-workout dinner still fails", () => {
+    const late = { started_at: iso(19, 30), ended_at: iso(20, 30) };
+    const c = dailyChecks({ meals: [meal(21, 0, 800, 50)], workout: late, clock, slots: null, now: day(23, 30), dayOver: true });
+    expect(c[3].ok).toBe(true);
+    const d = dailyChecks({ meals: [meal(21, 0, 800, 50)], workout: null, clock, slots: null, now: day(23, 30), dayOver: true });
+    expect(d[3].ok).toBe(false);
+  });
+  it("dinner early stays undecided until the day is over (no ✓ → ✗ flip); a fail shows at once", () => {
+    const c = dailyChecks({ meals: [meal(18, 0, 700)], workout: null, clock, slots: null, now: day(20, 30), dayOver: false });
+    expect(c[3].ok).toBeNull();
+    const f = dailyChecks({ meals: [meal(20, 30, 700)], workout: null, clock, slots: null, now: day(20, 45), dayOver: false });
+    expect(f[3].ok).toBe(false);
+  });
+  it("session later today → the session checks read 'Not started', not 'No workout'", () => {
+    const c = dailyChecks({ meals: [meal(8, 0, 500)], workout: null, clock, slots: null, now: day(10), dayOver: false, trainingLater: true });
+    expect(c[0].detail).toBe("Not started"); expect(c[1].detail).toBe("Not started");
+    expect(c[0].ok).toBeNull();
+  });
   it("protein after counts a feeding within 2 h of the end", () => {
     const c = dailyChecks({ meals: [meal(19, 30, 600, 42)], workout, clock, slots: null, now: day(20), dayOver: false });
     expect(c[1].ok).toBe(true);

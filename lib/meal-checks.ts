@@ -8,6 +8,7 @@ export const FUEL_BEFORE_MIN_H = 1, FUEL_BEFORE_MAX_H = 3;
 export const POST_PROTEIN_MIN_G = 30;
 export const ON_TIME_TOLERANCE_MIN = 45;
 export const ON_TIME_MIN_SHARE = 0.75;
+export const ON_TIME_MIN_KCAL = 300;   // a post shake or pre-bed snack isn't a "meal" for the on-time check
 
 export type CheckKey = "fuelled" | "postProtein" | "proteinHits" | "dinnerEarly" | "onTime";
 /** ok: true/false; null = not applicable today (e.g. no workout, no pattern yet, day not over). */
@@ -17,10 +18,13 @@ export type CheckMeal = TimingMeal & { carbs_g?: number };
 const H = 3_600_000;
 
 /** Score one day. `meals` are that day's rows; `workout` that day's (completed) session; `slots` the usual minutes (if learned);
- *  `dayOver` = the day has ended (bedtime passed) so "dinner early" and "on time" can be judged. */
+ *  `dayOver` = the day has ended (bedtime passed) so "dinner early" and "on time" can be judged;
+ *  `trainingLater` = no session yet but one is expected later today (the session checks read "Not started"). */
 export function dailyChecks(a: {
   meals: CheckMeal[]; workout: TimingWorkout | null; clock: DayClock; slots: number[] | null; now: Date; dayOver: boolean;
+  trainingLater?: boolean;
 }): Check[] {
+  const noWorkout = a.trainingLater ? "Not started" : "No workout";
   const fs = feedings(a.meals);
   const rowsByFeeding = (f: { at: string }) => {
     const t0 = new Date(f.at).getTime();
@@ -30,7 +34,7 @@ export function dailyChecks(a: {
 
   // 1. Fuelled the session: a feeding 1–3 h before the start with ≥ 60 g carbs and ≤ 20 g fat.
   let fuelled: Check;
-  if (!a.workout) fuelled = { key: "fuelled", label: "Fuelled the session", ok: null, detail: "No workout" };
+  if (!a.workout) fuelled = { key: "fuelled", label: "Fuelled the session", ok: null, detail: noWorkout };
   else {
     const start = new Date(a.workout.started_at).getTime();
     const pre = fs.filter((f) => { const h = (start - new Date(f.at).getTime()) / H; return h >= FUEL_BEFORE_MIN_H && h <= FUEL_BEFORE_MAX_H; });
@@ -42,7 +46,7 @@ export function dailyChecks(a: {
 
   // 2. Protein after: ≥ 30 g within 2 h of the end.
   let post: Check;
-  if (!a.workout?.ended_at) post = { key: "postProtein", label: "Protein after", ok: null, detail: a.workout ? "Session not finished" : "No workout" };
+  if (!a.workout?.ended_at) post = { key: "postProtein", label: "Protein after", ok: null, detail: a.workout ? "Session not finished" : noWorkout };
   else {
     const end = new Date(a.workout.ended_at).getTime();
     const windowOpen = a.now.getTime() - end < POST_WINDOW_HOURS * H;
@@ -57,23 +61,27 @@ export function dailyChecks(a: {
   const hitsCheck: Check = { key: "proteinHits", label: `${PROTEIN_HITS_TARGET} protein hits`,
     ok: hits >= PROTEIN_HITS_TARGET ? true : a.dayOver ? false : null, detail: `${hits} / ${PROTEIN_HITS_TARGET}` };
 
-  // 4. Last big meal ≥ 3 h before bed (judged once the cutoff has passed).
+  // 4. Last big meal ≥ 3 h before bed. A fail shows as soon as it happens; a pass only once the day is over (no ✓ → ✗ flip).
+  //    Recovery beats the sleep rule: a feeding within 2 h after the session's end is exempt.
   const bed = bedtimeFor(a.now, a.clock).getTime();
   const cutoff = bed - LATE_MEAL_HOURS * H;
-  const lateBig = fs.filter((f) => Number(f.calories) >= LATE_MEAL_KCAL && new Date(f.at).getTime() > cutoff);
+  const wEnd = a.workout?.ended_at ? new Date(a.workout.ended_at).getTime() : null;
+  const postWorkout = (f: { at: string }) => { const t = new Date(f.at).getTime(); return wEnd !== null && t >= wEnd && t - wEnd <= POST_WINDOW_HOURS * H; };
+  const lateBig = fs.filter((f) => Number(f.calories) >= LATE_MEAL_KCAL && new Date(f.at).getTime() > cutoff && !postWorkout(f));
   const dinner: Check = { key: "dinnerEarly", label: "Dinner ≥ 3 h before bed",
-    ok: lateBig.length ? false : (a.dayOver || a.now.getTime() >= cutoff) ? true : null,
+    ok: lateBig.length ? false : a.dayOver ? true : null,
     detail: lateBig.length ? `${Math.round(Number(lateBig[0].calories))} kcal at ${fmt(new Date(lateBig[0].at))}` : "" };
 
-  // 5. On usual times: ≥ 75 % of feedings within ±45 min of a usual slot.
+  // 5. On usual times: ≥ 75 % of meals (feedings ≥ 300 kcal) within ±45 min of a usual slot.
   let onTime: Check;
+  const mealsOnly = fs.filter((f) => Number(f.calories) >= ON_TIME_MIN_KCAL);
   if (!a.slots || a.slots.length === 0) onTime = { key: "onTime", label: "On your usual times", ok: null, detail: "Still learning" };
-  else if (fs.length === 0) onTime = { key: "onTime", label: "On your usual times", ok: null, detail: "Nothing logged" };
+  else if (mealsOnly.length === 0) onTime = { key: "onTime", label: "On your usual times", ok: null, detail: "Nothing logged" };
   else {
     const minute = (d: Date) => d.getHours() * 60 + d.getMinutes();
-    const near = fs.filter((f) => a.slots!.some((m) => Math.abs(minute(new Date(f.at)) - m) <= ON_TIME_TOLERANCE_MIN)).length;
-    const share = near / fs.length;
-    onTime = { key: "onTime", label: "On your usual times", ok: share >= ON_TIME_MIN_SHARE ? true : a.dayOver ? false : null, detail: `${near} of ${fs.length} meals` };
+    const near = mealsOnly.filter((f) => a.slots!.some((m) => Math.abs(minute(new Date(f.at)) - m) <= ON_TIME_TOLERANCE_MIN)).length;
+    const share = near / mealsOnly.length;
+    onTime = { key: "onTime", label: "On your usual times", ok: share >= ON_TIME_MIN_SHARE ? true : a.dayOver ? false : null, detail: `${near} of ${mealsOnly.length} meals` };
   }
   return [fuelled, post, hitsCheck, dinner, onTime];
 }

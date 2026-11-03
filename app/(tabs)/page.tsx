@@ -143,12 +143,14 @@ function HubInner() {
   const dayKey = now.toDateString();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const pattern = useMemo(() => (recentMeals ? usualMealSlots(recentMeals, now) : undefined), [recentMeals, dayKey]);
+  const usualTraining = usualTrainingStart(recentWorkouts, now);
   const plan = t && prof ? planNextMeal({
-    meals, todayWorkout, usualTraining: usualTrainingStart(recentWorkouts, now),
-    totals, targets: { kcal: t.kcal, protein_g: t.protein_g }, weight_lb: trend ?? prof.weight_lb, now, clock, pattern,
+    meals, todayWorkout, usualTraining,
+    totals, targets: { kcal: t.kcal, protein_g: t.protein_g, carbs_g: t.carbs_g, fat_g: t.fat_g }, weight_lb: trend ?? prof.weight_lb, now, clock, pattern,
   }) : null;
   const hits = proteinHits(meals);
-  const checks = dailyChecks({ meals, workout: todayWorkout, clock, slots: pattern?.ready ? pattern.slots.map((sl) => sl.minute) : null, now, dayOver: false });
+  const checks = dailyChecks({ meals, workout: todayWorkout, clock, slots: pattern?.ready ? pattern.slots.map((sl) => sl.minute) : null, now, dayOver: false,
+    trainingLater: !todayWorkout && !!usualTraining && usualTraining.getTime() > now.getTime() });
   const late = lateHeavyMeal(meals, now, clock);
 
   async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); await loadTargets(true); }

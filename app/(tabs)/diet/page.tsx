@@ -17,12 +17,13 @@ import { listCompletedWorkouts } from "@/lib/workouts-db";
 import type { WorkoutRow } from "@/lib/workouts";
 import { dailyChecks, type Check, type CheckMeal } from "@/lib/meal-checks";
 import { usualMealSlots, WEEKDAY_WINDOW_DAYS } from "@/lib/meal-slots";
-import { bedtimeFor } from "@/lib/meal-timing";
+import { bedtimeFor, usualTrainingStart } from "@/lib/meal-timing";
 
 type Range = 30 | 90 | "all";
 type MealRow = { id: string; food_name: string; grams: number; calories: number; protein_g: number;
   unit?: string | null };
-type DayMeals = { date: string; kcal: number; protein: number; meals: MealRow[]; raw: CheckMeal[] };
+type RawMeal = CheckMeal & { id: string };
+type DayMeals = { date: string; kcal: number; protein: number; meals: MealRow[]; raw: RawMeal[] };
 
 function fmtDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
@@ -32,6 +33,11 @@ function fmtDate(iso: string): string {
 const fmtDay = (iso: string) => {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
+/** Two-letter weekday for a grid column ("Mo", "Tu", …). */
+const fmtWeekday = (iso: string) => {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", { weekday: "short" }).slice(0, 2);
 };
 
 /** Once-a-day weigh-in entry: quiet row that locks after today's save; Edit reopens for typos. */
@@ -110,18 +116,21 @@ export default function DietPage() {
   const [openDay, setOpenDay] = useState<string | null>(localDateKey());
   const [mealErr, setMealErr] = useState("");
   const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
-  const [historyMeals, setHistoryMeals] = useState<CheckMeal[] | null>(null); // six weeks, for the usual-slot learner
+  const [historyMeals, setHistoryMeals] = useState<RawMeal[] | null>(null); // six weeks, for the usual-slot learner
 
   const load = useCallback(async () => {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
     start.setDate(start.getDate() - 6);
-    const [w, p, m, a] = await Promise.allSettled([
+    const since = new Date(); since.setHours(0, 0, 0, 0); since.setDate(since.getDate() - WEEKDAY_WINDOW_DAYS);
+    const [w, p, m, a, h] = await Promise.allSettled([
       listWeighIns(),
       getProfile(),
       supabase.from("meals").select("*").gte("logged_at", start.toISOString()).order("logged_at"),
       listHealthActivity(addDays(localDateKey(), -ACTIVITY_BASELINE_WINDOW_DAYS)),
+      supabase.from("meals").select("id,logged_at,calories,protein_g,fat_g,carbs_g").gte("logged_at", since.toISOString()),
     ]);
+    if (h.status === "fulfilled" && !h.value.error) setHistoryMeals((h.value.data as RawMeal[]) ?? []);
     if (w.status === "fulfilled") { setRows(w.value); setErr(""); }
     if (m.status === "fulfilled" && !m.value.error) setMealErr("");
     else { setErr("Couldn't load weigh-ins."); }
@@ -133,7 +142,7 @@ export default function DietPage() {
       for (const raw of (m.value.data ?? []) as (MealRow & { logged_at: string })[]) {
         const key = localDateKey(new Date(raw.logged_at));
         const entry = rowsByDay.get(key) ?? { date: key, kcal: 0, protein: 0, meals: [], raw: [] };
-        entry.raw.push({ logged_at: raw.logged_at, calories: Number(raw.calories), protein_g: Number(raw.protein_g), fat_g: Number((raw as { fat_g?: number }).fat_g ?? 0), carbs_g: Number((raw as { carbs_g?: number }).carbs_g ?? 0) });
+        entry.raw.push({ id: raw.id, logged_at: raw.logged_at, calories: Number(raw.calories), protein_g: Number(raw.protein_g), fat_g: Number((raw as { fat_g?: number }).fat_g ?? 0), carbs_g: Number((raw as { carbs_g?: number }).carbs_g ?? 0) });
         entry.kcal += Number(raw.calories);
         entry.protein += Number(raw.protein_g);
         entry.meals.push({ id: raw.id, food_name: raw.food_name, grams: raw.grams, calories: raw.calories, protein_g: raw.protein_g, unit: raw.unit });
@@ -147,9 +156,6 @@ export default function DietPage() {
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
     listCompletedWorkouts(60).then(setWorkouts).catch(() => setWorkouts([]));
-    const since = new Date(); since.setHours(0, 0, 0, 0); since.setDate(since.getDate() - WEEKDAY_WINDOW_DAYS);
-    supabase.from("meals").select("logged_at,calories,protein_g,fat_g,carbs_g").gte("logged_at", since.toISOString())
-      .then(({ data, error }) => { if (!error) setHistoryMeals((data as CheckMeal[]) ?? []); });
   }, []);
 
   async function removeMeal(date: string, id: string) {
@@ -159,8 +165,10 @@ export default function DietPage() {
       if (d.date !== date) return d;
       const m = d.meals.find((x) => x.id === id);
       if (!m) return d;
-      return { ...d, kcal: d.kcal - Number(m.calories), protein: d.protein - Number(m.protein_g), meals: d.meals.filter((x) => x.id !== id) };
+      return { ...d, kcal: d.kcal - Number(m.calories), protein: d.protein - Number(m.protein_g), meals: d.meals.filter((x) => x.id !== id),
+        raw: d.raw.filter((x) => x.id !== id) };
     }).filter((d) => d.meals.length > 0));
+    setHistoryMeals((hs) => hs && hs.filter((x) => x.id !== id));
     try { await deleteMeal(id); }
     catch { setMealErr("Couldn't delete. Please try again."); await load(); }
   }
@@ -179,6 +187,24 @@ export default function DietPage() {
     const since = addDays(today, -(range - 1));
     return trended.filter((p) => p.date >= since);
   }, [trended, range, today]);
+
+  // Controllables grid: all 7 days (empty ones too), oldest → newest, scored once per data change.
+  const perDay = useMemo(() => {
+    if (!profile) return null;
+    const clock = { wake: profile.wake_time, bed: profile.bed_time };
+    const now = new Date();
+    return Array.from({ length: 7 }, (_, i) => addDays(today, i - 6)).map((date) => {
+      const [y, mo, da] = date.split("-").map(Number);
+      const dayNoon = new Date(y, mo - 1, da, 12);
+      const w = workouts.find((x) => localDateKey(new Date(x.started_at)) === date) ?? null;
+      const slots = historyMeals ? (() => { const p = usualMealSlots(historyMeals, dayNoon); return p.ready ? p.slots.map((sl) => sl.minute) : null; })() : null;
+      const dayOver = now.getTime() > bedtimeFor(dayNoon, clock).getTime();
+      const usual = date === today && !w ? usualTrainingStart(workouts, now) : null;
+      const raw = days.find((d) => d.date === date)?.raw ?? [];
+      return { date, checks: dailyChecks({ meals: raw, workout: w ? { started_at: w.started_at, ended_at: w.ended_at } : null, clock, slots,
+        now: dayOver ? bedtimeFor(dayNoon, clock) : now, dayOver, trainingLater: !!usual && usual.getTime() > now.getTime() }) };
+    });
+  }, [historyMeals, days, workouts, profile, today]);
 
   const todayRow = rows.find((r) => r.date === today) ?? null;
   const last = rows.length ? rows[rows.length - 1] : null;
@@ -338,17 +364,7 @@ export default function DietPage() {
           {mealErr && <p className="px-1 text-sm text-danger">{mealErr}</p>}
         </section>
 
-        {profile && days.length > 0 && (() => {
-          const clock = { wake: profile.wake_time, bed: profile.bed_time };
-          const now = new Date();
-          const perDay = [...days].sort((a, b) => (a.date < b.date ? -1 : 1)).map((d) => {
-            const [y, mo, da] = d.date.split("-").map(Number);
-            const dayNoon = new Date(y, mo - 1, da, 12);
-            const w = workouts.find((x) => localDateKey(new Date(x.started_at)) === d.date) ?? null;
-            const slots = historyMeals ? (() => { const p = usualMealSlots(historyMeals, dayNoon); return p.ready ? p.slots.map((sl) => sl.minute) : null; })() : null;
-            const dayOver = now.getTime() > bedtimeFor(dayNoon, clock).getTime();
-            return { date: d.date, checks: dailyChecks({ meals: d.raw, workout: w ? { started_at: w.started_at, ended_at: w.ended_at } : null, clock, slots, now: dayOver ? bedtimeFor(dayNoon, clock) : now, dayOver }) };
-          });
+        {perDay && days.length > 0 && (() => {
           const labels = perDay[0].checks.map((c) => c.label);
           return (
             <section className="card-grad rounded-3xl border border-border p-5">
@@ -358,7 +374,7 @@ export default function DietPage() {
               </div>
               <div className="grid gap-y-1.5" style={{ gridTemplateColumns: `1fr repeat(${perDay.length}, 1.25rem)` }}>
                 <span />
-                {perDay.map((d) => <span key={d.date} className="text-center text-[10px] text-muted">{fmtDay(d.date).slice(0, 2)}</span>)}
+                {perDay.map((d) => <span key={d.date} className="text-center text-[10px] text-muted">{fmtWeekday(d.date)}</span>)}
                 {labels.map((label, i) => (
                   <div key={label} className="contents">
                     <span className="text-[12px] text-muted">{label}</span>
