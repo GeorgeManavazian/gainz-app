@@ -18,6 +18,8 @@ import { remaining } from "@/lib/hub";
 import { bedtimeFor, wakeFor, lateHeavyMeal, planLine, planNextMeal, proteinHits, usualTrainingStart, PROTEIN_HITS_TARGET } from "@/lib/meal-timing";
 import MealTimeline from "@/components/MealTimeline";
 import { usualMealSlots, WEEKDAY_WINDOW_DAYS } from "@/lib/meal-slots";
+import { dailyChecks } from "@/lib/meal-checks";
+import ChecksRow from "@/components/ChecksRow";
 import SavePatternSheet from "@/components/SavePatternSheet";
 import ConfirmDelete from "@/components/ConfirmDelete";
 import { deleteMeal } from "@/lib/meals-db";
@@ -146,6 +148,7 @@ function HubInner() {
     totals, targets: { kcal: t.kcal, protein_g: t.protein_g }, weight_lb: trend ?? prof.weight_lb, now, clock, pattern,
   }) : null;
   const hits = proteinHits(meals);
+  const checks = dailyChecks({ meals, workout: todayWorkout, clock, slots: pattern?.ready ? pattern.slots.map((sl) => sl.minute) : null, now, dayOver: false });
   const late = lateHeavyMeal(meals, now, clock);
 
   async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); await loadTargets(true); }
@@ -258,6 +261,7 @@ function HubInner() {
             </div>
             <MealTimeline wake={wakeFor(now, clock)} bed={bedtimeFor(now, clock)} now={now} meals={meals} workout={todayWorkout} plan={plan} usualMinutes={pattern?.ready ? pattern.slots.map((sl) => sl.minute) : []} />
             <p className="text-[14px] font-semibold leading-snug">{planLine(plan, now)}</p>
+            <ChecksRow checks={checks} />
             {late && (
               <p className="text-[12px] text-danger">
                 Heavy meal {late.hoursBeforeBed <= 0 ? "after bedtime" : `${Math.round(late.hoursBeforeBed * 10) / 10} h before bed`} — expect worse sleep.

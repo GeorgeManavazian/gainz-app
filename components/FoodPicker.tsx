@@ -35,9 +35,11 @@ const BASE_UNITS: Unit[] = [
 const HISTORY_PREVIEW = 5;
 const fmtG = (g: number) => String(Math.round(g * 10) / 10);
 
-export default function FoodPicker({ onPick, confirmLabel, successLabel, header }: {
+export default function FoodPicker({ onPick, confirmLabel, successLabel, header, warn }: {
   /** Returns the new row id when the pick was logged (enables Undo); void when it was only added to a draft. */
   onPick: (entry: MealEntry) => Promise<string | void> | string | void;
+  /** Shown above Save when the pick fights the plan (heavy meal near bed, fatty meal before training). */
+  warn?: (entry: MealEntry) => string | null;
   confirmLabel: string;
   successLabel?: string;
   header?: React.ReactNode;
@@ -307,6 +309,11 @@ export default function FoodPicker({ onPick, confirmLabel, successLabel, header 
             <span className="flex-1"><span className="block text-xl font-bold tabular-nums text-foreground">{scale(picked.per100g.carbs)}</span><span className="text-muted">C</span></span>
             <span className="flex-1"><span className="block text-xl font-bold tabular-nums text-foreground">{scale(picked.per100g.fat)}</span><span className="text-muted">F</span></span>
           </div>
+          {(() => {
+            const w = warn && grams > 0 ? warn({ food_name: picked.name, grams, calories: scale(picked.per100g.kcal), protein_g: scale(picked.per100g.protein),
+              carbs_g: scale(picked.per100g.carbs), fat_g: scale(picked.per100g.fat) }) : null;
+            return w ? <p className="rounded-xl bg-warning/15 px-3 py-2 text-[13px] text-warning" role="status">{w}</p> : null;
+          })()}
           {err && <p className="text-sm text-danger">{err}</p>}
           <div className="flex gap-3">
             <button

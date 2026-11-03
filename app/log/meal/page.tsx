@@ -6,13 +6,32 @@ import FoodPicker from "@/components/FoodPicker";
 import { logMeal } from "@/lib/log";
 import { listPatterns } from "@/lib/patterns-db";
 import { scaleItem, sortPatterns, totals, type PatternRow } from "@/lib/patterns";
+import { getProfile } from "@/lib/profile";
+import { getActiveWorkout, getTodayCompletedWorkout, listCompletedWorkouts } from "@/lib/workouts-db";
+import { usualTrainingStart, type DayClock } from "@/lib/meal-timing";
+import { preSaveWarning, type WarnContext } from "@/lib/meal-warnings";
+import type { MealEntry } from "@/lib/log";
 
 const MEAL_PREVIEW = 4;
 
 export default function LogMeal() {
   const [patterns, setPatterns] = useState<PatternRow[]>([]);
   const [showAll, setShowAll] = useState(false);
+  const [warnCtx, setWarnCtx] = useState<Omit<WarnContext, "now"> | null>(null);
   useEffect(() => { listPatterns().then((p) => setPatterns(sortPatterns(p))).catch(() => setPatterns([])); }, []);
+  // Context for the pre-save warning: bedtime, and whether training is still ahead today.
+  useEffect(() => {
+    Promise.allSettled([getProfile(), getActiveWorkout(), getTodayCompletedWorkout(), listCompletedWorkouts(60)]).then(([p, a, d, r]) => {
+      const prof = p.status === "fulfilled" ? p.value : null;
+      const clock: DayClock = { wake: prof?.wake_time ?? "07:00", bed: prof?.bed_time ?? "23:00" };
+      const active = a.status === "fulfilled" ? a.value : null;
+      const done = d.status === "fulfilled" ? d.value : null;
+      const recent = r.status === "fulfilled" ? r.value : [];
+      const training = active ? new Date(active.started_at) : done ? new Date(done.started_at) : usualTrainingStart(recent, new Date());
+      setWarnCtx({ clock, training, trainingDone: !!done || !!active });
+    });
+  }, []);
+  const warn = (e: MealEntry) => (warnCtx ? preSaveWarning(e, { ...warnCtx, now: new Date() }) : null);
 
   const yourMeals = (
     <section className="flex flex-col gap-1.5">
@@ -52,7 +71,7 @@ export default function LogMeal() {
     <AuthGuard>
       <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-background px-4 pb-10 pt-6 text-foreground">
         <h1 className="text-xl font-bold tracking-tight">Log meal</h1>
-        <FoodPicker confirmLabel="Save" successLabel="Logged ✓" onPick={logMeal} header={yourMeals} />
+        <FoodPicker confirmLabel="Save" successLabel="Logged ✓" onPick={logMeal} header={yourMeals} warn={warn} />
       </main>
     </AuthGuard>
   );

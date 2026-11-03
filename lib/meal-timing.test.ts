@@ -146,13 +146,13 @@ describe("planNextMeal", () => {
     const p = planNextMeal({ ...base, meals: [meal(12, 0, 600)], totals: { calories: 600, protein_g: 40 }, now: day(16, 30), usualTraining: day(17) });
     expect(p.kind).toBe("pre"); expect(p.snack).toBe(true);
     expect(p.kcal).toBeLessThanOrEqual(200); expect(p.end.getTime()).toBeLessThanOrEqual(day(17).getTime());
-    expect(planLine(p, day(16, 30))).toBe("Training at 5pm. Small carb snack now (≤200 kcal), main meal after ~6:30pm.");
+    expect(planLine(p, day(16, 30))).toBe("Training at 5pm. Fast carbs now (~40 g, no fat), main meal after ~6:30pm.");
   });
   it("pre window shorter than 45 min → snack, not a full meal (15:59 and 15:30, training 5pm)", () => {
     for (const now of [day(15, 59), day(15, 30)]) {
       const p = planNextMeal({ ...base, meals: [meal(12, 0, 600)], totals: { calories: 600, protein_g: 40 }, now, usualTraining: day(17) });
       expect(p.kind).toBe("pre"); expect(p.snack).toBe(true); expect(p.kcal).toBeLessThanOrEqual(200);
-      expect(planLine(p, now)).toBe("Training at 5pm. Small carb snack now (≤200 kcal), main meal after ~6:30pm.");
+      expect(planLine(p, now)).toBe("Training at 5pm. Fast carbs now (~40 g, no fat), main meal after ~6:30pm.");
     }
     // 45 min exactly is still a meal
     const p = planNextMeal({ ...base, meals: [meal(12, 0, 600)], totals: { calories: 600, protein_g: 40 }, now: day(15, 15), usualTraining: day(17) });
@@ -161,11 +161,11 @@ describe("planNextMeal", () => {
   it("late training: after-training meal past the heavy cutoff → light meal ≤300 kcal", () => {
     const p = planNextMeal({ ...base, meals: [meal(18, 0, 900)], totals: { calories: 900, protein_g: 50 }, now: day(19, 30), usualTraining: day(20) });
     expect(p.kind).toBe("fuelled-through"); expect(p.light).toBe(true); expect(p.kcal).toBe(300);
-    expect(p.end.getTime()).toBeLessThanOrEqual(day(22).getTime());
+    expect(p.end.getTime()).toBeLessThanOrEqual(day(22, 15).getTime());
     expect(planLine(p, day(19, 30))).toBe("Light meal after training, ~9:30pm · ≤300 kcal · 36 P.");
   });
   it("very late training: after-training meal past bed − 1 h → closed", () => {
-    const p = planNextMeal({ ...base, meals: [meal(18, 0, 900)], totals: { calories: 900, protein_g: 50 }, now: day(20), usualTraining: day(20, 30) });
+    const p = planNextMeal({ ...base, meals: [meal(18, 0, 900)], totals: { calories: 900, protein_g: 50 }, now: day(22, 20), usualTraining: day(22, 40) });
     expect(p.kind).toBe("closed");
   });
   it("active workout → training, no meal window", () => {
@@ -182,7 +182,7 @@ describe("planNextMeal", () => {
   it("post-workout window is capped at bed − 1 h", () => {
     const p = planNextMeal({ ...base, meals: [meal(12, 0, 600)], totals: { calories: 600, protein_g: 40 }, now: day(21, 35),
       todayWorkout: { started_at: iso(20, 30), ended_at: iso(21, 30) } });
-    expect(p.kind).toBe("post"); expect(p.end.getHours()).toBe(22); expect(p.end.getMinutes()).toBe(0);
+    expect(p.kind).toBe("post"); expect(p.end.getHours()).toBe(22); expect(p.end.getMinutes()).toBe(15);
   });
   it("before wake → closed for sleep, window opens at wake", () => {
     const p = planNextMeal({ ...base, meals: [], totals: { calories: 0, protein_g: 0 }, now: day(5) });
@@ -199,15 +199,30 @@ describe("planNextMeal", () => {
     expect(p.protein_g).toBe(0);
     expect(planLine(p, day(12))).toMatch(/· ~\d+ kcal\.$/);
   });
-  it("closed after bed − 2.5 h, light snack till bed − 1 h", () => {
+  it("after bed − 3 h: pre-bed protein snack until bed − 45 min, then closed", () => {
     const p = planNextMeal({ ...base, meals: [meal(18, 0, 700)], totals: { calories: 1500, protein_g: 120 }, now: day(20, 45) });
-    expect(p.kind).toBe("closed"); expect(p.end.getHours()).toBe(22);
-    expect(planLine(p, day(20, 45))).toMatch(/closed for sleep/);
+    expect(p.kind).toBe("prebed"); expect(p.end.getHours()).toBe(22); expect(p.end.getMinutes()).toBe(15);
+    expect(p.protein_g).toBe(35); expect(p.kcal).toBeLessThanOrEqual(300);
+    expect(planLine(p, day(20, 45))).toMatch(/^Pre-bed snack by 10:15pm: 35 g protein/);
+    const c = planNextMeal({ ...base, meals: [meal(18, 0, 700)], totals: { calories: 1500, protein_g: 120 }, now: day(22, 30) });
+    expect(c.kind).toBe("closed"); expect(planLine(c, day(22, 30))).toMatch(/closed for sleep/);
+  });
+  it("pre-workout window prescribes carbs around 0.45 g/lb and a fat ceiling", () => {
+    const p = planNextMeal({ ...base, meals: [meal(12, 0, 600)], totals: { calories: 600, protein_g: 40, carbs_g: 60, fat_g: 20 },
+      targets: { ...targets, carbs_g: 250, fat_g: 70 }, now: day(14), usualTraining: day(17) });
+    expect(p.kind).toBe("pre"); expect(p.carbs_g).toBe(90); expect(p.fat_max_g).toBe(15);
+    expect(planLine(p, day(14))).toMatch(/~90 C · fat under 15 g/);
+  });
+  it("the window that ends at the cutoff is marked as dinner", () => {
+    const p = planNextMeal({ ...base, meals: [meal(16, 0, 500)], totals: { calories: 1600, protein_g: 130, carbs_g: 150 },
+      targets: { ...targets, carbs_g: 250 }, now: day(19, 15) });
+    expect(p.isDinner).toBe(true);
+    expect(planLine(p, day(19, 15))).toMatch(/last big meal/);
   });
   it("eat when the tank is empty; macros split across meals left before the cutoff", () => {
     const p = planNextMeal({ ...base, meals: [meal(8, 0, 400)], totals: { calories: 400, protein_g: 30 }, now: day(12) });
     expect(p.kind).toBe("eat");
-    expect(p.mealsLeft).toBe(3); // 12:00 → 20:30 cutoff = 8.5 h / 3.5 h → 3
+    expect(p.mealsLeft).toBe(3); // 12:00 → 20:00 cutoff = 8 h / 3.5 h → 3
     expect(p.kcal).toBe(600); expect(p.protein_g).toBe(36);
     expect(planLine(p, day(12))).toMatch(/4 h since your last meal/);
   });
@@ -253,9 +268,9 @@ describe("planNextMeal with a learned pattern", () => {
     expect(p.mealsLeft).toBe(2);
   });
   it("a slot straddling the cutoff is clamped to it", () => {
-    const p = planNextMeal({ ...base, meals: [meal(16, 0, 500)], totals: { calories: 1500, protein_g: 120 }, now: day(19, 50),
-      pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots: [{ minute: 20 * 60 + 15 }] } });
-    expect(p.kind).toBe("eat"); expect(p.end.getHours()).toBe(20); expect(p.end.getMinutes()).toBe(30);
+    const p = planNextMeal({ ...base, meals: [meal(16, 0, 500)], totals: { calories: 1500, protein_g: 120 }, now: day(19, 20),
+      pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots: [{ minute: 19 * 60 + 45 }] } });
+    expect(p.kind).toBe("eat"); expect(p.end.getHours()).toBe(20); expect(p.end.getMinutes()).toBe(0);
   });
   it("learning still lets the post-workout prompt through", () => {
     const p = planNextMeal({ ...base, meals: [], totals: { calories: 600, protein_g: 40 }, now: day(18, 15),
@@ -265,10 +280,10 @@ describe("planNextMeal with a learned pattern", () => {
   it("after the last slot with little left → done; a slot inside the sleep cutoff → closed", () => {
     const late = planNextMeal({ ...base, meals: [meal(19, 30, 700)], totals: { calories: 2050, protein_g: 170 }, now: day(20, 15),
       pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots } });
-    expect(late.kind).toBe("done"); expect(planLine(late, day(20, 15))).toMatch(/^Past your usual meals · ~150 kcal left, optional/);
+    expect(late.kind).toBe("prebed"); // past the cutoff now (bed − 3 h) → the protein snack window
     const lateSlot = planNextMeal({ ...base, meals: [], totals: { calories: 1000, protein_g: 80 }, now: day(20, 15),
       pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots: [{ minute: 21 * 60 }] } });
-    expect(lateSlot.kind).toBe("closed");
+    expect(lateSlot.kind).toBe("prebed"); // a usual slot inside the cutoff only ever gets the protein snack
   });
 });
 

@@ -13,11 +13,16 @@ import { deleteWeighIn, listWeighIns, localDateKey, upsertWeighIn, type WeighInR
 import { addDays, assessProgress, emaTrend, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight, type Assessment } from "@/lib/trend";
 import { computeActivityBonus, ACTIVITY_BASELINE_WINDOW_DAYS } from "@/lib/activity-adjustment";
 import { listHealthActivity, type HealthActivityRow } from "@/lib/health-activity";
+import { listCompletedWorkouts } from "@/lib/workouts-db";
+import type { WorkoutRow } from "@/lib/workouts";
+import { dailyChecks, type Check, type CheckMeal } from "@/lib/meal-checks";
+import { usualMealSlots, WEEKDAY_WINDOW_DAYS } from "@/lib/meal-slots";
+import { bedtimeFor } from "@/lib/meal-timing";
 
 type Range = 30 | 90 | "all";
 type MealRow = { id: string; food_name: string; grams: number; calories: number; protein_g: number;
   unit?: string | null };
-type DayMeals = { date: string; kcal: number; protein: number; meals: MealRow[] };
+type DayMeals = { date: string; kcal: number; protein: number; meals: MealRow[]; raw: CheckMeal[] };
 
 function fmtDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
@@ -104,6 +109,8 @@ export default function DietPage() {
   const [activity, setActivity] = useState<HealthActivityRow[]>([]);
   const [openDay, setOpenDay] = useState<string | null>(localDateKey());
   const [mealErr, setMealErr] = useState("");
+  const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
+  const [historyMeals, setHistoryMeals] = useState<CheckMeal[] | null>(null); // six weeks, for the usual-slot learner
 
   const load = useCallback(async () => {
     const start = new Date();
@@ -125,7 +132,8 @@ export default function DietPage() {
       const rowsByDay = new Map<string, DayMeals>();
       for (const raw of (m.value.data ?? []) as (MealRow & { logged_at: string })[]) {
         const key = localDateKey(new Date(raw.logged_at));
-        const entry = rowsByDay.get(key) ?? { date: key, kcal: 0, protein: 0, meals: [] };
+        const entry = rowsByDay.get(key) ?? { date: key, kcal: 0, protein: 0, meals: [], raw: [] };
+        entry.raw.push({ logged_at: raw.logged_at, calories: Number(raw.calories), protein_g: Number(raw.protein_g), fat_g: Number((raw as { fat_g?: number }).fat_g ?? 0), carbs_g: Number((raw as { carbs_g?: number }).carbs_g ?? 0) });
         entry.kcal += Number(raw.calories);
         entry.protein += Number(raw.protein_g);
         entry.meals.push({ id: raw.id, food_name: raw.food_name, grams: raw.grams, calories: raw.calories, protein_g: raw.protein_g, unit: raw.unit });
@@ -137,6 +145,12 @@ export default function DietPage() {
     }
   }, []);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    listCompletedWorkouts(60).then(setWorkouts).catch(() => setWorkouts([]));
+    const since = new Date(); since.setHours(0, 0, 0, 0); since.setDate(since.getDate() - WEEKDAY_WINDOW_DAYS);
+    supabase.from("meals").select("logged_at,calories,protein_g,fat_g,carbs_g").gte("logged_at", since.toISOString())
+      .then(({ data, error }) => { if (!error) setHistoryMeals((data as CheckMeal[]) ?? []); });
+  }, []);
 
   async function removeMeal(date: string, id: string) {
     setMealErr("");
@@ -323,6 +337,42 @@ export default function DietPage() {
           </ul>
           {mealErr && <p className="px-1 text-sm text-danger">{mealErr}</p>}
         </section>
+
+        {profile && days.length > 0 && (() => {
+          const clock = { wake: profile.wake_time, bed: profile.bed_time };
+          const now = new Date();
+          const perDay = [...days].sort((a, b) => (a.date < b.date ? -1 : 1)).map((d) => {
+            const [y, mo, da] = d.date.split("-").map(Number);
+            const dayNoon = new Date(y, mo - 1, da, 12);
+            const w = workouts.find((x) => localDateKey(new Date(x.started_at)) === d.date) ?? null;
+            const slots = historyMeals ? (() => { const p = usualMealSlots(historyMeals, dayNoon); return p.ready ? p.slots.map((sl) => sl.minute) : null; })() : null;
+            const dayOver = now.getTime() > bedtimeFor(dayNoon, clock).getTime();
+            return { date: d.date, checks: dailyChecks({ meals: d.raw, workout: w ? { started_at: w.started_at, ended_at: w.ended_at } : null, clock, slots, now: dayOver ? bedtimeFor(dayNoon, clock) : now, dayOver }) };
+          });
+          const labels = perDay[0].checks.map((c) => c.label);
+          return (
+            <section className="card-grad rounded-3xl border border-border p-5">
+              <div className="mb-2 flex items-baseline justify-between">
+                <h2 className="text-[15px] font-semibold">Controllables</h2>
+                <span className="text-[11px] text-muted">last 7 days</span>
+              </div>
+              <div className="grid gap-y-1.5" style={{ gridTemplateColumns: `1fr repeat(${perDay.length}, 1.25rem)` }}>
+                <span />
+                {perDay.map((d) => <span key={d.date} className="text-center text-[10px] text-muted">{fmtDay(d.date).slice(0, 2)}</span>)}
+                {labels.map((label, i) => (
+                  <div key={label} className="contents">
+                    <span className="text-[12px] text-muted">{label}</span>
+                    {perDay.map((d) => {
+                      const c: Check = d.checks[i];
+                      return <span key={d.date + label} title={c.detail} aria-label={`${fmtDay(d.date)} ${label}: ${c.ok === true ? "yes" : c.ok === false ? "no" : "n/a"}`}
+                        className={`mx-auto h-3 w-3 rounded-full ${c.ok === true ? "bg-success" : c.ok === false ? "bg-danger/70" : "border border-border"}`} />;
+                    })}
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
 
         <section className="card-grad rounded-3xl border border-border p-5">
           <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-muted">Recent weigh-ins</p>
