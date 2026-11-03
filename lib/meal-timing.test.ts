@@ -275,6 +275,11 @@ describe("planNextMeal with a learned pattern", () => {
       pattern: { ready: true, daysWithMeals: 14, windowDays: 14, slots: [{ minute: 19 * 60 + 45 }] } });
     expect(p.kind).toBe("eat"); expect(p.end.getHours()).toBe(20); expect(p.end.getMinutes()).toBe(0);
   });
+  it("a late session's snack promises light protein after, not a main meal past bed", () => {
+    const p = planNextMeal({ ...base, meals: [meal(17, 0, 500)], totals: { calories: 1500, protein_g: 110 }, now: day(20, 10), usualTraining: day(20, 30) });
+    expect(p.kind).toBe("pre"); expect(p.snack).toBe(true);
+    expect(planLine(p, day(20, 10))).toMatch(/light protein after\.$/);
+  });
   it("learning still lets the post-workout prompt through", () => {
     const p = planNextMeal({ ...base, meals: [], totals: { calories: 600, protein_g: 40 }, now: day(18, 15),
       todayWorkout: { started_at: iso(17), ended_at: iso(18) }, pattern: { ready: false, daysWithMeals: 3, windowDays: 14, slots: [] } });

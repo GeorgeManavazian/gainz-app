@@ -201,8 +201,10 @@ export default function DietPage() {
       const dayOver = now.getTime() > bedtimeFor(dayNoon, clock).getTime();
       const usual = date === today && !w ? usualTrainingStart(workouts, now) : null;
       const raw = days.find((d) => d.date === date)?.raw ?? [];
-      return { date, checks: dailyChecks({ meals: raw, workout: w ? { started_at: w.started_at, ended_at: w.ended_at } : null, clock, slots,
-        now: dayOver ? bedtimeFor(dayNoon, clock) : now, dayOver, trainingLater: !!usual && usual.getTime() > now.getTime() }) };
+      const checks = dailyChecks({ meals: raw, workout: w ? { started_at: w.started_at, ended_at: w.ended_at } : null, clock, slots,
+        now: dayOver ? bedtimeFor(dayNoon, clock) : now, dayOver, trainingLater: !!usual && usual.getTime() > now.getTime() });
+      // A day with nothing logged is unknown, not a pass/fail.
+      return { date, checks: raw.length === 0 ? checks.map((c) => ({ ...c, ok: null, detail: "Nothing logged" })) : checks };
     });
   }, [historyMeals, days, workouts, profile, today]);
 

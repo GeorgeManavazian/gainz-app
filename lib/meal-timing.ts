@@ -353,7 +353,9 @@ export function planLine(p: Plan, now: Date): string {
     case "pre": {
       if (p.snack) {
         const t = p.training ?? p.end;
-        return `Training at ${fmtT(t)}. Fast carbs ${p.start.getTime() > now.getTime() ? `~${fmtT(p.start)}` : "now"} (~${PRE_SNACK_CARBS} g, no fat), main meal after ~${fmtT(new Date(t.getTime() + POST_MEAL_DELAY_HOURS * H))}.`;
+        const after = new Date(t.getTime() + POST_MEAL_DELAY_HOURS * H);
+        const tail = after.getTime() >= p.cutoff.getTime() ? "light protein after" : `main meal after ~${fmtT(after)}`;
+        return `Training at ${fmtT(t)}. Fast carbs ${p.start.getTime() > now.getTime() ? `~${fmtT(p.start)}` : "now"} (~${PRE_SNACK_CARBS} g, no fat), ${tail}.`;
       }
       const fat = p.fat_max_g === 0 ? "no fat" : `fat under ${p.fat_max_g ?? PRE_FAT_MAX_G} g`;
       return `Pre-workout meal ${fmtT(p.start)}–${fmtT(p.end)} · ${macros}${C} · ${fat}.`;
