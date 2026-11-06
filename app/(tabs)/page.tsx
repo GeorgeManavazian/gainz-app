@@ -40,9 +40,7 @@ function HubInner() {
   const [done, setDone] = useState<{ w: WorkoutRow; sets: number } | null>(null);
   const [recentWorkouts, setRecentWorkouts] = useState<WorkoutRow[]>([]);
   const [sleepToday, setSleepToday] = useState<number | null>(null);
-  useEffect(() => {
-    listSleep(localDateKey()).then((rows) => setSleepToday(rows.find((r) => r.date === localDateKey())?.quality ?? null)).catch(() => {});
-  }, []);
+  const [workoutsLoaded, setWorkoutsLoaded] = useState(false);
   const [recentMeals, setRecentMeals] = useState<Meal[] | null>(null); // last six weeks, for the usual-slot learner; null until loaded
   const params = useSearchParams();
   const router = useRouter();
@@ -84,13 +82,17 @@ function HubInner() {
   }
 
   const loadWorkouts = useCallback(async () => {
-    getActiveWorkout().then(setActive).catch(() => setActive(null));
-    listCompletedWorkouts(60).then(setRecentWorkouts).catch(() => setRecentWorkouts([]));
-    getTodayCompletedWorkout().then(async (w) => {
-      if (!w) return setDone(null);
-      const rows = await listLiftsForWorkout(w.id).catch(() => []);
-      setDone({ w, sets: totalSets(rows) });
-    }).catch(() => setDone(null));
+    // Targets depend on the day type, which depends on these; hold targets until all three settle (no rest→training flicker).
+    await Promise.allSettled([
+      getActiveWorkout().then(setActive).catch(() => setActive(null)),
+      listCompletedWorkouts(60).then(setRecentWorkouts).catch(() => setRecentWorkouts([])),
+      getTodayCompletedWorkout().then(async (w) => {
+        if (!w) return setDone(null);
+        const rows = await listLiftsForWorkout(w.id).catch(() => []);
+        setDone({ w, sets: totalSets(rows) });
+      }).catch(() => setDone(null)),
+    ]);
+    setWorkoutsLoaded(true);
   }, []);
 
   useEffect(() => {
@@ -130,7 +132,7 @@ function HubInner() {
   const activityBonus = computeActivityBonus(activity, today);
   const dayType = dayTypeFor({ active: !!active, doneToday: !!done, usualTraining: usualTrainingStart(recentWorkouts, now), now });
   const targets =
-    profile === undefined ? undefined
+    profile === undefined || !workoutsLoaded ? undefined
     : profile === null ? null
     : profile === "error" ? "error"
     : computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, new Date(), activityBonus, dayType);
@@ -163,6 +165,13 @@ function HubInner() {
 
   async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); await loadTargets(true); }
   async function saveSleep(q: number) { await upsertSleep(today, q); setSleepToday(q); }
+  useEffect(() => {
+    const fetchSleep = () => listSleep(today).then((rows) => setSleepToday(rows.find((r) => r.date === today)?.quality ?? null)).catch(() => {});
+    fetchSleep();
+    const onVis = () => { if (document.visibilityState === "visible") fetchSleep(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [today]);
 
   const kcalLeft = t ? remaining(totals.calories, t.kcal) : 0;
 

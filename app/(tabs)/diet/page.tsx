@@ -13,7 +13,7 @@ import { deleteWeighIn, listWeighIns, localDateKey, upsertWeighIn, type WeighInR
 import { addDays, assessProgress, emaTrend, inCooldown, slopeLbPerWk, suggestAdjustment, trendWeight, type Assessment } from "@/lib/trend";
 import { computeActivityBonus, ACTIVITY_BASELINE_WINDOW_DAYS } from "@/lib/activity-adjustment";
 import { listHealthActivity, type HealthActivityRow } from "@/lib/health-activity";
-import { listCompletedWorkouts } from "@/lib/workouts-db";
+import { getActiveWorkout, listCompletedWorkouts } from "@/lib/workouts-db";
 import type { WorkoutRow } from "@/lib/workouts";
 import { dailyChecks, type Check, type CheckMeal } from "@/lib/meal-checks";
 import { usualMealSlots, WEEKDAY_WINDOW_DAYS } from "@/lib/meal-slots";
@@ -117,6 +117,8 @@ export default function DietPage() {
   const [openDay, setOpenDay] = useState<string | null>(localDateKey());
   const [mealErr, setMealErr] = useState("");
   const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
+  const [activeNow, setActiveNow] = useState(false);
+  const [workoutsLoaded, setWorkoutsLoaded] = useState(false);
   const [historyMeals, setHistoryMeals] = useState<RawMeal[] | null>(null); // six weeks, for the usual-slot learner
 
   const load = useCallback(async () => {
@@ -156,7 +158,10 @@ export default function DietPage() {
   }, []);
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
-    listCompletedWorkouts(60).then(setWorkouts).catch(() => setWorkouts([]));
+    Promise.allSettled([
+      listCompletedWorkouts(60).then(setWorkouts).catch(() => setWorkouts([])),
+      getActiveWorkout().then((w) => setActiveNow(!!w)).catch(() => setActiveNow(false)),
+    ]).then(() => setWorkoutsLoaded(true));
   }, []);
 
   async function removeMeal(date: string, id: string) {
@@ -219,9 +224,9 @@ export default function DietPage() {
   const delta = suggestAdjustment(slope, phase, rate);
   const activityBonus = computeActivityBonus(activity, today);
   const nowD = new Date();
-  const dayType = dayTypeFor({ active: false, doneToday: workouts.some((w) => localDateKey(new Date(w.started_at)) === today),
+  const dayType = dayTypeFor({ active: activeNow, doneToday: workouts.some((w) => localDateKey(new Date(w.started_at)) === today),
     usualTraining: usualTrainingStart(workouts, nowD), now: nowD });
-  const targets = profile
+  const targets = profile && workoutsLoaded
     ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, nowD, activityBonus, dayType)
     : null;
   const baseTargets = profile

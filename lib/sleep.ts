@@ -2,9 +2,8 @@ import { supabase } from "@/lib/supabase";
 
 /** Morning sleep rating, 1 (awful) … 5 (great), keyed to the date you woke up. */
 export type SleepRow = { id: string; date: string; quality: number };
-export const SLEEP_LABELS = ["Awful", "Poor", "OK", "Good", "Great"] as const;
-
-export const isQuality = (n: unknown): n is number => Number.isInteger(n) && (n as number) >= 1 && (n as number) <= 5;
+import { isQuality } from "@/lib/sleep-quality";
+export { SLEEP_LABELS, isQuality } from "@/lib/sleep-quality";
 
 export async function listSleep(sinceDate?: string): Promise<SleepRow[]> {
   let q = supabase.from("sleep_logs").select("id,date,quality").order("date", { ascending: true });

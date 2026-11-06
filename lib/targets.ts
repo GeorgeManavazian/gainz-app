@@ -81,9 +81,11 @@ export function computeTargets(p: Profile, today: Date = new Date(), activityBon
   const rawKcal = (p.phase === "cut" ? tdee - delta : p.phase === "bulk" ? tdee + delta : tdee) + activityBonusKcal;
 
   const kcal = Math.round(rawKcal);
-  const fat_g = Math.round((dayType ? FAT_G_PER_LB_BY_DAY[dayType] : FAT_G_PER_LB) * p.weight_lb);
   const protein_g = Math.round((p.protein_g_per_lb ?? defaultProteinPerLb(p.phase)) * p.weight_lb);
-  const remaining = kcal - 9 * fat_g - 4 * protein_g;
+  let fat_g = Math.round((dayType ? FAT_G_PER_LB_BY_DAY[dayType] : FAT_G_PER_LB) * p.weight_lb);
+  let remaining = kcal - 9 * fat_g - 4 * protein_g;
+  // The day-type fat is a preference, not a floor: if it doesn't fit, fall back to the default split.
+  if (remaining < 0 && dayType) { fat_g = Math.round(FAT_G_PER_LB * p.weight_lb); remaining = kcal - 9 * fat_g - 4 * protein_g; }
   const carbs_g = Math.max(0, Math.round(remaining / 4));
 
   const t: Targets = { kcal, protein_g, carbs_g, fat_g, tdee, tdee_est, dayType };

@@ -1,7 +1,7 @@
 // components/SleepTap.tsx
 "use client";
 import { useState } from "react";
-import { SLEEP_LABELS } from "@/lib/sleep";
+import { SLEEP_LABELS } from "@/lib/sleep-quality";
 
 /** "How did you sleep?" — five taps, saved immediately; shows the pick, tap again to change. */
 export default function SleepTap({ value, onSave }: { value: number | null; onSave: (q: number) => Promise<void> }) {

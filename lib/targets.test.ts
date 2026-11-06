@@ -67,6 +67,13 @@ describe("computeTargets", () => {
     for (const t of [train, rest]) expect(Math.abs(4 * t.protein_g + 4 * t.carbs_g + 9 * t.fat_g - t.kcal)).toBeLessThanOrEqual(2);
   });
 
+  it("null day type is the old split; a rest-day fat that doesn't fit falls back instead of warning", () => {
+    expect(computeTargets(athlete, today, 0, null)).toMatchObject({ protein_g: 173, carbs_g: 351, fat_g: 56 });
+    // 170 lb, 1250 kcal: rest fat 68 g (612) + protein 173 g (692) = 1304 > 1250; default 56 g (504) still fits.
+    const lean = computeTargets({ ...athlete, tdee_override: 1250, rate_lb_per_wk: 0, phase: "maintain" }, today, 0, "rest");
+    expect(lean.warning).toBeUndefined(); expect(lean.fat_g).toBe(56);
+  });
+
   it("uses the estimate when override is null", () => {
     const t = computeTargets({ ...athlete, tdee_override: null }, today);
     expect(t.tdee).toBe(t.tdee_est);

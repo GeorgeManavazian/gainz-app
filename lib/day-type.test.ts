@@ -11,5 +11,7 @@ describe("dayTypeFor", () => {
     expect(dayTypeFor({ active: false, doneToday: false, usualTraining: at(17), now: at(9) })).toBe("training");
     expect(dayTypeFor({ active: false, doneToday: false, usualTraining: at(17), now: at(21) })).toBe("rest");
     expect(dayTypeFor({ active: false, doneToday: false, usualTraining: null, now: at(9) })).toBe("rest");
+    expect(dayTypeFor({ active: false, doneToday: false, usualTraining: at(17), now: at(20) })).toBe("rest"); // exactly +3 h
+    expect(dayTypeFor({ active: false, doneToday: true, usualTraining: at(17), now: at(9) })).toBe("training");
   });
 });
