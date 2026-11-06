@@ -18,6 +18,7 @@ import type { WorkoutRow } from "@/lib/workouts";
 import { dailyChecks, type Check, type CheckMeal } from "@/lib/meal-checks";
 import { usualMealSlots, WEEKDAY_WINDOW_DAYS } from "@/lib/meal-slots";
 import { bedtimeFor, usualTrainingStart } from "@/lib/meal-timing";
+import { dayTypeFor } from "@/lib/day-type";
 
 type Range = 30 | 90 | "all";
 type MealRow = { id: string; food_name: string; grams: number; calories: number; protein_g: number;
@@ -217,8 +218,11 @@ export default function DietPage() {
   const assessment: Assessment = profile ? assessProgress(slope, phase, rate) : "insufficient_data";
   const delta = suggestAdjustment(slope, phase, rate);
   const activityBonus = computeActivityBonus(activity, today);
+  const nowD = new Date();
+  const dayType = dayTypeFor({ active: false, doneToday: workouts.some((w) => localDateKey(new Date(w.started_at)) === today),
+    usualTraining: usualTrainingStart(workouts, nowD), now: nowD });
   const targets = profile
-    ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, new Date(), activityBonus)
+    ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, nowD, activityBonus, dayType)
     : null;
   const baseTargets = profile
     ? computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, new Date())

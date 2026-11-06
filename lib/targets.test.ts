@@ -56,6 +56,17 @@ describe("computeTargets", () => {
     expect(t.warning).toBeUndefined();
   });
 
+  it("day type keeps kcal and protein, moves fat ↔ carbs", () => {
+    const base = computeTargets(athlete, today);
+    const train = computeTargets(athlete, today, 0, "training");
+    const rest = computeTargets(athlete, today, 0, "rest");
+    for (const t of [train, rest]) { expect(t.kcal).toBe(base.kcal); expect(t.protein_g).toBe(base.protein_g); }
+    expect(train.fat_g).toBe(46); expect(rest.fat_g).toBe(68);
+    expect(train.carbs_g).toBeGreaterThan(base.carbs_g); expect(rest.carbs_g).toBeLessThan(base.carbs_g);
+    expect(train.dayType).toBe("training");
+    for (const t of [train, rest]) expect(Math.abs(4 * t.protein_g + 4 * t.carbs_g + 9 * t.fat_g - t.kcal)).toBeLessThanOrEqual(2);
+  });
+
   it("uses the estimate when override is null", () => {
     const t = computeTargets({ ...athlete, tdee_override: null }, today);
     expect(t.tdee).toBe(t.tdee_est);

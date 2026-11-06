@@ -160,3 +160,16 @@ create policy "own custom_foods" on custom_foods for all
 -- Sub-project 10: meal timing (2026-11-02). Paste this block once.
 alter table profiles add column if not exists wake_time time not null default '07:00';
 alter table profiles add column if not exists bed_time time not null default '23:00';
+
+-- Sub-project 11: morning sleep rating (2026-11-05). Paste this block once.
+create table if not exists sleep_logs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) default auth.uid(),
+  date date not null,
+  quality smallint not null check (quality between 1 and 5),
+  created_at timestamptz not null default now(),
+  unique (user_id, date)
+);
+alter table sleep_logs enable row level security;
+create policy "own sleep_logs" on sleep_logs for all
+  using (user_id = auth.uid()) with check (user_id = auth.uid());

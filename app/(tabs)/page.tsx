@@ -20,6 +20,9 @@ import MealTimeline from "@/components/MealTimeline";
 import { usualMealSlots, WEEKDAY_WINDOW_DAYS } from "@/lib/meal-slots";
 import { dailyChecks } from "@/lib/meal-checks";
 import ChecksRow from "@/components/ChecksRow";
+import SleepTap from "@/components/SleepTap";
+import { listSleep, upsertSleep } from "@/lib/sleep";
+import { dayTypeFor } from "@/lib/day-type";
 import SavePatternSheet from "@/components/SavePatternSheet";
 import ConfirmDelete from "@/components/ConfirmDelete";
 import { deleteMeal } from "@/lib/meals-db";
@@ -36,6 +39,10 @@ function HubInner() {
   const [active, setActive] = useState<WorkoutRow | null>(null);
   const [done, setDone] = useState<{ w: WorkoutRow; sets: number } | null>(null);
   const [recentWorkouts, setRecentWorkouts] = useState<WorkoutRow[]>([]);
+  const [sleepToday, setSleepToday] = useState<number | null>(null);
+  useEffect(() => {
+    listSleep(localDateKey()).then((rows) => setSleepToday(rows.find((r) => r.date === localDateKey())?.quality ?? null)).catch(() => {});
+  }, []);
   const [recentMeals, setRecentMeals] = useState<Meal[] | null>(null); // last six weeks, for the usual-slot learner; null until loaded
   const params = useSearchParams();
   const router = useRouter();
@@ -121,11 +128,12 @@ function HubInner() {
   const today = localDateKey();
   const trend = trendWeight(weighIns);
   const activityBonus = computeActivityBonus(activity, today);
+  const dayType = dayTypeFor({ active: !!active, doneToday: !!done, usualTraining: usualTrainingStart(recentWorkouts, now), now });
   const targets =
     profile === undefined ? undefined
     : profile === null ? null
     : profile === "error" ? "error"
-    : computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, new Date(), activityBonus);
+    : computeTargets({ ...profile, weight_lb: trend ?? profile.weight_lb }, new Date(), activityBonus, dayType);
 
   const todayRow = weighIns.find((r) => r.date === today) ?? null;
   const last = weighIns.length ? weighIns[weighIns.length - 1] : null;
@@ -154,6 +162,7 @@ function HubInner() {
   const late = lateHeavyMeal(meals, now, clock);
 
   async function saveWeight(weight_lb: number) { await upsertWeighIn(today, weight_lb); await loadTargets(true); }
+  async function saveSleep(q: number) { await upsertSleep(today, q); setSleepToday(q); }
 
   const kcalLeft = t ? remaining(totals.calories, t.kcal) : 0;
 
@@ -207,6 +216,7 @@ function HubInner() {
               <p className="text-sm text-muted">
                 <span className="font-semibold text-accent tabular-nums">{totals.calories.toLocaleString()}</span>
                 {" "}/ {targets.kcal.toLocaleString()} eaten
+                {targets.dayType && <span className="block text-[11px] font-semibold uppercase tracking-wider text-accent">{targets.dayType === "training" ? "Training day · carbs up" : "Rest day · fat up"}</span>}
               </p>
             </div>
 
@@ -317,6 +327,7 @@ function HubInner() {
 
         <WeighInCard compact todayWeight={todayRow?.weight_lb ?? null} lastWeight={last?.weight_lb ?? null}
           trend={trend} slope={slope} onSave={saveWeight} />
+        <SleepTap value={sleepToday} onSave={saveSleep} />
 
         {saveOpen && (
           <SavePatternSheet meals={meals} onClose={() => setSaveOpen(false)}

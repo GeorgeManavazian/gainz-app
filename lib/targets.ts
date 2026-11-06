@@ -64,24 +64,29 @@ export type Targets = {
   tdee: number;
   tdee_est: number;
   warning?: string;
+  /** null = no day-type split (e.g. the profile page's generic preview). */
+  dayType?: DayType | null;
 };
 
 export const FAT_G_PER_LB = 0.33;
+/** Same kcal on every day; on training days carbs move up and fat down, on rest days the reverse. */
+export type DayType = "training" | "rest";
+export const FAT_G_PER_LB_BY_DAY: Record<DayType, number> = { training: 0.27, rest: 0.4 };
 const KCAL_PER_LB_FAT = 3500;
 
-export function computeTargets(p: Profile, today: Date = new Date(), activityBonusKcal: number = 0): Targets {
+export function computeTargets(p: Profile, today: Date = new Date(), activityBonusKcal: number = 0, dayType: DayType | null = null): Targets {
   const tdee_est = estimateTdee(p, today);
   const tdee = p.tdee_override ?? tdee_est;
   const delta = (p.rate_lb_per_wk * KCAL_PER_LB_FAT) / 7;
   const rawKcal = (p.phase === "cut" ? tdee - delta : p.phase === "bulk" ? tdee + delta : tdee) + activityBonusKcal;
 
   const kcal = Math.round(rawKcal);
-  const fat_g = Math.round(FAT_G_PER_LB * p.weight_lb);
+  const fat_g = Math.round((dayType ? FAT_G_PER_LB_BY_DAY[dayType] : FAT_G_PER_LB) * p.weight_lb);
   const protein_g = Math.round((p.protein_g_per_lb ?? defaultProteinPerLb(p.phase)) * p.weight_lb);
   const remaining = kcal - 9 * fat_g - 4 * protein_g;
   const carbs_g = Math.max(0, Math.round(remaining / 4));
 
-  const t: Targets = { kcal, protein_g, carbs_g, fat_g, tdee, tdee_est };
+  const t: Targets = { kcal, protein_g, carbs_g, fat_g, tdee, tdee_est, dayType };
   if (remaining < 0) t.warning = "kcal too low for fat + protein floors";
   return t;
 }
